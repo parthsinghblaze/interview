@@ -206,8 +206,8 @@ parent.addEventListener('click', () => {}, true);`,
                                     key={idx}
                                     onClick={() => changeExample(idx)}
                                     className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${currentExample === idx
-                                            ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
-                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                        ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
+                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                         }`}
                                 >
                                     {ex.title}
@@ -277,7 +277,7 @@ parent.addEventListener('click', () => {}, true);`,
                             {/* Current Step Display */}
                             <AnimatePresence mode="wait">
                                 <motion.div
-                                    key={activeExample + currentStep}
+                                    key={currentExample + currentStep}
                                     initial={{ opacity: 0, scale: 0.98 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 1.02 }}
@@ -358,11 +358,11 @@ parent.addEventListener('click', () => {}, true);`,
                                                 ))}
                                             </div>
                                         </div>
-                                        {currentStepData.output && (
+                                        {(currentStepData as any).output && (
                                             <div className="bg-green-500/10 p-4 rounded-xl border border-green-500/50 flex flex-col justify-center items-center text-center">
                                                 <div className="text-[10px] uppercase font-bold text-green-500 mb-1">Execution Log</div>
                                                 <div className="text-green-400 font-bold font-mono underline decoration-wavy">
-                                                    {currentStepData.output}
+                                                    {(currentStepData as any).output}
                                                 </div>
                                             </div>
                                         )}

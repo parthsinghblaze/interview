@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import Search from './components/Search';
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = React.useState('');
   const features = [
     {
       icon: Play,
@@ -43,7 +44,7 @@ export default function Home() {
       description: 'Master the core of technical interviews with visual guides.',
       icon: Code,
       status: 'active',
-      count: '3 Visualizers',
+      count: '7 Visualizers',
       href: '/dsa',
       gradient: 'from-blue-500 to-cyan-500'
     },
@@ -69,20 +70,22 @@ export default function Home() {
     },
     {
       id: 'react',
-      title: 'React',
+      title: 'React Engineering',
       description: 'Deep dive into hooks, rendering cycles, and state management.',
       icon: Box,
-      status: 'coming-soon',
-      href: '#',
+      status: 'active',
+      count: '12 Masterclasses',
+      href: '/react',
       gradient: 'from-blue-400 to-indigo-500'
     },
     {
       id: 'nextjs',
-      title: 'Next.js',
+      title: 'Next.js 15+',
       description: 'Server components, routing, and modern full-stack patterns.',
       icon: Layers,
-      status: 'coming-soon',
-      href: '#',
+      status: 'active',
+      count: '8 Architectures',
+      href: '/nextjs',
       gradient: 'from-slate-800 to-black'
     },
     {
@@ -272,9 +275,24 @@ export default function Home() {
       {/* Topics Section */}
       <section id="topics" className="py-20 bg-gray-50 dark:bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Explore Topics</h2>
             <p className="mt-4 text-gray-600 dark:text-slate-400">Choose a path to master your technical skills.</p>
+          </div>
+
+          <div className="max-w-xl mx-auto mb-12">
+            <div className="relative group">
+              <input
+                type="text"
+                placeholder="Search categories (e.g. DSA, JavaScript)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-5 pr-12 py-4 bg-white dark:bg-slate-900 border-2 border-gray-200 dark:border-slate-800 rounded-2xl focus:border-blue-500 dark:focus:border-blue-500 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 dark:text-white"
+              />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-blue-600 rounded-xl text-white">
+                <Terminal size={20} />
+              </div>
+            </div>
           </div>
 
           <motion.div
@@ -284,50 +302,55 @@ export default function Home() {
             viewport={{ once: true }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {topics.map((topic) => (
-              <motion.div variants={item} key={topic.id}>
-                <div className={`relative group h-full bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-800 shadow-md hover:shadow-xl transition-all duration-300 ${topic.status === 'locked' ? 'opacity-75' : ''}`}>
-                  {/* Card Header Gradient */}
-                  <div className={`h-2 w-full bg-gradient-to-r ${topic.gradient}`}></div>
+            {topics
+              .filter(topic =>
+                topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                topic.description.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((topic) => (
+                <motion.div variants={item} key={topic.id}>
+                  <div className={`relative group h-full bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-800 shadow-md hover:shadow-xl transition-all duration-300 ${topic.status === 'locked' ? 'opacity-75' : ''}`}>
+                    {/* Card Header Gradient */}
+                    <div className={`h-2 w-full bg-gradient-to-r ${topic.gradient}`}></div>
 
-                  <div className="p-6 flex flex-col h-full">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className={`p-3 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors`}>
-                        <topic.icon size={28} />
+                    <div className="p-6 flex flex-col h-full">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className={`p-3 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors`}>
+                          <topic.icon size={28} />
+                        </div>
+                        {topic.status === 'coming-soon' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400">
+                            <Lock size={12} /> Coming Soon
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 shadow-sm border border-green-200 dark:border-transparent">
+                            {topic.count}
+                          </span>
+                        )}
                       </div>
-                      {topic.status === 'coming-soon' ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-400">
-                          <Lock size={12} /> Coming Soon
-                        </span>
+
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{topic.title}</h3>
+                      <p className="text-gray-600 dark:text-slate-400 text-sm mb-6 flex-grow">{topic.description}</p>
+
+                      {topic.status === 'active' ? (
+                        <Link
+                          href={topic.href}
+                          className="inline-flex items-center justify-center w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-500 font-semibold rounded-lg hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500 dark:hover:text-white transition-all group-hover:scale-[1.02]"
+                        >
+                          Start Learning <ArrowRight size={16} className="ml-2" />
+                        </Link>
                       ) : (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 shadow-sm border border-green-200 dark:border-transparent">
-                          {topic.count}
-                        </span>
+                        <button
+                          disabled
+                          className="inline-flex items-center justify-center w-full px-4 py-3 bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 font-medium rounded-lg cursor-not-allowed border border-transparent"
+                        >
+                          Notify Me
+                        </button>
                       )}
                     </div>
-
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{topic.title}</h3>
-                    <p className="text-gray-600 dark:text-slate-400 text-sm mb-6 flex-grow">{topic.description}</p>
-
-                    {topic.status === 'active' ? (
-                      <Link
-                        href={topic.href}
-                        className="inline-flex items-center justify-center w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-500 font-semibold rounded-lg hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500 dark:hover:text-white transition-all group-hover:scale-[1.02]"
-                      >
-                        Start Learning <ArrowRight size={16} className="ml-2" />
-                      </Link>
-                    ) : (
-                      <button
-                        disabled
-                        className="inline-flex items-center justify-center w-full px-4 py-3 bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 font-medium rounded-lg cursor-not-allowed border border-transparent"
-                      >
-                        Notify Me
-                      </button>
-                    )}
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
           </motion.div>
         </div>
       </section>

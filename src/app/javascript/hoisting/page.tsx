@@ -208,14 +208,14 @@ greet = function() {
                     </div>
 
                     {/* Code Comparison */}
-                    <div className="grid grid-cols-2 gap-0 border-b border-slate-700" style={{ height: '40vh' }}>
+                    <div className="grid grid-cols-2 gap-0 border-b border-slate-700" style={{ height: '45vh' }}>
                         {/* Original Code */}
-                        <div className="border-r border-slate-700 bg-slate-900/50 flex flex-col">
+                        <div className="border-r border-slate-700 bg-slate-900/50">
                             <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-700 bg-slate-900">
                                 <Code className="text-red-400" size={20} />
                                 <h3 className="text-lg font-bold">Original Code</h3>
                             </div>
-                            <div className="flex-1 overflow-auto">
+                            <div className="h-full overflow-auto">
                                 <SyntaxHighlighter
                                     language="javascript"
                                     style={atomDark}
@@ -224,7 +224,8 @@ greet = function() {
                                         padding: '2rem',
                                         fontSize: '1.1rem',
                                         lineHeight: '1.8',
-                                        backgroundColor: 'transparent'
+                                        backgroundColor: 'transparent',
+                                        height: '100%'
                                     }}
                                 >
                                     {currentEx.code}
@@ -233,12 +234,12 @@ greet = function() {
                         </div>
 
                         {/* After Hoisting */}
-                        <div className="bg-slate-900/30 flex flex-col">
+                        <div className="bg-slate-900/30">
                             <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-700 bg-slate-900">
                                 <ArrowUp className="text-green-400" size={20} />
                                 <h3 className="text-lg font-bold">After Hoisting</h3>
                             </div>
-                            <div className="flex-1 overflow-auto">
+                            <div className="h-full overflow-auto">
                                 <SyntaxHighlighter
                                     language="javascript"
                                     style={atomDark}
@@ -247,7 +248,8 @@ greet = function() {
                                         padding: '2rem',
                                         fontSize: '1.1rem',
                                         lineHeight: '1.8',
-                                        backgroundColor: 'transparent'
+                                        backgroundColor: 'transparent',
+                                        height: '100%'
                                     }}
                                 >
                                     {currentEx.hoistedCode}

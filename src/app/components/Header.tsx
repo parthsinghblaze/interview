@@ -22,8 +22,8 @@ const Header = () => {
     ];
 
     const moreTopics = [
-        { name: 'React', icon: Box, href: '#', active: false },
-        { name: 'Next.js', icon: Layers, href: '#', active: false },
+        { name: 'React', icon: Box, href: '/react', active: true },
+        { name: 'Next.js', icon: Layers, href: '/nextjs', active: true },
         { name: 'Node.js', icon: Server, href: '#', active: false },
         { name: 'Database', icon: Database, href: '#', active: false },
     ];
@@ -68,7 +68,7 @@ const Header = () => {
                             <button className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all">
                                 More <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform" />
                             </button>
-                            <div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50">
+                            <div className="absolute top-full right-0 mt-0 w-48 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50">
                                 <div className="p-2 space-y-1">
                                     {moreTopics.map((item) => (
                                         <div key={item.name}>

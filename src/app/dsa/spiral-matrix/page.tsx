@@ -315,6 +315,8 @@ const SpiralMatrixVisualizer = () => {
                                 <SyntaxHighlighter
                                     language={language}
                                     style={atomDark}
+                                    showLineNumbers={true}
+                                    wrapLines={true}
                                     lineProps={(lineNumber: number) => ({
                                         style: {
                                             display: 'block',

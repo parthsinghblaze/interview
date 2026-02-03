@@ -324,12 +324,12 @@ console.log(account.balance); // undefined`,
                     </div>
 
                     {/* Code Display */}
-                    <div className="bg-slate-900/50 flex flex-col" style={{ height: '40vh' }}>
+                    <div className="bg-slate-900/50" style={{ height: '45vh' }}>
                         <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-700 bg-slate-900">
                             <Code className="text-purple-400" size={20} />
                             <h3 className="text-lg font-bold">Code Example</h3>
                         </div>
-                        <div className="flex-1 overflow-auto">
+                        <div className="h-full overflow-auto">
                             <SyntaxHighlighter
                                 language="javascript"
                                 style={atomDark}
@@ -338,7 +338,8 @@ console.log(account.balance); // undefined`,
                                     padding: '2rem',
                                     fontSize: '1.1rem',
                                     lineHeight: '1.8',
-                                    backgroundColor: 'transparent'
+                                    backgroundColor: 'transparent',
+                                    height: '100%'
                                 }}
                             >
                                 {currentEx.code}

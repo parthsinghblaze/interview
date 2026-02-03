@@ -16,6 +16,8 @@ This document serves as the primary technical specification and implementation g
 ### Core Directories
 - `/src/app/javascript/`: JS concept pages (Closures, Promises, etc.)
 - `/src/app/dsa/`: Data structures and algorithms (Array Rotation, Max Number, etc.)
+- `/src/app/react/`: React-specific interview topics and hook deep-dives.
+- `/src/app/nextjs/`: Next.js architectural patterns (SSR, SSG, App Router).
 - `/src/app/components/`: Shared components (`Header`, `Footer`, `ThemeToggle`)
 - `/public/`: Static assets (grids, SVG decorations)
 

@@ -9,15 +9,19 @@ const searchData = [
     // Categories
     { title: 'Data Structures & Algorithms', category: 'Category', href: '/dsa', id: 'dsa' },
     { title: 'JavaScript', category: 'Category', href: '/javascript', id: 'javascript' },
-    { title: 'React', category: 'Category', href: '#', id: 'react', status: 'coming-soon' },
-    { title: 'Next.js', category: 'Category', href: '#', id: 'nextjs', status: 'coming-soon' },
+    { title: 'React Engineering', category: 'Category', href: '/react', id: 'react' },
+    { title: 'Next.js 15+', category: 'Category', href: '/nextjs', id: 'nextjs' },
     { title: 'Node.js', category: 'Category', href: '#', id: 'nodejs', status: 'coming-soon' },
     { title: 'Database', category: 'Category', href: '#', id: 'database', status: 'coming-soon' },
 
     // DSA Topics
     { title: 'Find Maximum Number', category: 'DSA', href: '/dsa/find-max', id: 'find-max' },
+    { title: 'Array Rotation', category: 'DSA', href: '/dsa/array-rotation', id: 'array-rotation' },
+    { title: 'Spiral Matrix', category: 'DSA', href: '/dsa/spiral-matrix', id: 'spiral-matrix' },
+    { title: 'Duplicate Frequency', category: 'DSA', href: '/dsa/frequency-counter', id: 'frequency-counter' },
     { title: 'Armstrong Number Checker', category: 'DSA', href: '/dsa/armstrong', id: 'armstrong' },
     { title: 'Factors Finder', category: 'DSA', href: '/dsa/factors', id: 'factors' },
+    { title: 'Valid Parentheses (Sequence Check)', category: 'DSA', href: '/dsa/valid-parentheses', id: 'valid-parentheses' },
     { title: 'Time & Space Complexity', category: 'DSA', href: '/dsa/complexity', id: 'complexity' },
 
     // JavaScript Topics
@@ -26,6 +30,31 @@ const searchData = [
     { title: 'Event Loop', category: 'JavaScript', href: '/javascript/event-loop', id: 'event-loop' },
     { title: 'Promises', category: 'JavaScript', href: '/javascript/promises', id: 'promises' },
     { title: 'Async/Await', category: 'JavaScript', href: '/javascript/async-await', id: 'async-await' },
+    { title: 'The "this" Keyword', category: 'JavaScript', href: '/javascript/this-keyword', id: 'this-keyword' },
+    { title: 'Prototypes & Inheritance', category: 'JavaScript', href: '/javascript/prototypes', id: 'prototypes' },
+    { title: 'Debounce & Throttle', category: 'JavaScript', href: '/javascript/debounce-throttle', id: 'debounce-throttle' },
+    { title: 'Higher-Order Functions', category: 'JavaScript', href: '/javascript/higher-order-functions', id: 'higher-order-functions' },
+    { title: 'Function Currying', category: 'JavaScript', href: '/javascript/currying', id: 'currying' },
+    { title: 'Event Delegation', category: 'JavaScript', href: '/javascript/event-delegation', id: 'event-delegation' },
+    { title: 'Spread & Rest Operators', category: 'JavaScript', href: '/javascript/spread-rest', id: 'spread-rest' },
+    { title: 'Generators & Iterators', category: 'JavaScript', href: '/javascript/generators', id: 'generators' },
+    { title: 'Strict Mode', category: 'JavaScript', href: '/javascript/strict-mode', id: 'strict-mode' },
+    { title: 'ES Modules vs CJS', category: 'JavaScript', href: '/javascript/modules', id: 'modules' },
+    { title: 'Garbage Collection', category: 'JavaScript', href: '/javascript/garbage-collection', id: 'garbage-collection' },
+    { title: 'Map, Set & WeakMap', category: 'JavaScript', href: '/javascript/map-set', id: 'map-set' },
+
+    // React Topics
+    { title: 'Lifecycle Methods', category: 'React', href: '/react/lifecycle', id: 'react-lifecycle' },
+    { title: 'Hooks API (useMemo, useCallback)', category: 'React', href: '/react/hooks', id: 'react-hooks' },
+    { title: 'Redux & Context API', category: 'React', href: '/react/state-management', id: 'react-state' },
+    { title: 'Performance Optimization', category: 'React', href: '/react/optimization', id: 'react-optimization' },
+    { title: 'HOCs & Patterns', category: 'React', href: '/react/patterns', id: 'react-patterns' },
+
+    // Next.js Topics
+    { title: 'Server-Side Rendering (SSR)', category: 'Next.js', href: '/nextjs/ssr', id: 'nextjs-ssr' },
+    { title: 'Static Site Generation (SSG)', category: 'Next.js', href: '/nextjs/ssr', id: 'nextjs-ssg' },
+    { title: 'App Router Architecture', category: 'Next.js', href: '/nextjs/routing', id: 'nextjs-routing' },
+    { title: 'React Server Components (RSC)', category: 'Next.js', href: '/nextjs/routing', id: 'nextjs-rsc' },
 ];
 
 export default function Search() {

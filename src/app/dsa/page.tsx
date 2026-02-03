@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash, LayoutGrid } from 'lucide-react';
+import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash, LayoutGrid, Braces } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -81,6 +81,18 @@ export default function DSAPage() {
             learning: 'Matrix manipulation, boundary condition handling, and complex loops.',
             href: '/dsa/spiral-matrix',
             color: 'rose'
+        },
+        {
+            id: 'valid-parentheses',
+            title: 'Valid Parentheses',
+            description: 'Check if a sequence of parentheses, brackets, and braces is logically balanced using a stack.',
+            icon: Braces,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(n)',
+            techniques: ['Stacks', 'LIFO', 'Pattern Matching'],
+            learning: 'Linear data structures, balanced sequence logic, and last-in-first-out processing.',
+            href: '/dsa/valid-parentheses',
+            color: 'blue'
         }
     ];
 
