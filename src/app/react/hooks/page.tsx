@@ -19,6 +19,7 @@ import {
     Layout,
     Layers,
     AlertTriangle,
+    AlertCircle,
     Info,
     Smartphone,
     ChevronLeft,
@@ -45,180 +46,224 @@ const ReactHooksPage = () => {
         useMemo: {
             title: 'useMemo',
             subtitle: 'Memoize Expensive Calculations',
-            code: `const memoizedValue = useMemo(() => {
-  return heavyWeightProcess(a, b);
-}, [a, b]);`,
-            interviewAnswer: "useMemo is a React Hook that lets you cache the result of a calculation between re-renders. It only recomputes the memoized value when one of the dependencies has changed.",
-            simpleExplanation: "Think of it like a calculator with a 'memory' button. If you've already done 5 + 5 once, it gives you 10 from memory instead of doing the math again, until you change the numbers.",
+            code: `// Prevents re-filtering 10,000 items on every small UI tweak
+const filteredData = useMemo(() => {
+  console.log("🔥 Filtering Heavy Dataset...");
+  return largeDataset.filter(item => 
+    item.tags.includes(activeFilter)
+  );
+}, [largeDataset, activeFilter]);`,
+            interviewAnswer: "useMemo is a performance optimization hook that returns a memoized value. It only recalculates the value when one of its dependencies changes, preventing expensive computations (like heavy filtering or data transformation) from running on every render.",
+            simpleExplanation: "Think of it like a smart 'Cache'. If you've already calculated the results for 'Filter: Electronics', it will just grab the old result from the shelf until you change the filter to 'Fashion'.",
             rememberPoints: [
                 "Only for performance optimization",
-                "Referential equality for objects/arrays",
-                "Doesn't run on every render"
+                "Referential equality for objects/arrays to prevent child re-renders",
+                "Don't wrap everything in useMemo; only use for heavy logic"
             ],
             steps: [
                 {
-                    line: 1,
-                    description: 'React detects useMemo and checks its internal Hook store.',
-                    badge: '🔍 Scanning Cache',
-                    visual: 'memory_check',
-                    data: { cache: 'Empty', dependencies: { a: 10, b: 20 } }
-                },
-                {
                     line: 2,
-                    description: 'Function executes because cache is empty or dependencies changed.',
-                    badge: '⚙️ Processing',
-                    visual: 'calculating',
-                    data: { result: '300', status: 'Caching...' }
+                    description: 'React detects the useMemo slot for this component.',
+                    badge: '🔍 Checking Memory',
+                    visual: 'memory_check',
+                    data: { slot: 'Hook_Slot_0', deps_snapshot: '[data, "elec"]' }
                 },
                 {
                     line: 3,
-                    description: 'Result is saved in React\'s internal memory linked to this component.',
-                    badge: '💾 Saved',
+                    description: 'Dependencies compared. Snapshot changed? Triggering calculation.',
+                    badge: '⚙️ Processing',
+                    visual: 'calculating',
+                    data: { computeTime: '45ms', itemsCount: '10,000' }
+                },
+                {
+                    line: 6,
+                    description: 'Result is cached. On next render, if [data, filter] match, this block is skipped.',
+                    badge: '💾 Cached',
                     visual: 'stored',
-                    data: { memorySlot: 'Slot_A1', value: '300' }
+                    data: { value: 'Array(84)', status: 'Saved' }
                 }
             ],
-            takeaway: "Use useMemo when computing values is expensive or when passing objects/arrays to memoized children."
+            takeaway: "Use useMemo when a calculation is noticeably slow or when passing new object/array instances to memoized children."
         },
         useCallback: {
             title: 'useCallback',
             subtitle: 'Stable Function References',
-            code: `const handleAction = useCallback(() => {
-  doSomething(data);
-}, [data]);`,
-            interviewAnswer: "useCallback is a hook that returns a memoized version of the callback that only changes if one of the dependencies has changed. It is useful for passing stable functions to optimized child components.",
-            simpleExplanation: "Like giving someone a specific instruction sheet. You only write a 'new' sheet if the instructions actually change. Otherwise, they keep the exact same sheet, saving them from getting confused by new copies.",
+            code: `// Keeps the function identity stable across renders
+const handleToggle = useCallback((id) => {
+  setItems(prev => prev.map(item => 
+    item.id === id ? { ...item, done: !item.done } : item
+  ));
+}, [setItems]); // stable dependency
+
+// Child only re-renders if handleToggle identity changes
+<OptimizedListItem onToggle={handleToggle} />`,
+            interviewAnswer: "useCallback returns a memoized version of the callback function that only changes if one of the dependencies has changed. It's essentially useMemo for function instances. Its primary purpose is to maintain referential identity to prevent unnecessary re-renders of child components wrapped in React.memo.",
+            simpleExplanation: "Like giving your child an ID card. Even if you change your clothes (parent re-renders), the child recognizes the ID card is the same and doesn't get confused (re-render).",
             rememberPoints: [
-                "Memoizes the function instance, not the result",
-                "Prevents unnecessary re-renders of React.memo children",
-                "Essential for stability in dependency arrays"
+                "Memoizes the function instance, not the logic result",
+                "Useless unless the child component uses React.memo",
+                "Prevents 'Effect infinite loops' when functions are in dependency arrays"
             ],
             steps: [
                 {
-                    line: 1,
-                    description: 'useCallback creates a function and stores its reference.',
-                    badge: '⚓ Creating Ref',
+                    line: 2,
+                    description: 'React stores the function reference (memory address) in its hook store.',
+                    badge: '⚓ Pinning Ref',
                     visual: 'ref_create',
-                    data: { handleAction: 'Function_Ref_001', dependencies: 'v1' }
+                    data: { fn_addr: '0x12a4f', deps: 'none' }
                 },
                 {
-                    line: 3,
-                    description: 'On re-render, dependencies are compared. If unchanged, the SAME reference is returned.',
-                    badge: '🎯 Cache Hit',
+                    line: 9,
+                    description: 'Parent re-renders. React compares dependencies; finds them identical.',
+                    badge: '🎯 Identity Match',
                     visual: 'ref_stable',
-                    data: { returned: 'Function_Ref_001 (Same)', status: 'Stable' }
+                    data: { returned_ref: '0x12a4f (Original)', status: 'Stable' }
+                },
+                {
+                    line: 9,
+                    description: 'Child sees identical reference. Skips its own re-rendering process.',
+                    badge: '🚀 Performance Gain',
+                    visual: 'skipping',
+                    data: { component: 'OptimizedListItem', action: 'Memo_Skip' }
                 }
             ],
-            takeaway: "useCallback is nearly always used in pair with React.memo on child components."
+            takeaway: "useCallback is almost always paired with React.memo on the child being passed the function."
         },
         useReducer: {
             title: 'useReducer',
-            subtitle: 'State Logic Decoupling',
-            code: `const [state, dispatch] = useReducer(reducer, { count: 0 });
+            subtitle: 'Complex State Management',
+            code: `// Consolidates logic into a central reducer function
+const [state, dispatch] = useReducer((state, action) => {
+  switch (action.type) {
+    case 'add': return { ...state, cart: [...state.cart, action.item] };
+    case 'clear': return { ...state, cart: [] };
+    default: return state;
+  }
+}, { cart: [], total: 0 });
 
-dispatch({ type: 'increment' });`,
-            interviewAnswer: "useReducer is an alternative to useState that is preferable when you have complex state logic that involves multiple sub-values or when the next state depends on the previous one.",
-            simpleExplanation: "Like a bank teller. You don't walk in and change the computer yourself. You hand a 'slip' (action) to the teller (reducer), who then updates the bank's vault (state).",
+dispatch({ type: 'add', item: { name: 'React Book' } });`,
+            interviewAnswer: "useReducer is a hook for managing complex state logic. It follows the Redux pattern: you dispatch an 'action' to a 'reducer' function which calculates the new state. This decouples the 'how' state changes from the component's event handlers.",
+            simpleExplanation: "Like a restaurant ordering system. You (the user) give a ticket (action) to the counter. The kitchen (reducer) decides how to update the inventory (state) based on that ticket.",
             rememberPoints: [
-                "Better for complex state",
-                "Decouples 'how' to update from 'what' triggered it",
-                "Easy to test in isolation"
+                "Perfect for state objects with multiple related sub-values",
+                "Keeps logic outside the component for better testing",
+                "Standardizes state transitions via action types"
             ],
             steps: [
                 {
-                    line: 1,
-                    description: 'Initial state and reducer are registered in the component.',
-                    badge: '⚡ Initialization',
+                    line: 2,
+                    description: 'The Reducer function is registered as the "brain" for this state.',
+                    badge: '⚡ Mapping Brain',
                     visual: 'reducer_ready',
-                    data: { state: { count: 0 } }
+                    data: { current: 'Initial State' }
+                },
+                {
+                    line: 9,
+                    description: 'Dispatch launches an action object into the React pipeline.',
+                    badge: '📣 Dispatching',
+                    visual: 'action_sent',
+                    data: { type: 'add', payload: '...' }
                 },
                 {
                     line: 3,
-                    description: 'Action is dispatched. It travels to the reducer function.',
-                    badge: '📣 Dispatch',
-                    visual: 'action_sent',
-                    data: { action: 'increment' }
-                },
-                {
-                    line: 1,
-                    description: 'Reducer calculates new state based on current state and action.',
-                    badge: '⚙️ Reducing',
+                    description: 'Reducer receives state+action, calculates the new immutable state object.',
+                    badge: '⚙️ Transforming',
                     visual: 'state_transformed',
-                    data: { old: 0, new: 1 }
+                    data: { old_len: 0, new_len: 1 }
                 }
             ],
-            takeaway: "If your useState becomes a mess of multiple handlers, move to useReducer."
+            takeaway: "If you have 3+ useStates that always change together, useReducer is your best friend."
         },
         useRef: {
             title: 'useRef',
-            subtitle: 'Direct DOM & Mutable Storage',
-            code: `const myRef = useRef(initial);
+            subtitle: 'Mutable Box & DOM Reference',
+            code: `// 1. Accessing DOM elements directly
+const videoRef = useRef(null);
+const handlePlay = () => videoRef.current.play();
 
-// myRef.current = newValue;`,
-            interviewAnswer: "useRef returns a mutable ref object whose .current property is initialized to the passed argument. The returned object will persist for the full lifetime of the component and changing it does not trigger a re-render.",
-            simpleExplanation: "Think of it like a hidden drawer in your desk. You can put things in it and change them anytime, but nobody else in the room (the UI) notices until you choose to show them.",
+// 2. Mutable instance variables (doesn't trigger render)
+const timerId = useRef(0);
+useEffect(() => {
+  timerId.current = setInterval(() => { ... }, 1000);
+  return () => clearInterval(timerId.current);
+}, []);`,
+            interviewAnswer: "useRef returns a persistent, mutable object whose .current property can hold any value. Unlike state, changing a ref's value does not trigger a re-render. It is primarily used for direct DOM access or storing values that need to persist but don't impact the UI.",
+            simpleExplanation: "A 'secret pocket'. You can put things in it and change them whenever you want, but React won't rebuild the entire UI just because you changed what's in your pocket.",
             rememberPoints: [
-                "Changing it NEVER triggers a re-render",
-                "Accessing DOM elements directly",
-                "Persisting values between renders"
+                "Modifying .current is a Side Effect (do it in useEffect)",
+                "Persistent across all re-renders of the component",
+                "Useful for 'Previous Value' tracking"
             ],
             steps: [
                 {
-                    line: 1,
-                    description: 'React creates a persistent object { current: initial }.',
-                    badge: '📦 Allocation',
+                    line: 2,
+                    description: 'React creates an object { current: null }. This object stays alive as long as the component does.',
+                    badge: '📦 Box Created',
                     visual: 'ref_init',
-                    data: { current: 'initial' }
+                    data: { addr: 'Ref_Object_ID', value: 'null' }
                 },
                 {
                     line: 3,
-                    description: 'Mutation occurs. ref.current changes, but component state remains still.',
-                    badge: '🖊️ Mutating',
+                    description: 'On Mount, React assigns the real HTML element to the .current property.',
+                    badge: '🔗 DOM Linked',
                     visual: 'ref_mutate',
-                    data: { current: 'new_value', reRender: 'No' }
+                    data: { current: '<video />', element: 'Attached' }
+                },
+                {
+                    line: 10,
+                    description: 'Updating .current. The value changes instantly, but the UI component is not notified to refresh.',
+                    badge: '🖊️ Silent Update',
+                    visual: 'ref_update',
+                    data: { timerId: '124', reRender: 'Skipped' }
                 }
             ],
-            takeaway: "Use useRef for DOM access or keeping values that shouldn't affect the UI cycle."
+            takeaway: "Use useRef for DOM access or values that don't need to be displayed on screen."
         },
         useTransition: {
             title: 'useTransition',
-            subtitle: 'Non-blocking State Updates',
+            subtitle: 'Interruptible Render Updates',
             code: `const [isPending, startTransition] = useTransition();
 
-startTransition(() => {
-  setItems(hugeList); // Non-urgent
-});`,
-            interviewAnswer: "useTransition is a React Hook that lets you update the state without blocking the UI. It marks a state transition as non-urgent, allowing regular updates to interrupt it.",
-            simpleExplanation: "Like a restaurant taking your order. They acknowledge you immediately, but the heavy food (blocking update) happens in the background while you can still talk and drink water.",
+const handleSearch = (e) => {
+  // Urgent: Update the input text immediately
+  setText(e.target.value);
+
+  // Non-urgent: Filter the massive list in the background
+  startTransition(() => {
+    setFilteredList(hugeDataset.filter(...));
+  });
+};`,
+            interviewAnswer: "useTransition is a Concurrent React hook that lets you mark state updates as 'transitions'. This tells React they are non-urgent and can be interrupted by higher-priority updates (like typing). It prevents 'input lag' during heavy re-renders.",
+            simpleExplanation: "Like a waiter taking your drink order (urgent) versus the kitchen cooking a 7-course meal (transition). You get your water immediately while the heavy work happens in the background.",
             rememberPoints: [
-                "Keep UI responsive during heavy renders",
-                "Adds user feedback via isPending",
-                "Only for state updates that slow down the UI"
+                "Keeps the UI responsive during massive data processing",
+                "Provides an 'isPending' flag to show loading spinners",
+                "Only use for CPU-heavy rendering, not network requests"
             ],
             steps: [
                 {
                     line: 1,
-                    description: 'Hooks provides a pending flag and a transition scheduler.',
-                    badge: '💤 Idle',
+                    description: 'React prepares a secondary background rendering pipeline.',
+                    badge: '💤 Scheduler Ready',
                     visual: 'wait',
-                    data: { isPending: false }
+                    data: { priority: 'Default', isPending: false }
                 },
                 {
-                    line: 3,
-                    description: 'Low-priority update is scheduled. isPending becomes true.',
-                    badge: '⏳ Pending',
+                    line: 8,
+                    description: 'Update is marked. isPending becomes true. React stays on the current screen.',
+                    badge: '⏳ Preparing',
                     visual: 'loading',
-                    data: { isPending: true }
+                    data: { isPending: true, mode: 'Concurrent' }
                 },
                 {
-                    line: 5,
-                    description: 'React renders in background. User can still interact with other elements.',
-                    badge: '🏗️ Background',
+                    line: 9,
+                    description: 'React works on the new UI in memory. If a user types again, this work is PAUSED or RESTARTED.',
+                    badge: '🏗️ Low Priority',
                     visual: 'rendering',
-                    data: { isPending: true, priority: 'Low' }
+                    data: { interruption: 'Allowed', cpu_usage: 'Deferred' }
                 }
             ],
-            takeaway: "useTransition is the key to preventing 'jank' in modern high-performance React apps."
+            takeaway: "useTransition is what makes modern React apps feel fast even with massive amounts of data."
         }
     };
 
@@ -247,72 +292,72 @@ startTransition(() => {
 
             <div className="pt-20 min-h-[calc(100vh-5rem)] flex flex-col lg:flex-row">
 
-                {/* Sidebar - Definitions & Theory */}
-                <div className="w-full lg:w-[400px] bg-slate-900 border-r border-white/5 flex flex-col overflow-y-auto lg:h-[calc(100vh-5rem)]">
-                    <div className="p-8 space-y-8">
-                        {/* Header */}
-                        <div>
-                            <div className="flex items-center gap-4 mb-4">
-                                <Boxes className="text-cyan-400" size={32} />
-                                <h1 className="text-3xl font-black tracking-tight">Hook Lab</h1>
-                            </div>
-                            <p className="text-slate-500 font-medium">Step inside the internal engine of React Hooks.</p>
+                {/* Left Sidebar - Definitions & Theory */}
+                <div className="w-80 bg-slate-900 border-r border-slate-700 p-6 overflow-y-auto lg:h-[calc(100vh-5rem)]">
+                    {/* Header */}
+                    <div className="mb-8">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Boxes className="text-cyan-400" size={40} />
+                            <h1 className="text-3xl font-bold">Hook Lab</h1>
                         </div>
-
-                        {/* Interview Answer */}
-                        <div className="p-6 rounded-3xl bg-slate-800/40 border border-white/5 space-y-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                <BookOpen className="text-cyan-400" size={18} />
-                                <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">Interview Answer</h3>
-                            </div>
-                            <p className="text-slate-100 text-sm leading-relaxed font-semibold italic">
-                                "{currentHook.interviewAnswer}"
-                            </p>
-                        </div>
-
-                        {/* Simple Explanation */}
-                        <div className="p-6 rounded-3xl bg-amber-500/10 border border-amber-500/20 space-y-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Lightbulb className="text-amber-400" size={18} />
-                                <h3 className="text-xs font-black text-amber-400 uppercase tracking-widest">Simple Explanation</h3>
-                            </div>
-                            <p className="text-amber-100/80 text-sm leading-relaxed font-bold">
-                                {currentHook.simpleExplanation}
-                            </p>
-                        </div>
-
-                        {/* Remember Section */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <Activity className="text-emerald-400" size={18} />
-                                <h3 className="text-xs font-black text-emerald-400 uppercase tracking-widest">Remember</h3>
-                            </div>
-                            <div className="grid gap-3">
-                                {currentHook.rememberPoints.map((point: string, i: number) => (
-                                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 text-xs text-slate-300 font-bold">
-                                        <CheckCircle className="text-emerald-500 shrink-0" size={14} />
-                                        {point}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Rules of Hooks */}
-                        <div className="p-6 rounded-3xl bg-red-500/5 border border-red-500/20">
-                            <h3 className="text-xs font-black text-red-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                <AlertTriangle size={16} /> Strict Rules
-                            </h3>
-                            <ul className="space-y-3 text-[11px] text-slate-500 font-bold uppercase tracking-wide">
-                                <li>• Only at the Top Level</li>
-                                <li>• Only in React Functions</li>
-                            </ul>
-                        </div>
+                        <p className="text-slate-400 text-sm">
+                            Step inside the internal engine of React Hooks.
+                        </p>
                     </div>
 
-                    <div className="mt-auto p-8 border-t border-white/5">
+                    {/* Interview Answer */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <BookOpen className="text-cyan-400" size={22} />
+                            <h3 className="text-base font-bold text-cyan-400 uppercase">Interview Answer</h3>
+                        </div>
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            "{currentHook.interviewAnswer}"
+                        </p>
+                    </div>
+
+                    {/* Simple Explanation */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Lightbulb className="text-yellow-400" size={22} />
+                            <h3 className="text-base font-bold text-yellow-400 uppercase">Simple Explanation</h3>
+                        </div>
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            {currentHook.simpleExplanation}
+                        </p>
+                    </div>
+
+                    {/* Remember Section */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <AlertCircle className="text-purple-400" size={22} />
+                            <h3 className="text-base font-bold text-purple-400 uppercase">Remember</h3>
+                        </div>
+                        <ul className="space-y-3 text-slate-200 text-base">
+                            {currentHook.rememberPoints.map((point: string, i: number) => (
+                                <li key={i} className="flex items-start gap-2">
+                                    <span className="text-purple-400 mt-1">•</span>
+                                    <div>{point}</div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Rules of Hooks */}
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <h4 className="text-sm font-semibold text-slate-400 mb-3 uppercase flex items-center gap-2">
+                            <AlertTriangle size={16} /> Rules of Hooks
+                        </h4>
+                        <ul className="space-y-2 text-slate-400 text-xs">
+                            <li>• Only at the Top Level</li>
+                            <li>• Only in React Functions</li>
+                        </ul>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t border-slate-700">
                         <Link href="/react">
-                            <div className="flex items-center gap-3 text-slate-500 hover:text-white transition-colors uppercase text-[10px] font-black tracking-[0.2em]">
-                                <ChevronLeft size={16} /> Back to Dashboard
+                            <div className="flex items-center gap-3 text-slate-500 hover:text-white transition-colors uppercase text-[10px] font-black tracking-widest">
+                                <ChevronLeft size={16} /> Back to React
                             </div>
                         </Link>
                     </div>

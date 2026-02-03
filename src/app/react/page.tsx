@@ -41,7 +41,7 @@ export default function ReactPage() {
             difficulty: 'Easy',
             interviewFrequency: 'High',
             keyPoints: ['ReactDOM.createRoot', 'index.js entry', 'Component Tree Rendering'],
-            href: '#',
+            href: '/react/entry-point',
             color: 'blue'
         },
         {

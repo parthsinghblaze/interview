@@ -19,6 +19,8 @@ const searchData = [
     { title: 'Array Rotation', category: 'DSA', href: '/dsa/array-rotation', id: 'array-rotation' },
     { title: 'Spiral Matrix', category: 'DSA', href: '/dsa/spiral-matrix', id: 'spiral-matrix' },
     { title: 'Duplicate Frequency', category: 'DSA', href: '/dsa/frequency-counter', id: 'frequency-counter' },
+    { title: 'Binary Search (Logarithmic)', category: 'DSA', href: '/dsa/binary-search', id: 'binary-search' },
+    { title: 'Two Sum (Target Pair)', category: 'DSA', href: '/dsa/two-sum', id: 'two-sum' },
     { title: 'Armstrong Number Checker', category: 'DSA', href: '/dsa/armstrong', id: 'armstrong' },
     { title: 'Factors Finder', category: 'DSA', href: '/dsa/factors', id: 'factors' },
     { title: 'Valid Parentheses (Sequence Check)', category: 'DSA', href: '/dsa/valid-parentheses', id: 'valid-parentheses' },
@@ -45,6 +47,7 @@ const searchData = [
 
     // React Topics
     { title: 'Lifecycle Methods', category: 'React', href: '/react/lifecycle', id: 'react-lifecycle' },
+    { title: 'Entry Point & Rendering', category: 'React', href: '/react/entry-point', id: 'react-entry' },
     { title: 'Hooks API (useMemo, useCallback)', category: 'React', href: '/react/hooks', id: 'react-hooks' },
     { title: 'Redux & Context API', category: 'React', href: '/react/state-management', id: 'react-state' },
     { title: 'Performance Optimization', category: 'React', href: '/react/optimization', id: 'react-optimization' },

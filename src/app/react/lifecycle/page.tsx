@@ -117,42 +117,55 @@ const LifecyclePage = () => {
             <div className="pt-20 min-h-[calc(100vh-5rem)] flex flex-col lg:flex-row">
 
                 {/* Theory Sidebar */}
-                <div className="w-full lg:w-96 bg-slate-900 border-r border-white/5 p-8 flex flex-col overflow-y-auto lg:h-[calc(100vh-5rem)]">
-                    <div className="mb-10">
+                <div className="w-80 bg-slate-900 border-r border-slate-700 p-6 overflow-y-auto lg:h-[calc(100vh-5rem)]">
+                    {/* Header */}
+                    <div className="mb-8">
                         <div className="flex items-center gap-4 mb-6">
                             <Clock className="text-purple-400" size={40} />
-                            <h1 className="text-4xl font-black tracking-tight">Lifecycle</h1>
+                            <h1 className="text-3xl font-bold">Lifecycle</h1>
                         </div>
-                        <p className="text-slate-500 font-medium">
+                        <p className="text-slate-400 text-sm">
                             The journey of a component from birth (Mount) to death (Unmount).
                         </p>
                     </div>
 
-                    <div className="p-6 rounded-3xl bg-purple-500/10 border border-purple-500/20 mb-8">
-                        <div className="flex items-center gap-2 mb-4">
-                            <BookOpen className="text-purple-400" size={20} />
-                            <h3 className="text-xs font-black text-purple-400 uppercase tracking-widest">Interview Answer</h3>
+                    {/* Interview Answer */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <BookOpen className="text-purple-400" size={22} />
+                            <h3 className="text-base font-bold text-purple-400 uppercase">Interview Answer</h3>
                         </div>
-                        <p className="text-slate-200 text-sm leading-relaxed">
+                        <p className="text-slate-200 text-base leading-relaxed">
                             "Lifecycle methods are special hooks that allow us to run code at specific points in a component's existence. In modern React, most of these are handled by the useEffect hook."
                         </p>
                     </div>
 
-                    <div className="p-6 rounded-3xl bg-amber-500/10 border border-amber-500/20 mb-8">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Lightbulb className="text-amber-400" size={20} />
-                            <h3 className="text-xs font-black text-amber-400 uppercase tracking-widest">Simple Analogy</h3>
+                    {/* Simple Explanation */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Lightbulb className="text-amber-400" size={22} />
+                            <h3 className="text-base font-bold text-amber-400 uppercase">Simple Analogy</h3>
                         </div>
-                        <p className="text-amber-100/80 text-sm leading-relaxed font-bold">
-                            "Think of a component like a stage play: Mount is setting up the stage, Update is changing scenes, and Unmount is taking down the stage when the show is over."
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            Think of a component like a stage play: **Mount** is setting up the stage, **Update** is changing scenes, and **Unmount** is taking down the stage when the show is over.
                         </p>
                     </div>
 
-                    <div className="mt-auto">
+                    {/* Pro Tip Section */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Activity className="text-emerald-400" size={22} />
+                            <h3 className="text-base font-bold text-emerald-400 uppercase">Pro Tip</h3>
+                        </div>
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            Always mention that `useEffect` with an empty array acts like `componentDidMount` AND the cleanup return like `componentWillUnmount`.
+                        </p>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t border-slate-700">
                         <Link href="/react">
-                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-800/40 border border-white/5 hover:bg-slate-800 transition-colors text-slate-400 hover:text-white group">
-                                <ChevronLeft className="group-hover:-translate-x-1 transition-transform" />
-                                <span className="font-bold text-sm uppercase tracking-widest">Back to React</span>
+                            <div className="flex items-center gap-3 text-slate-500 hover:text-white transition-colors uppercase text-[10px] font-black tracking-widest">
+                                <ChevronLeft size={16} /> Back to React
                             </div>
                         </Link>
                     </div>

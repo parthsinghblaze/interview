@@ -19,31 +19,15 @@ const ArmstrongVisualizer = () => {
     // Generate steps for Armstrong number check
     const generateSteps = (num: number) => {
         const steps = [];
-        const numStr = num.toString();
-        const digits = numStr.split('').map(Number);
-        const n = digits.length;
+        let temp = num;
+        const n = num.toString().length; // We still need the count of digits
 
         // Initial step
         steps.push({
-            description: `Checking if ${num} is an Armstrong number`,
+            description: `Checking if ${num} is an Armstrong number. Total digits (n) = ${n}`,
             stage: 'init',
             number: num,
             digits: [],
-            powers: [],
-            sum: 0,
-            currentDigit: null,
-            highlightDigit: -1,
-            isArmstrong: null,
-            jsLine: 0,
-            pyLine: 0
-        });
-
-        // Extract digits
-        steps.push({
-            description: `Number has ${n} digits: [${digits.join(', ')}]`,
-            stage: 'extract',
-            number: num,
-            digits: digits,
             powers: [],
             sum: 0,
             currentDigit: null,
@@ -55,60 +39,64 @@ const ArmstrongVisualizer = () => {
 
         let sum = 0;
         const powers: number[] = [];
+        const extractedDigits: number[] = [];
+        let iteration = 0;
 
-        // Calculate powers for each digit
-        for (let i = 0; i < digits.length; i++) {
-            const digit = digits[i];
+        while (temp > 0) {
+            const digit = temp % 10;
             const power = Math.pow(digit, n);
+            extractedDigits.unshift(digit);
 
             steps.push({
-                description: `Calculating ${digit}^${n} = ${power}`,
+                description: `Extracting digit: ${temp} % 10 = ${digit}. Calculating ${digit}^${n} = ${power}`,
                 stage: 'calculating',
                 number: num,
-                digits: digits,
+                digits: [...extractedDigits],
                 powers: [...powers],
                 sum: sum,
                 currentDigit: digit,
-                highlightDigit: i,
+                highlightDigit: 0, // In math approach, we always extract the last
                 isArmstrong: null,
-                jsLine: 2,
-                pyLine: 2
+                jsLine: 5,
+                pyLine: 4
             });
 
-            powers.push(power);
+            powers.unshift(power);
             sum += power;
+            temp = Math.floor(temp / 10);
 
             steps.push({
-                description: `Sum = ${sum} (added ${power})`,
+                description: `New sum = ${sum}. Remaining number = ${temp}`,
                 stage: 'summing',
                 number: num,
-                digits: digits,
+                digits: [...extractedDigits],
                 powers: [...powers],
                 sum: sum,
                 currentDigit: null,
-                highlightDigit: i,
+                highlightDigit: -1,
                 isArmstrong: null,
-                jsLine: 3,
-                pyLine: 3
+                jsLine: 7,
+                pyLine: 6
             });
+            iteration++;
         }
 
         // Final check
         const isArmstrong = sum === num;
         steps.push({
             description: isArmstrong
-                ? `${num} = ${sum} ✓ It's an Armstrong number!`
-                : `${num} ≠ ${sum} ✗ Not an Armstrong number`,
+                ? `Final sum ${sum} matches ${num}! It's an Armstrong number.`
+                : `Final sum ${sum} does not match ${num}. Not an Armstrong number.`,
             stage: 'result',
             number: num,
-            digits: digits,
+            digits: extractedDigits,
             powers: powers,
             sum: sum,
             currentDigit: null,
             highlightDigit: -1,
             isArmstrong: isArmstrong,
-            jsLine: 4,
-            pyLine: 4
+            jsLine: 9,
+            pyLine: 8
         });
 
         return steps;
@@ -121,22 +109,27 @@ const ArmstrongVisualizer = () => {
 
     const currentStepData = { ...steps[currentStep], completed: currentStep === steps.length - 1 };
 
-    // JavaScript code
+    // JavaScript code - Mathematical Approach
     const jsCode = [
         "function isArmstrong(num) {",
-        "  const digits = num.toString().split('').map(Number);",
-        "  const n = digits.length;",
-        "  const sum = digits.reduce((acc, d) => acc + Math.pow(d, n), 0);",
+        "  let n = num.toString().length, sum = 0, temp = num;",
+        "  while (temp > 0) {",
+        "    let digit = temp % 10;",
+        "    sum += Math.pow(digit, n);",
+        "    temp = Math.floor(temp / 10);",
+        "  }",
         "  return sum === num;",
         "}"
     ];
 
-    // Python code
+    // Python code - Mathematical Approach
     const pyCode = [
         "def is_armstrong(num):",
-        "    digits = [int(d) for d in str(num)]",
-        "    n = len(digits)",
-        "    sum_powers = sum(d ** n for d in digits)",
+        "    n, sum_powers, temp = len(str(num)), 0, num",
+        "    while temp > 0:",
+        "        digit = temp % 10",
+        "        sum_powers += digit ** n",
+        "        temp //= 10",
         "    return sum_powers == num"
     ];
 

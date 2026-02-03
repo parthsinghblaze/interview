@@ -93,6 +93,30 @@ export default function DSAPage() {
             learning: 'Linear data structures, balanced sequence logic, and last-in-first-out processing.',
             href: '/dsa/valid-parentheses',
             color: 'blue'
+        },
+        {
+            id: 'two-sum',
+            title: 'Two Sum',
+            description: 'Find two numbers in an array that add up to a specific target sum using an optimized Hash Map.',
+            icon: Hash,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(n)',
+            techniques: ['Hash Map', 'Target Complement', 'Optimization'],
+            learning: 'Data structures, hash tables, and one-pass search algorithms.',
+            href: '/dsa/two-sum',
+            color: 'green'
+        },
+        {
+            id: 'binary-search',
+            title: 'Binary Search',
+            description: 'Efficiently find an element in a sorted array by repeatedly dividing the search interval in half.',
+            icon: SearchIcon,
+            timeComplexity: 'O(log n)',
+            spaceComplexity: 'O(1)',
+            techniques: ['Divide & Conquer', 'Sorted Search', 'Iteration'],
+            learning: 'Logarithmic time complexity, boundary management, and search efficiency.',
+            href: '/dsa/binary-search',
+            color: 'blue'
         }
     ];
 
