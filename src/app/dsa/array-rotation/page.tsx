@@ -287,17 +287,17 @@ const ArrayRotationVisualizer = () => {
     };
 
     return (
-        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans selection:bg-indigo-500/30">
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans selection:bg-indigo-500/30">
             <Header />
 
-            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-black pt-20 pb-6 px-4 md:px-6">
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
 
-                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+                <div className="w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
                     {/* LEFT COLUMN: Controller & Code */}
-                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar">
 
                         {/* 1. Controller Panel */}
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
@@ -471,20 +471,20 @@ const ArrayRotationVisualizer = () => {
                     </div>
 
                     {/* RIGHT COLUMN: Visualization */}
-                    <div className="h-full flex flex-col gap-6 overflow-hidden">
+                    <div className="flex flex-col gap-6">
 
                         {/* 1. Animation Stage */}
-                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col items-center">
+                        <div className="min-h-[500px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-hidden flex flex-col items-center">
                             {/* Step Description */}
                             <div className="w-full text-center mb-8 relative z-20">
                                 <motion.div
                                     key={currentStepData.description}
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="inline-block bg-slate-800/80 border border-indigo-500/30 rounded-full px-6 py-2 shadow-lg"
+                                    className="inline-block bg-slate-800/80 border border-indigo-500/30 rounded-2xl md:rounded-full px-4 md:px-6 py-2 shadow-lg"
                                 >
-                                    <p className="text-lg md:text-xl font-medium text-indigo-100 flex items-center gap-3">
-                                        <Info size={20} className="text-indigo-400" />
+                                    <p className="text-sm md:text-xl font-medium text-indigo-100 flex items-center gap-3">
+                                        <Info size={18} className="text-indigo-400 shrink-0" />
                                         {currentStepData.description}
                                     </p>
                                 </motion.div>
@@ -493,8 +493,8 @@ const ArrayRotationVisualizer = () => {
                             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.05),transparent_70%)] pointer-events-none"></div>
 
                             {/* Array Visualizer */}
-                            <div className="flex-1 w-full flex items-center justify-center relative z-10">
-                                <div className="flex gap-4">
+                            <div className="flex-1 w-full flex items-center justify-center relative z-10 overflow-x-auto pb-8 custom-scrollbar">
+                                <div className="flex gap-4 min-w-max px-4">
                                     {(currentStepData.array as number[]).map((val, idx) => {
                                         const isHighlighted = ((currentStepData as any).highlighted || []).includes(idx);
                                         const isMoving = (currentStepData as any).movingIndex === idx;
@@ -508,13 +508,13 @@ const ArrayRotationVisualizer = () => {
                                                     scale: isHighlighted || isMoving ? 1.15 : 1,
                                                     opacity: 1,
                                                 }}
-                                                className={`w-20 h-20 rounded-2xl border-2 flex flex-col items-center justify-center shadow-2xl relative transition-all duration-300 ${isHighlighted
+                                                className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl border-2 flex flex-col items-center justify-center shadow-2xl relative transition-all duration-300 ${isHighlighted
                                                     ? 'bg-indigo-600/30 border-indigo-400 border-dashed'
                                                     : isMoving
                                                         ? 'bg-amber-600/30 border-amber-400'
                                                         : 'bg-slate-800 border-white/5'}`}
                                             >
-                                                <span className="text-3xl font-bold font-mono text-white">{val}</span>
+                                                <span className="text-2xl md:text-3xl font-bold font-mono text-white">{val}</span>
                                                 <span className="absolute -bottom-6 text-[10px] text-slate-600 font-bold uppercase tracking-tighter">idx: {idx}</span>
                                                 {isMoving && (
                                                     <motion.div
@@ -543,19 +543,19 @@ const ArrayRotationVisualizer = () => {
                         </div>
 
                         {/* 2. Stats Panel */}
-                        <div className="h-32 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
-                            <div className="grid grid-cols-3 gap-4 h-full">
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl sticky bottom-4 lg:relative lg:bottom-0">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
                                     <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Rotation</span>
-                                    <span className="text-3xl font-bold text-indigo-400 capitalize">{rotationType}</span>
+                                    <span className="text-xl md:text-3xl font-bold text-indigo-400 capitalize">{rotationType}</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
                                     <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">K Value</span>
-                                    <span className="text-3xl font-bold text-purple-400">{kValue}</span>
+                                    <span className="text-xl md:text-3xl font-bold text-purple-400">{kValue}</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                <div className="col-span-2 md:col-span-1 flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
                                     <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Complexity</span>
-                                    <span className="text-2xl font-bold text-cyan-400">O({rotationType === 'optimized' ? 'n' : 'n·k'})</span>
+                                    <span className="text-lg md:text-2xl font-bold text-cyan-400">O({rotationType === 'optimized' ? 'n' : 'n·k'})</span>
                                 </div>
                             </div>
                         </div>

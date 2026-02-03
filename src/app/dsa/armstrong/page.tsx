@@ -193,19 +193,19 @@ const ArmstrongVisualizer = () => {
     };
 
     return (
-        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans selection:bg-purple-500/30">
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans selection:bg-purple-500/30">
             <Header />
 
             {/* Main Content Area - Full Screen Layout */}
-            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-950 to-black pt-20 pb-6 px-4 md:px-6">
                 {/* Background Decoration */}
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
 
-                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+                <div className="w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
                     {/* LEFT COLUMN: Controller & Code */}
-                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar">
 
                         {/* 1. Controller Panel */}
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
@@ -382,10 +382,10 @@ const ArmstrongVisualizer = () => {
                     </div>
 
                     {/* RIGHT COLUMN: Visualization */}
-                    <div className="h-full flex flex-col gap-6 overflow-hidden">
+                    <div className="flex flex-col gap-6">
 
                         {/* 1. Main Animation Stage */}
-                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col items-center">
+                        <div className="min-h-[500px] lg:h-full bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-hidden flex flex-col items-center">
                             {/* Step Description Header */}
                             <div className="w-full text-center mb-8 relative z-20">
                                 <motion.div
@@ -409,7 +409,7 @@ const ArmstrongVisualizer = () => {
                                 <div className="max-w-4xl w-full">
                                     {/* Digits Display */}
                                     {currentStepData.digits.length > 0 && (
-                                        <div className="flex justify-center gap-4 mb-12">
+                                        <div className="flex flex-wrap justify-center gap-4 mb-12">
                                             {currentStepData.digits.map((digit, idx) => (
                                                 <motion.div
                                                     key={idx}
@@ -480,19 +480,19 @@ const ArmstrongVisualizer = () => {
                         </div>
 
                         {/* 2. Info Panel */}
-                        <div className="h-32 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
-                            <div className="grid grid-cols-3 gap-4 h-full">
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl sticky bottom-4 lg:relative lg:bottom-0">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
                                     <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Number</span>
-                                    <span className="text-3xl font-bold text-purple-400">{inputNumber}</span>
+                                    <span className="text-2xl md:text-3xl font-bold text-purple-400">{inputNumber}</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
                                     <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Digits</span>
-                                    <span className="text-3xl font-bold text-pink-400">{currentStepData.digits.length || '-'}</span>
+                                    <span className="text-2xl md:text-3xl font-bold text-pink-400">{currentStepData.digits.length || '-'}</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                <div className="col-span-2 md:col-span-1 flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
                                     <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Complexity</span>
-                                    <span className="text-2xl font-bold text-cyan-400">O(d)</span>
+                                    <span className="text-xl md:text-2xl font-bold text-cyan-400">O(d)</span>
                                 </div>
                             </div>
                         </div>

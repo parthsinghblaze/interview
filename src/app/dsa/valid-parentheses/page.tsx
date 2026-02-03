@@ -191,16 +191,16 @@ const ValidParenthesesVisualizer = () => {
     }, [isPlaying, currentStep, steps.length]);
 
     return (
-        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans selection:bg-indigo-500/30">
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans selection:bg-indigo-500/30">
             <Header />
 
-            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 via-slate-950 to-black pt-20 pb-6 px-4 md:px-6">
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent"></div>
 
-                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+                <div className="w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
                     {/* LEFT COLUMN */}
-                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar">
 
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
                             <div className="flex items-center justify-between mb-6">
@@ -291,9 +291,9 @@ const ValidParenthesesVisualizer = () => {
                     </div>
 
                     {/* RIGHT COLUMN */}
-                    <div className="flex flex-col gap-6 overflow-hidden text-left">
+                    <div className="flex flex-col gap-6 text-left">
 
-                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative flex flex-col items-center justify-center overflow-hidden">
+                        <div className="min-h-[600px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative flex flex-col items-center justify-center overflow-hidden">
 
                             {/* Narrator */}
                             <div className="absolute top-8 left-0 right-0 flex justify-center z-20">
@@ -301,9 +301,9 @@ const ValidParenthesesVisualizer = () => {
                                     key={currentStepData.description}
                                     initial={{ opacity: 0, y: -20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="px-6 py-2 bg-slate-800/90 border border-indigo-500/30 rounded-full text-indigo-100 font-medium shadow-2xl backdrop-blur-md flex items-center gap-3"
+                                    className="px-4 md:px-6 py-2 bg-slate-800/90 border border-indigo-500/30 rounded-2xl md:rounded-full text-indigo-100 font-medium shadow-2xl backdrop-blur-md flex items-center gap-3 text-sm md:text-base max-w-[90%]"
                                 >
-                                    <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                                    <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shrink-0" />
                                     {currentStepData.description}
                                 </motion.div>
                             </div>
@@ -312,23 +312,25 @@ const ValidParenthesesVisualizer = () => {
                             <div className="relative z-10 w-full max-w-4xl flex flex-col items-center gap-12">
 
                                 {/* Input String Visualization */}
-                                <div className="flex flex-col items-center gap-4">
+                                <div className="flex flex-col items-center gap-4 w-full">
                                     <div className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.2em]">Input Array Scan</div>
-                                    <div className="flex gap-2">
-                                        {input.split('').map((char, idx) => (
-                                            <motion.div
-                                                key={idx}
-                                                animate={{
-                                                    backgroundColor: currentStepData.currentIndex === idx ? '#6366f1' : 'transparent',
-                                                    borderColor: currentStepData.currentIndex === idx ? '#818cf8' : 'rgba(255,255,255,0.1)',
-                                                    scale: currentStepData.currentIndex === idx ? 1.1 : 1,
-                                                    opacity: currentStepData.currentIndex > idx ? 0.3 : 1
-                                                }}
-                                                className="w-12 h-12 rounded-xl border-2 flex items-center justify-center text-xl font-bold font-mono transition-colors"
-                                            >
-                                                {char}
-                                            </motion.div>
-                                        ))}
+                                    <div className="w-full overflow-x-auto pb-4 custom-scrollbar">
+                                        <div className="flex gap-2 justify-start md:justify-center min-w-max px-4">
+                                            {input.split('').map((char, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    animate={{
+                                                        backgroundColor: currentStepData.currentIndex === idx ? '#6366f1' : 'transparent',
+                                                        borderColor: currentStepData.currentIndex === idx ? '#818cf8' : 'rgba(255,255,255,0.1)',
+                                                        scale: currentStepData.currentIndex === idx ? 1.1 : 1,
+                                                        opacity: currentStepData.currentIndex > idx ? 0.3 : 1
+                                                    }}
+                                                    className="w-10 h-10 md:w-12 md:h-12 rounded-xl border-2 flex items-center justify-center text-lg md:text-xl font-bold font-mono transition-colors"
+                                                >
+                                                    {char}
+                                                </motion.div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -403,8 +405,8 @@ const ValidParenthesesVisualizer = () => {
                         </div>
 
                         {/* Stats Panel */}
-                        <div className="h-32 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
-                            <div className="grid grid-cols-4 gap-4 h-full">
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div className="bg-slate-800/40 rounded-2xl p-3 border border-white/5 flex flex-col justify-center">
                                     <div className="flex items-center gap-2 mb-1">
                                         <ArrowRight className="text-indigo-400" size={14} />

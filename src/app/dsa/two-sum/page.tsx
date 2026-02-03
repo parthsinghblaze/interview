@@ -192,16 +192,16 @@ const TwoSumVisualizer = () => {
     const togglePlay = () => setIsPlaying(!isPlaying);
 
     return (
-        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans">
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans">
             <Header />
 
-            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black pt-20 pb-6 px-4 md:px-6">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
 
-                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+                <div className="w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
                     {/* Controls & Code */}
-                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar">
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
                             <div className="flex items-center justify-between mb-6">
                                 <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
@@ -288,7 +288,7 @@ const TwoSumVisualizer = () => {
                     </div>
 
                     {/* Visualization Area */}
-                    <div className="flex flex-col gap-6 overflow-hidden">
+                    <div className="flex flex-col gap-6">
 
                         {/* Status Message */}
                         <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-6">
@@ -303,35 +303,37 @@ const TwoSumVisualizer = () => {
                             </motion.div>
                         </div>
 
-                        <div className="flex-1 grid grid-rows-[1fr_200px] gap-6 overflow-hidden">
+                        <div className="flex flex-col lg:grid lg:grid-rows-[1fr_200px] gap-6 overflow-hidden">
                             {/* Array Visualizer */}
-                            <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 flex flex-col items-center justify-center relative">
-                                <div className="text-xs text-slate-500 uppercase tracking-widest mb-8">Array Traversal</div>
-                                <div className="flex gap-4">
-                                    {parsedArray.map((val: number, idx: number) => {
-                                        const isCurrent = idx === currentStepData.currentIndex;
-                                        const isPair = currentStepData.pair.includes(idx);
-                                        const isVisited = idx < currentStepData.currentIndex && !isPair;
+                            <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 flex flex-col items-center justify-center relative min-h-[300px]">
+                                <div className="text-xs text-slate-500 uppercase tracking-widest mb-12">Array Traversal</div>
+                                <div className="w-full overflow-x-auto pb-8 custom-scrollbar">
+                                    <div className="flex gap-4 justify-start md:justify-center min-w-max px-4">
+                                        {parsedArray.map((val: number, idx: number) => {
+                                            const isCurrent = idx === currentStepData.currentIndex;
+                                            const isPair = currentStepData.pair.includes(idx);
+                                            const isVisited = idx < currentStepData.currentIndex && !isPair;
 
-                                        return (
-                                            <motion.div
-                                                key={idx}
-                                                animate={{
-                                                    scale: isCurrent ? 1.2 : (isPair ? 1.15 : 1),
-                                                    y: isCurrent ? -10 : 0
-                                                }}
-                                                className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 text-xl font-bold transition-colors ${isPair ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]' :
-                                                    isCurrent ? 'bg-blue-500/20 border-blue-500 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]' :
-                                                        isVisited ? 'bg-slate-800/50 border-white/5 text-slate-600' :
-                                                            'bg-slate-800 border-white/10 text-slate-300'
-                                                    }`}
-                                            >
-                                                {val}
-                                                {isCurrent && <div className="absolute -top-10 text-[10px] font-black text-blue-400">CHECKING</div>}
-                                                {isPair && <div className="absolute -top-10 text-[10px] font-black text-emerald-400">MATCH!</div>}
-                                            </motion.div>
-                                        );
-                                    })}
+                                            return (
+                                                <motion.div
+                                                    key={idx}
+                                                    animate={{
+                                                        scale: isCurrent ? 1.2 : (isPair ? 1.15 : 1),
+                                                        y: isCurrent ? -10 : 0
+                                                    }}
+                                                    className={`w-14 md:w-16 h-14 md:h-16 rounded-2xl flex items-center justify-center border-2 text-xl font-bold transition-colors relative ${isPair ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]' :
+                                                        isCurrent ? 'bg-blue-500/20 border-blue-500 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]' :
+                                                            isVisited ? 'bg-slate-800/50 border-white/5 text-slate-600' :
+                                                                'bg-slate-800 border-white/10 text-slate-300'
+                                                        }`}
+                                                >
+                                                    {val}
+                                                    {isCurrent && <div className="absolute -top-10 text-[10px] whitespace-nowrap font-black text-blue-400">CHECKING</div>}
+                                                    {isPair && <div className="absolute -top-10 text-[10px] whitespace-nowrap font-black text-emerald-400">MATCH!</div>}
+                                                </motion.div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
 

@@ -231,16 +231,16 @@ const BinarySearchVisualizer = () => {
     };
 
     return (
-        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans">
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans">
             <Header />
 
-            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black pt-20 pb-6 px-4 md:px-6">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
 
-                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+                <div className="w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
                     {/* Controls & Code */}
-                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar">
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
                             <div className="flex items-center justify-between mb-6">
                                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
@@ -327,7 +327,7 @@ const BinarySearchVisualizer = () => {
                     </div>
 
                     {/* Visualization Area */}
-                    <div className="flex flex-col gap-6 overflow-hidden">
+                    <div className="flex flex-col gap-6">
 
                         {/* Status Message */}
                         <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-6">
@@ -342,62 +342,64 @@ const BinarySearchVisualizer = () => {
                             </motion.div>
                         </div>
 
-                        <div className="flex-1 flex flex-col bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 items-center justify-center relative overflow-hidden">
+                        <div className="min-h-[400px] lg:flex-1 flex flex-col bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 items-center justify-center relative overflow-hidden">
                             <div className="text-xs text-slate-500 uppercase tracking-widest mb-12 relative z-20">Searching in Half-Intervals</div>
 
-                            <div className="flex gap-3 justify-center items-end h-64 relative z-20">
-                                {parsedArray.map((val: number, idx: number) => {
-                                    const isMid = idx === currentStepData.mid;
-                                    const isLow = idx === currentStepData.low;
-                                    const isHigh = idx === currentStepData.high;
-                                    const inRange = idx >= currentStepData.low && idx <= currentStepData.high;
-                                    const isTarget = currentStepData.found && idx === currentStepData.currentIndex;
+                            <div className="w-full overflow-x-auto pb-8 custom-scrollbar">
+                                <div className="flex gap-3 justify-start md:justify-center items-end min-w-max px-4 h-64 relative z-20">
+                                    {parsedArray.map((val: number, idx: number) => {
+                                        const isMid = idx === currentStepData.mid;
+                                        const isLow = idx === currentStepData.low;
+                                        const isHigh = idx === currentStepData.high;
+                                        const inRange = idx >= currentStepData.low && idx <= currentStepData.high;
+                                        const isTarget = currentStepData.found && idx === currentStepData.currentIndex;
 
-                                    return (
-                                        <div key={idx} className="flex flex-col items-center gap-4 relative">
-                                            {/* Pointers */}
-                                            <div className="h-20 flex flex-col justify-end gap-1">
-                                                {isMid && (
-                                                    <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex flex-col items-center">
-                                                        <span className="text-[10px] font-black text-amber-400 uppercase">Mid</span>
-                                                        <ArrowDown size={14} className="text-amber-400" />
-                                                    </motion.div>
-                                                )}
-                                                <div className="flex gap-2">
-                                                    {isLow && (
-                                                        <motion.div initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex flex-col items-center">
-                                                            <span className="text-[8px] font-black text-emerald-400 uppercase">L</span>
-                                                            <ArrowDown size={10} className="text-emerald-400" />
+                                        return (
+                                            <div key={idx} className="flex flex-col items-center gap-4 relative">
+                                                {/* Pointers */}
+                                                <div className="h-20 flex flex-col justify-end gap-1">
+                                                    {isMid && (
+                                                        <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex flex-col items-center">
+                                                            <span className="text-[10px] font-black text-amber-400 uppercase">Mid</span>
+                                                            <ArrowDown size={14} className="text-amber-400" />
                                                         </motion.div>
                                                     )}
-                                                    {isHigh && (
-                                                        <motion.div initial={{ x: 10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex flex-col items-center">
-                                                            <span className="text-[8px] font-black text-rose-400 uppercase">H</span>
-                                                            <ArrowDown size={10} className="text-rose-400" />
-                                                        </motion.div>
-                                                    )}
+                                                    <div className="flex gap-2">
+                                                        {isLow && (
+                                                            <motion.div initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex flex-col items-center">
+                                                                <span className="text-[8px] font-black text-emerald-400 uppercase">L</span>
+                                                                <ArrowDown size={10} className="text-emerald-400" />
+                                                            </motion.div>
+                                                        )}
+                                                        {isHigh && (
+                                                            <motion.div initial={{ x: 10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex flex-col items-center">
+                                                                <span className="text-[8px] font-black text-rose-400 uppercase">H</span>
+                                                                <ArrowDown size={10} className="text-rose-400" />
+                                                            </motion.div>
+                                                        )}
+                                                    </div>
                                                 </div>
+
+                                                {/* Bar/Box */}
+                                                <motion.div
+                                                    animate={{
+                                                        scale: isMid ? 1.2 : 1,
+                                                        opacity: inRange ? 1 : 0.2
+                                                    }}
+                                                    className={`w-14 md:w-16 h-16 rounded-2xl flex items-center justify-center border-2 text-xl font-bold transition-all duration-300 ${isTarget ? 'bg-blue-500 border-blue-300 text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' :
+                                                        isMid ? 'bg-amber-500/20 border-amber-500 text-amber-400' :
+                                                            inRange ? 'bg-slate-800 border-blue-500/30 text-slate-200' :
+                                                                'bg-slate-900 border-white/5 text-slate-700'
+                                                        }`}
+                                                >
+                                                    {val}
+                                                </motion.div>
+
+                                                <span className="text-[10px] font-mono text-slate-500">[{idx}]</span>
                                             </div>
-
-                                            {/* Bar/Box */}
-                                            <motion.div
-                                                animate={{
-                                                    scale: isMid ? 1.2 : 1,
-                                                    opacity: inRange ? 1 : 0.2
-                                                }}
-                                                className={`w-14 md:w-16 h-16 rounded-2xl flex items-center justify-center border-2 text-xl font-bold transition-all duration-300 ${isTarget ? 'bg-blue-500 border-blue-300 text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' :
-                                                    isMid ? 'bg-amber-500/20 border-amber-500 text-amber-400' :
-                                                        inRange ? 'bg-slate-800 border-blue-500/30 text-slate-200' :
-                                                            'bg-slate-900 border-white/5 text-slate-700'
-                                                    }`}
-                                            >
-                                                {val}
-                                            </motion.div>
-
-                                            <span className="text-[10px] font-mono text-slate-500">[{idx}]</span>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             {/* Background decoration */}
@@ -405,19 +407,19 @@ const BinarySearchVisualizer = () => {
                         </div>
 
                         {/* Complexity Stats */}
-                        <div className="h-32 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
-                            <div className="grid grid-cols-3 gap-4 h-full">
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-4">
                                     <span className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Time Complexity</span>
-                                    <span className="text-2xl font-black text-blue-400">O(log n)</span>
+                                    <span className="text-xl md:text-2xl font-black text-blue-400">O(log n)</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-4">
                                     <span className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Space Complexity</span>
-                                    <span className="text-2xl font-black text-cyan-400">O(1)</span>
+                                    <span className="text-xl md:text-2xl font-black text-cyan-400">O(1)</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                <div className="col-span-2 md:col-span-1 flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-4">
                                     <span className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Status</span>
-                                    <span className={`text-sm font-black uppercase tracking-widest ${currentStepData.status === 'found' ? 'text-emerald-400' :
+                                    <span className={`text-xs md:text-sm font-black uppercase tracking-widest ${currentStepData.status === 'found' ? 'text-emerald-400' :
                                         currentStepData.status === 'not_found' ? 'text-rose-400' :
                                             'text-amber-400'
                                         }`}>{currentStepData.status.replace('_', ' ')}</span>

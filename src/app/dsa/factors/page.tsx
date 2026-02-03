@@ -345,19 +345,19 @@ const FactorsVisualizer = () => {
     };
 
     return (
-        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans selection:bg-blue-500/30">
             <Header />
 
             {/* Main Content Area - Full Screen Layout */}
-            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black pt-20 pb-6 px-4 md:px-6">
                 {/* Background Decoration */}
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
 
-                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+                <div className="w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
                     {/* LEFT COLUMN: Controller & Info - Matches "Controller on top left" */}
-                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar">
 
                         {/* 1. Controller Panel */}
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
@@ -541,20 +541,20 @@ const FactorsVisualizer = () => {
                     </div>
 
                     {/* RIGHT COLUMN: Visualization - Takes remaining space */}
-                    <div className="h-full flex flex-col gap-6 overflow-hidden">
+                    <div className="flex flex-col gap-6">
 
                         {/* 1. Main Animation Stage */}
-                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col items-center">
+                        <div className="min-h-[500px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-hidden flex flex-col items-center">
                             {/* Step Description Header */}
                             <div className="w-full text-center mb-8 relative z-20">
                                 <motion.div
                                     key={currentStepData.description}
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="inline-block bg-slate-800/80 border border-blue-500/30 rounded-full px-6 py-2 shadow-lg"
+                                    className="inline-block bg-slate-800/80 border border-blue-500/30 rounded-2xl md:rounded-full px-4 md:px-6 py-2 shadow-lg"
                                 >
-                                    <p className="text-lg md:text-xl font-medium text-blue-100 flex items-center gap-3">
-                                        <Info size={20} className="text-blue-400" />
+                                    <p className="text-sm md:text-xl font-medium text-blue-100 flex items-center gap-3">
+                                        <Info size={18} className="text-blue-400 shrink-0" />
                                         {currentStepData.description}
                                     </p>
                                 </motion.div>
@@ -578,20 +578,20 @@ const FactorsVisualizer = () => {
                                                 <div className="flex items-center gap-6 md:gap-12">
                                                     {/* Dividend */}
                                                     <div className="flex flex-col items-center gap-2">
-                                                        <span className="text-slate-400 text-xs font-mono uppercase tracking-widest">Dividend</span>
-                                                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-2xl">
-                                                            <span className="text-4xl md:text-5xl font-bold text-white">{currentStepData.number}</span>
+                                                        <span className="text-slate-400 text-[10px] md:text-xs font-mono uppercase tracking-widest">Dividend</span>
+                                                        <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-2xl">
+                                                            <span className="text-3xl md:text-5xl font-bold text-white">{currentStepData.number}</span>
                                                         </div>
                                                     </div>
 
                                                     {/* Operator */}
-                                                    <span className="text-4xl text-slate-600 font-light">÷</span>
+                                                    <span className="text-2xl md:text-4xl text-slate-600 font-light">÷</span>
 
                                                     {/* Divisor */}
                                                     <div className="flex flex-col items-center gap-2">
-                                                        <span className="text-slate-400 text-xs font-mono uppercase tracking-widest">Divisor</span>
-                                                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-blue-600/20 border border-blue-500/50 flex items-center justify-center shadow-2xl shadow-blue-500/10">
-                                                            <span className="text-4xl md:text-5xl font-bold text-blue-400">{currentStepData.checking}</span>
+                                                        <span className="text-slate-400 text-[10px] md:text-xs font-mono uppercase tracking-widest">Divisor</span>
+                                                        <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl bg-blue-600/20 border border-blue-500/50 flex items-center justify-center shadow-2xl shadow-blue-500/10">
+                                                            <span className="text-3xl md:text-5xl font-bold text-blue-400">{currentStepData.checking}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -645,26 +645,26 @@ const FactorsVisualizer = () => {
                         </div>
 
                         {/* 2. Factors Found Grid (Bottom) */}
-                        <div className="h-48 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col">
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="font-bold text-slate-200">Factors Found</h3>
                                 <span className="text-slate-500 text-sm">{currentStepData.factors.length} items</span>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto custom-scrollbar">
+                            <div className="flex-1 overflow-x-auto custom-scrollbar">
                                 {currentStepData.factors.length === 0 ? (
-                                    <div className="h-full flex items-center justify-center text-slate-600 font-mono text-sm border-2 border-dashed border-slate-800 rounded-xl">
+                                    <div className="h-full min-h-[4rem] flex items-center justify-center text-slate-600 font-mono text-sm border-2 border-dashed border-slate-800 rounded-xl">
                                         Waiting for factors...
                                     </div>
                                 ) : (
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex flex-nowrap gap-2 pb-4">
                                         <AnimatePresence>
                                             {currentStepData.factors.map((factor, idx) => (
                                                 <motion.div
                                                     key={`${factor}-${idx}`}
                                                     initial={{ scale: 0, opacity: 0 }}
                                                     animate={{ scale: 1, opacity: 1 }}
-                                                    className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold text-lg border transition-colors ${factor === currentStepData.newFactor || factor === currentStepData.newPair
+                                                    className={`w-10 h-10 md:w-12 md:h-12 shrink-0 flex items-center justify-center rounded-xl font-bold text-lg border transition-colors ${factor === currentStepData.newFactor || factor === currentStepData.newPair
                                                         ? 'bg-green-500 text-white border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.5)] z-10'
                                                         : 'bg-slate-800 text-blue-300 border-white/5'
                                                         }`}

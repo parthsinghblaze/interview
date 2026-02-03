@@ -144,10 +144,10 @@ const ComplexityPage = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                         >
-                            <h1 className="text-5xl font-bold text-white mb-4">
+                            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
                                 Algorithm Complexity
                             </h1>
-                            <p className="text-xl text-blue-300 max-w-3xl mx-auto">
+                            <p className="text-lg md:text-xl text-blue-300 max-w-3xl mx-auto px-4">
                                 Understanding how algorithms scale with input size - the foundation of writing efficient code
                             </p>
                         </motion.div>
@@ -362,25 +362,25 @@ const ComplexityPage = () => {
                     </motion.div>
 
                     {/* Tab Selector */}
-                    <div className="flex justify-center gap-4 mb-12">
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
                         <button
                             onClick={() => setActiveTab('time')}
-                            className={`flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all ${activeTab === 'time'
+                            className={`flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all ${activeTab === 'time'
                                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
                                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                 }`}
                         >
-                            <Clock size={24} />
+                            <Clock size={20} className="md:w-6 md:h-6" />
                             Time Complexity
                         </button>
                         <button
                             onClick={() => setActiveTab('space')}
-                            className={`flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all ${activeTab === 'space'
+                            className={`flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all ${activeTab === 'space'
                                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
                                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                 }`}
                         >
-                            <Database size={24} />
+                            <Database size={20} className="md:w-6 md:h-6" />
                             Space Complexity
                         </button>
                     </div>
@@ -411,9 +411,9 @@ const ComplexityPage = () => {
                             </div>
 
                             {/* Growth Visualization */}
-                            <div className="bg-slate-900 rounded-2xl p-8 mb-12 border border-slate-800">
-                                <h2 className="text-2xl font-bold text-white mb-6">Operations Growth Comparison</h2>
-                                <div className="flex items-end justify-around gap-4 h-80 bg-slate-950/50 p-6 rounded-xl border border-slate-800">
+                            <div className="bg-slate-900 rounded-2xl p-4 md:p-8 mb-12 border border-slate-800 overflow-x-auto">
+                                <h2 className="text-xl md:text-2xl font-bold text-white mb-6">Operations Growth Comparison</h2>
+                                <div className="flex items-end justify-around gap-2 md:gap-4 h-80 min-w-[600px] md:min-w-0 bg-slate-950/50 p-4 md:p-6 rounded-xl border border-slate-800">
                                     {timeComplexities.map((complexity) => {
                                         const height = (complexity.operations / maxHeight) * 100;
                                         const isTooBig = complexity.operations > 1000;
@@ -421,13 +421,13 @@ const ComplexityPage = () => {
                                         return (
                                             <div key={complexity.notation} className="flex flex-col items-center gap-3 flex-1">
                                                 <div className="text-center min-h-[60px]">
-                                                    <div className={`text-sm font-mono font-bold mb-1 text-${complexity.color}-400`}>
+                                                    <div className={`text-xs md:text-sm font-mono font-bold mb-1 text-${complexity.color}-400`}>
                                                         {complexity.notation}
                                                     </div>
-                                                    <div className="text-2xl font-bold text-white">
+                                                    <div className="text-lg md:text-2xl font-bold text-white">
                                                         {isTooBig ? '∞' : complexity.operations.toLocaleString()}
                                                     </div>
-                                                    <div className="text-xs text-slate-500">ops</div>
+                                                    <div className="text-[10px] md:text-xs text-slate-500">ops</div>
                                                 </div>
                                                 <motion.div
                                                     initial={{ height: 0 }}
@@ -441,7 +441,7 @@ const ComplexityPage = () => {
                                                     }}
                                                 >
                                                     {isTooBig && (
-                                                        <div className="absolute inset-0 flex items-center justify-center text-white font-bold">
+                                                        <div className="absolute inset-0 flex items-center justify-center text-white text-[10px] md:text-xs font-bold rotate-90 md:rotate-0">
                                                             Too Large!
                                                         </div>
                                                     )}

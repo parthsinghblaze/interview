@@ -158,17 +158,17 @@ const FrequencyCounter = () => {
     };
 
     return (
-        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans selection:bg-rose-500/30">
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans selection:bg-rose-500/30">
             <Header />
 
-            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-rose-900/10 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-rose-900/10 via-slate-950 to-black pt-20 pb-6 px-4 md:px-6">
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rose-500/50 to-transparent"></div>
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
 
-                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+                <div className="w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
                     {/* LEFT COLUMN: Controller */}
-                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar">
 
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
                             <div className="flex items-center justify-between mb-6">
@@ -309,20 +309,20 @@ const FrequencyCounter = () => {
                     </div>
 
                     {/* RIGHT COLUMN: Visualization */}
-                    <div className="h-full flex flex-col gap-6 overflow-hidden">
+                    <div className="flex flex-col gap-6">
 
                         {/* 1. Animation Stage */}
-                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col">
+                        <div className="min-h-[500px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-hidden flex flex-col">
                             {/* Step Description */}
                             <div className="w-full text-center mb-12 relative z-20">
                                 <motion.div
                                     key={(currentStepData as any).description}
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="inline-block bg-slate-800/80 border border-rose-500/30 rounded-full px-6 py-2 shadow-lg"
+                                    className="inline-block bg-slate-800/80 border border-rose-500/30 rounded-2xl md:rounded-full px-4 md:px-6 py-2 shadow-lg"
                                 >
-                                    <p className="text-lg font-medium text-rose-100 flex items-center gap-3">
-                                        <Info size={20} className="text-rose-400" />
+                                    <p className="text-sm md:text-lg font-medium text-rose-100 flex items-center gap-3">
+                                        <Info size={18} className="text-rose-400 shrink-0" />
                                         {(currentStepData as any).description}
                                     </p>
                                 </motion.div>
@@ -331,61 +331,65 @@ const FrequencyCounter = () => {
                             {/* Processing Lane */}
                             <div className="flex-1 flex flex-col items-center justify-center gap-16 relative z-10">
                                 {/* Input String Visualization */}
-                                <div className="flex gap-2 p-4 bg-slate-950/50 rounded-2xl border border-white/5 shadow-2xl">
-                                    {inputString.split('').map((char, idx) => (
-                                        <motion.div
-                                            key={idx}
-                                            animate={{
-                                                scale: (currentStepData as any).currentIndex === idx ? 1.2 : 1,
-                                                backgroundColor: (currentStepData as any).currentIndex === idx ? 'rgba(225, 29, 72, 0.3)' : 'rgba(30, 41, 59, 0.5)',
-                                                borderColor: (currentStepData as any).currentIndex === idx ? 'rgba(225, 29, 72, 0.5)' : 'rgba(255, 255, 255, 0.05)',
-                                            }}
-                                            className="w-12 h-12 md:w-16 md:h-16 rounded-xl border flex items-center justify-center font-mono text-2xl font-bold relative"
-                                        >
-                                            {char}
-                                            {(currentStepData as any).currentIndex === idx && (
-                                                <motion.div
-                                                    layoutId="pointer"
-                                                    className="absolute -top-10 text-rose-500"
-                                                    initial={{ y: 0 }}
-                                                    animate={{ y: [0, -5, 0] }}
-                                                    transition={{ repeat: Infinity, duration: 1 }}
-                                                >
-                                                    <Zap size={24} fill="currentColor" />
-                                                </motion.div>
-                                            )}
-                                        </motion.div>
-                                    ))}
+                                <div className="w-full overflow-x-auto pb-4 custom-scrollbar">
+                                    <div className="flex gap-2 p-4 bg-slate-950/50 rounded-2xl border border-white/5 shadow-2xl min-w-max mx-auto">
+                                        {inputString.split('').map((char, idx) => (
+                                            <motion.div
+                                                key={idx}
+                                                animate={{
+                                                    scale: (currentStepData as any).currentIndex === idx ? 1.2 : 1,
+                                                    backgroundColor: (currentStepData as any).currentIndex === idx ? 'rgba(225, 29, 72, 0.3)' : 'rgba(30, 41, 59, 0.5)',
+                                                    borderColor: (currentStepData as any).currentIndex === idx ? 'rgba(225, 29, 72, 0.5)' : 'rgba(255, 255, 255, 0.05)',
+                                                }}
+                                                className="w-10 h-10 md:w-16 md:h-16 rounded-xl border flex items-center justify-center font-mono text-xl md:text-2xl font-bold relative"
+                                            >
+                                                {char}
+                                                {(currentStepData as any).currentIndex === idx && (
+                                                    <motion.div
+                                                        layoutId="pointer"
+                                                        className="absolute -top-10 text-rose-500"
+                                                        initial={{ y: 0 }}
+                                                        animate={{ y: [0, -5, 0] }}
+                                                        transition={{ repeat: Infinity, duration: 1 }}
+                                                    >
+                                                        <Zap size={20} className="md:w-6 md:h-6" fill="currentColor" />
+                                                    </motion.div>
+                                                )}
+                                            </motion.div>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <MoveRight className="text-slate-700 animate-pulse rotate-90 lg:rotate-0" size={32} />
 
                                 {/* Hash Map Visualization */}
                                 <div className="w-full max-w-2xl bg-slate-800/30 rounded-3xl p-8 border border-white/5 relative overflow-hidden min-h-[200px]">
-                                    <div className="absolute top-4 left-6 flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-widest">
+                                    <div className="flex-initial flex items-center gap-2 text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-widest mb-4">
                                         <Database size={14} />
-                                        Frequency Map (Hash Table)
+                                        Frequency Map
                                     </div>
 
-                                    <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                        <AnimatePresence>
-                                            {Object.entries((currentStepData as any).freqMap || {}).map(([char, count]) => (
-                                                <motion.div
-                                                    key={char}
-                                                    layout
-                                                    initial={{ scale: 0, opacity: 0 }}
-                                                    animate={{
-                                                        scale: (currentStepData as any).highlightedChar === char ? 1.1 : 1,
-                                                        opacity: 1,
-                                                        backgroundColor: (currentStepData as any).highlightedChar === char ? 'rgba(225, 29, 72, 0.2)' : 'rgba(30, 41, 59, 0.8)'
-                                                    }}
-                                                    className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-colors ${(currentStepData as any).highlightedChar === char ? 'border-rose-500 shadow-[0_0_20px_rgba(225,29,72,0.2)]' : 'border-white/5'}`}
-                                                >
-                                                    <span className="text-slate-400 text-xs font-bold uppercase tracking-tighter">Char: '{char}'</span>
-                                                    <span className="text-3xl font-bold font-mono text-rose-400">{count as any}</span>
-                                                </motion.div>
-                                            ))}
-                                        </AnimatePresence>
+                                    <div className="overflow-x-auto pb-4 custom-scrollbar">
+                                        <div className="flex flex-nowrap md:grid md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+                                            <AnimatePresence>
+                                                {Object.entries((currentStepData as any).freqMap || {}).map(([char, count]) => (
+                                                    <motion.div
+                                                        key={char}
+                                                        layout
+                                                        initial={{ scale: 0, opacity: 0 }}
+                                                        animate={{
+                                                            scale: (currentStepData as any).highlightedChar === char ? 1.1 : 1,
+                                                            opacity: 1,
+                                                            backgroundColor: (currentStepData as any).highlightedChar === char ? 'rgba(225, 29, 72, 0.2)' : 'rgba(30, 41, 59, 0.8)'
+                                                        }}
+                                                        className={`p-3 md:p-4 rounded-2xl border-2 shrink-0 flex flex-col items-center gap-1 transition-colors ${(currentStepData as any).highlightedChar === char ? 'border-rose-500 shadow-[0_0_20px_rgba(225,29,72,0.2)]' : 'border-white/5'}`}
+                                                    >
+                                                        <span className="text-slate-400 text-[10px] font-bold uppercase tracking-tighter">'{char}'</span>
+                                                        <span className="text-xl md:text-3xl font-bold font-mono text-rose-400">{count as any}</span>
+                                                    </motion.div>
+                                                ))}
+                                            </AnimatePresence>
+                                        </div>
                                     </div>
 
                                     {Object.keys((currentStepData as any).freqMap || {}).length === 0 && (
@@ -409,21 +413,21 @@ const FrequencyCounter = () => {
                         </div>
 
                         {/* 2. Stats Panel */}
-                        <div className="h-32 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
-                            <div className="grid grid-cols-3 gap-4 h-full">
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
-                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Unique Chars</span>
-                                    <span className="text-3xl font-bold text-rose-400">{Object.keys((currentStepData as any).freqMap || {}).length}</span>
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl sticky bottom-4 lg:relative lg:bottom-0">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
+                                    <span className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest mb-1">Unique Chars</span>
+                                    <span className="text-xl md:text-3xl font-bold text-rose-400">{Object.keys((currentStepData as any).freqMap || {}).length}</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
-                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Max Freq</span>
-                                    <span className="text-3xl font-bold text-orange-400">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
+                                    <span className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest mb-1">Max Freq</span>
+                                    <span className="text-xl md:text-3xl font-bold text-orange-400">
                                         {Math.max(0, ...Object.values((currentStepData as any).freqMap || {}).map(v => v as number)) || 0}
                                     </span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
-                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Complexity</span>
-                                    <span className="text-2xl font-bold text-cyan-400">O(n)</span>
+                                <div className="col-span-2 md:col-span-1 flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
+                                    <span className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest mb-1">Complexity</span>
+                                    <span className="text-lg md:text-2xl font-bold text-cyan-400">O(n)</span>
                                 </div>
                             </div>
                         </div>

@@ -250,16 +250,16 @@ const SpiralMatrixVisualizer = () => {
     }, [isPlaying, currentStep, steps.length]);
 
     return (
-        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans selection:bg-amber-500/30">
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans selection:bg-amber-500/30">
             <Header />
 
-            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/10 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/10 via-slate-950 to-black pt-20 pb-6 px-4 md:px-6">
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent"></div>
 
-                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+                <div className="w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
                     {/* LEFT COLUMN */}
-                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar">
 
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
                             <div className="flex items-center justify-between mb-6">
@@ -334,9 +334,9 @@ const SpiralMatrixVisualizer = () => {
                     </div>
 
                     {/* RIGHT COLUMN */}
-                    <div className="flex flex-col gap-6 overflow-hidden">
+                    <div className="flex flex-col gap-6">
 
-                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative flex flex-col items-center justify-center overflow-hidden">
+                        <div className="min-h-[500px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative flex flex-col items-center justify-center overflow-hidden">
 
                             {/* Narrator */}
                             <div className="absolute top-8 left-0 right-0 flex justify-center z-20">
@@ -344,17 +344,17 @@ const SpiralMatrixVisualizer = () => {
                                     key={currentStepData.description}
                                     initial={{ opacity: 0, y: -20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="px-6 py-2 bg-slate-800/90 border border-amber-500/30 rounded-full text-amber-100 font-medium shadow-2xl backdrop-blur-md flex items-center gap-3"
+                                    className="px-4 md:px-6 py-2 bg-slate-800/90 border border-amber-500/30 rounded-2xl md:rounded-full text-amber-100 font-medium shadow-2xl backdrop-blur-md flex items-center gap-3"
                                 >
-                                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                                    {currentStepData.description}
+                                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                                    <span className="text-sm md:text-base">{currentStepData.description}</span>
                                 </motion.div>
                             </div>
 
                             {/* Matrix Grid */}
                             <div className="relative z-10 flex flex-col items-center gap-8">
                                 <div
-                                    className="grid gap-3 p-4 bg-slate-800/30 rounded-3xl border border-white/5 shadow-inner"
+                                    className="grid gap-2 md:gap-3 p-4 bg-slate-800/30 rounded-3xl border border-white/5 shadow-inner"
                                     style={{ gridTemplateColumns: `repeat(${matrix[0].length}, minmax(0, 1fr))` }}
                                 >
                                     {matrix.map((row, rIdx) =>
@@ -362,17 +362,11 @@ const SpiralMatrixVisualizer = () => {
                                             const isActive = currentStepData.activeCell?.r === rIdx && currentStepData.activeCell?.c === cIdx;
                                             const isVisited = currentStepData.result.includes(val);
 
-                                            // Boundary highlights
-                                            const isTopBound = rIdx === currentStepData.boundaries.top - 1;
-                                            const isBottomBound = rIdx === currentStepData.boundaries.bottom + 1;
-                                            const isLeftBound = cIdx === currentStepData.boundaries.left - 1;
-                                            const isRightBound = cIdx === currentStepData.boundaries.right + 1;
-
                                             return (
                                                 <motion.div
                                                     key={`${rIdx}-${cIdx}`}
                                                     layout
-                                                    className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-xl font-bold transition-all duration-300 ${isActive
+                                                    className={`w-10 h-10 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center text-sm md:text-xl font-bold transition-all duration-300 ${isActive
                                                         ? 'bg-amber-500 text-slate-950 scale-110 shadow-[0_0_30px_rgba(245,158,11,0.5)] z-20'
                                                         : isVisited
                                                             ? 'bg-slate-700/50 text-slate-400 scale-95 opacity-50'
@@ -392,14 +386,14 @@ const SpiralMatrixVisualizer = () => {
                                         <ArrowRight size={14} />
                                         <span className="text-[10px] uppercase tracking-widest font-bold">Spiral Result Output</span>
                                     </div>
-                                    <div className="flex flex-wrap gap-2 p-4 bg-slate-950/80 border border-white/5 rounded-2xl min-h-[60px] shadow-inner overflow-hidden">
+                                    <div className="flex flex-nowrap md:flex-wrap gap-2 p-4 bg-slate-950/80 border border-white/5 rounded-2xl min-h-[60px] shadow-inner overflow-x-auto pb-4 custom-scrollbar">
                                         <AnimatePresence mode="popLayout">
                                             {currentStepData.result.map((val, idx) => (
                                                 <motion.div
                                                     key={`res-${val}-${idx}`}
                                                     initial={{ opacity: 0, scale: 0.5, x: 20 }}
                                                     animate={{ opacity: 1, scale: 1, x: 0 }}
-                                                    className="w-10 h-10 flex items-center justify-center bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg font-mono font-bold text-sm"
+                                                    className="w-8 h-8 md:w-10 md:h-10 shrink-0 flex items-center justify-center bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg font-mono font-bold text-xs md:text-sm"
                                                 >
                                                     {val}
                                                 </motion.div>
@@ -413,23 +407,23 @@ const SpiralMatrixVisualizer = () => {
                             </div>
                         </div>
 
-                        <div className="h-32 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
-                            <div className="grid grid-cols-4 gap-4 h-full">
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl sticky bottom-4 lg:relative lg:bottom-0">
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div className="bg-slate-800/40 rounded-2xl p-3 border border-white/5 flex flex-col justify-center">
                                     <span className="text-[10px] uppercase text-slate-500 font-bold tracking-tighter mb-1">Matrix Size</span>
-                                    <span className="text-xl font-bold text-amber-400">{matrix.length} × {matrix[0].length}</span>
+                                    <span className="text-lg md:text-xl font-bold text-amber-400">{matrix.length} × {matrix[0].length}</span>
                                 </div>
                                 <div className="bg-slate-800/40 rounded-2xl p-3 border border-white/5 flex flex-col justify-center">
                                     <span className="text-[10px] uppercase text-slate-500 font-bold tracking-tighter mb-1">Traversed</span>
-                                    <span className="text-xl font-bold text-orange-400">{currentStepData.result.length} / {matrix.length * matrix[0].length}</span>
+                                    <span className="text-lg md:text-xl font-bold text-orange-400">{currentStepData.result.length} / {matrix.length * matrix[0].length}</span>
                                 </div>
                                 <div className="bg-slate-800/40 rounded-2xl p-3 border border-white/5 flex flex-col justify-center">
                                     <span className="text-[10px] uppercase text-slate-500 font-bold tracking-tighter mb-1">Time</span>
-                                    <span className="text-xl font-bold text-cyan-400">O(R × C)</span>
+                                    <span className="text-lg md:text-xl font-bold text-cyan-400">O(R × C)</span>
                                 </div>
                                 <div className="bg-slate-800/40 rounded-2xl p-3 border border-white/5 flex flex-col justify-center">
                                     <span className="text-[10px] uppercase text-slate-500 font-bold tracking-tighter mb-1">Space</span>
-                                    <span className="text-xl font-bold text-purple-400">O(1)</span>
+                                    <span className="text-lg md:text-xl font-bold text-purple-400">O(1)</span>
                                 </div>
                             </div>
                         </div>
