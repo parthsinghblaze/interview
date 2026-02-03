@@ -18,7 +18,7 @@ export default function DSAPage() {
             spaceComplexity: 'O(1)',
             techniques: ['Linear Search', 'Iteration', 'Comparison'],
             learning: 'Understanding iteration, comparison operations, and array traversal.',
-            href: '/find-max',
+            href: '/dsa/find-max',
             color: 'blue'
         },
         {
@@ -30,7 +30,7 @@ export default function DSAPage() {
             spaceComplexity: 'O(1)',
             techniques: ['Modulo Arithmetic', 'Digit Extraction', 'Powers'],
             learning: 'Number manipulation, mathematical computations, and validation logic.',
-            href: '/armstrong',
+            href: '/dsa/armstrong',
             color: 'purple'
         },
         {
@@ -42,7 +42,7 @@ export default function DSAPage() {
             spaceComplexity: 'O(1)',
             techniques: ['Math Optimization', 'Divisibility', 'Loops'],
             learning: 'Algorithm optimization, mathematical properties, and efficiency.',
-            href: '/factors',
+            href: '/dsa/factors',
             color: 'green'
         }
     ];
@@ -82,13 +82,13 @@ export default function DSAPage() {
                             >
                                 {/* Card Header */}
                                 <div className={`p-6 bg-gradient-to-br ${algo.color === 'blue' ? 'from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/10' :
-                                        algo.color === 'purple' ? 'from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/10' :
-                                            'from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10'
+                                    algo.color === 'purple' ? 'from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/10' :
+                                        'from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10'
                                     }`}>
                                     <div className="flex justify-between items-start">
                                         <div className={`p-3 rounded-xl ${algo.color === 'blue' ? 'bg-blue-100 text-blue-600 dark:bg-blue-800/50 dark:text-blue-300' :
-                                                algo.color === 'purple' ? 'bg-purple-100 text-purple-600 dark:bg-purple-800/50 dark:text-purple-300' :
-                                                    'bg-emerald-100 text-emerald-600 dark:bg-emerald-800/50 dark:text-emerald-300'
+                                            algo.color === 'purple' ? 'bg-purple-100 text-purple-600 dark:bg-purple-800/50 dark:text-purple-300' :
+                                                'bg-emerald-100 text-emerald-600 dark:bg-emerald-800/50 dark:text-emerald-300'
                                             }`}>
                                             <algo.icon size={32} />
                                         </div>
@@ -127,8 +127,8 @@ export default function DSAPage() {
                                     <Link
                                         href={algo.href}
                                         className={`w-full py-3 rounded-lg font-semibold text-center flex items-center justify-center gap-2 transition-all group ${algo.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' :
-                                                algo.color === 'purple' ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/20' :
-                                                    'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+                                            algo.color === 'purple' ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/20' :
+                                                'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
                                             } shadow-lg`}
                                     >
                                         <Play size={18} className="fill-current" /> Try Visualizer

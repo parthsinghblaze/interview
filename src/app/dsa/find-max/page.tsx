@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, RotateCcw, Play } from 'lucide-react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 const DSAVisualizer = () => {
     // Sample array to visualize
@@ -51,7 +51,7 @@ const DSAVisualizer = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
 
-    const currentStepData = steps[currentStep];
+    const currentStepData = { ...steps[currentStep], completed: currentStep === steps.length - 1 };
 
     // JavaScript code
     const jsCode = [
@@ -147,7 +147,7 @@ const DSAVisualizer = () => {
                                                 {idx}
                                             </span>
                                             <span className={`text-xl font-bold ${idx === currentStepData.maxIndex ? 'text-green-400' :
-                                                    idx === currentStepData.comparing ? 'text-yellow-400' : 'text-white'
+                                                idx === currentStepData.comparing ? 'text-yellow-400' : 'text-white'
                                                 }`}>{value}</span>
                                         </div>
                                     ))}
@@ -200,8 +200,8 @@ const DSAVisualizer = () => {
                                         <button
                                             onClick={() => setLanguage('javascript')}
                                             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${language === 'javascript'
-                                                    ? 'bg-yellow-500 text-slate-900 shadow-md'
-                                                    : 'text-slate-400 hover:text-white'
+                                                ? 'bg-yellow-500 text-slate-900 shadow-md'
+                                                : 'text-slate-400 hover:text-white'
                                                 }`}
                                         >
                                             JavaScript
@@ -209,8 +209,8 @@ const DSAVisualizer = () => {
                                         <button
                                             onClick={() => setLanguage('python')}
                                             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${language === 'python'
-                                                    ? 'bg-blue-500 text-white shadow-md'
-                                                    : 'text-slate-400 hover:text-white'
+                                                ? 'bg-blue-500 text-white shadow-md'
+                                                : 'text-slate-400 hover:text-white'
                                                 }`}
                                         >
                                             Python

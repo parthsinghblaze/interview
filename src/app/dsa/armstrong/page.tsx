@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, RotateCcw, Play, Edit3 } from 'lucide-react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 const ArmstrongVisualizer = () => {
     // Initial number to check
@@ -384,8 +384,8 @@ const ArmstrongVisualizer = () => {
                                         <button
                                             onClick={() => setLanguage('javascript')}
                                             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${language === 'javascript'
-                                                    ? 'bg-yellow-500 text-slate-900 shadow-md'
-                                                    : 'text-slate-400 hover:text-white'
+                                                ? 'bg-yellow-500 text-slate-900 shadow-md'
+                                                : 'text-slate-400 hover:text-white'
                                                 }`}
                                         >
                                             JavaScript
@@ -393,8 +393,8 @@ const ArmstrongVisualizer = () => {
                                         <button
                                             onClick={() => setLanguage('python')}
                                             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${language === 'python'
-                                                    ? 'bg-blue-500 text-white shadow-md'
-                                                    : 'text-slate-400 hover:text-white'
+                                                ? 'bg-blue-500 text-white shadow-md'
+                                                : 'text-slate-400 hover:text-white'
                                                 }`}
                                         >
                                             Python
@@ -502,8 +502,8 @@ const ArmstrongVisualizer = () => {
                                 {/* Result Badge */}
                                 {currentStepData.completed && (
                                     <div className={`mt-6 p-6 rounded-xl text-center border-2 animate-in zoom-in-50 duration-300 ${currentStepData.isArmstrong
-                                            ? 'bg-green-500/10 border-green-500/50'
-                                            : 'bg-red-500/10 border-red-500/50'
+                                        ? 'bg-green-500/10 border-green-500/50'
+                                        : 'bg-red-500/10 border-red-500/50'
                                         }`}>
                                         <p className={`font-black text-2xl mb-2 ${currentStepData.isArmstrong ? 'text-green-400' : 'text-red-400'
                                             }`}>
