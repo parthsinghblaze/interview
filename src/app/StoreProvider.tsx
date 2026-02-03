@@ -20,10 +20,21 @@ export default function StoreProvider({
         if (storeRef.current) {
             // Check localStorage for theme
             const savedTheme = localStorage.getItem('theme');
+            let initialTheme: 'light' | 'dark' = 'light';
+
             if (savedTheme === 'dark' || savedTheme === 'light') {
-                storeRef.current.dispatch(setTheme(savedTheme));
+                initialTheme = savedTheme;
             } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                storeRef.current.dispatch(setTheme('dark'));
+                initialTheme = 'dark';
+            }
+
+            storeRef.current.dispatch(setTheme(initialTheme));
+
+            // Sync with DOM
+            if (initialTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
             }
         }
     }, []);

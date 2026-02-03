@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Edit3, Zap, Code, In
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const FactorsVisualizer = () => {
     // Initial number to check
@@ -470,35 +472,57 @@ const FactorsVisualizer = () => {
                         {/* 2. Step Description & Code Snippet (Compact) */}
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl flex-1 flex flex-col min-h-[300px]">
                             <div className="flex items-center gap-2 mb-4 text-blue-400">
-                                <Info size={18} />
-                                <h3 className="font-bold text-sm uppercase tracking-wider">Current Operation</h3>
+                                <Code size={18} />
+                                <h3 className="font-bold text-sm uppercase tracking-wider">Algorithm Code</h3>
                             </div>
 
-                            <div className="bg-slate-800/50 rounded-xl p-4 border border-white/5 mb-4 flex-grow">
-                                <p className="text-lg leading-relaxed text-slate-200">
-                                    {currentStepData.description}
-                                </p>
-                            </div>
-
-                            <div className="relative">
-                                <div className="absolute top-0 right-0 p-2">
-                                    <div className="flex bg-slate-900/80 rounded p-1 border border-white/10">
+                            <div className="relative flex-1 min-h-0 flex flex-col">
+                                <div className="absolute top-0 right-0 p-2 z-10 w-full flex justify-end pointer-events-none">
+                                    <div className="flex bg-slate-900/80 rounded p-1 border border-white/10 backdrop-blur-sm pointer-events-auto">
                                         <button
-                                            className={`px-2 py-0.5 text-xs rounded ${language === 'javascript' ? 'bg-blue-500/20 text-blue-300' : 'text-slate-500'}`}
+                                            className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${language === 'javascript' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                                             onClick={() => setLanguage('javascript')}
                                         >JS</button>
                                         <button
-                                            className={`px-2 py-0.5 text-xs rounded ${language === 'python' ? 'bg-blue-500/20 text-blue-300' : 'text-slate-500'}`}
+                                            className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${language === 'python' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                                             onClick={() => setLanguage('python')}
                                         >PY</button>
                                     </div>
                                 </div>
-                                <div className="bg-slate-950 rounded-lg p-3 font-mono text-xs overflow-x-auto border border-slate-800/50 h-32 custom-scrollbar">
-                                    {code.map((line, idx) => (
-                                        <div key={idx} className={`${idx === currentLine ? 'bg-blue-500/20 text-blue-200' : 'text-slate-500'} px-1 rounded`}>
-                                            {line}
-                                        </div>
-                                    ))}
+
+                                <div className="flex-1 rounded-xl overflow-hidden border border-slate-700/50 shadow-inner bg-[#1e1e1e] relative">
+                                    <div className="absolute inset-0 overflow-auto custom-scrollbar">
+                                        <SyntaxHighlighter
+                                            language={language}
+                                            style={atomDark}
+                                            showLineNumbers={true}
+                                            wrapLines={true}
+                                            customStyle={{
+                                                margin: 0,
+                                                padding: '1.5rem',
+                                                minHeight: '100%',
+                                                fontSize: '0.9rem',
+                                                lineHeight: '1.6',
+                                                backgroundColor: '#1e1e1e',
+                                                fontFamily: 'var(--font-mono)'
+                                            }}
+                                            lineNumberStyle={{ minWidth: '2em', paddingRight: '1em', color: '#6e7681', textAlign: 'right' }}
+                                            lineProps={(lineNumber) => {
+                                                const isCurrentLine = lineNumber === currentLine + 1;
+                                                return {
+                                                    style: {
+                                                        backgroundColor: isCurrentLine ? 'rgba(59, 130, 246, 0.15)' : undefined,
+                                                        display: 'block',
+                                                        width: '100%',
+                                                        borderLeft: isCurrentLine ? '3px solid #3b82f6' : '3px solid transparent',
+                                                        paddingLeft: '1rem'
+                                                    }
+                                                };
+                                            }}
+                                        >
+                                            {code.join('\n')}
+                                        </SyntaxHighlighter>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -509,88 +533,104 @@ const FactorsVisualizer = () => {
                     <div className="h-full flex flex-col gap-6 overflow-hidden">
 
                         {/* 1. Main Animation Stage */}
-                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col items-center justify-center">
+                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col items-center">
+                            {/* Step Description Header */}
+                            <div className="w-full text-center mb-8 relative z-20">
+                                <motion.div
+                                    key={currentStepData.description}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="inline-block bg-slate-800/80 border border-blue-500/30 rounded-full px-6 py-2 shadow-lg"
+                                >
+                                    <p className="text-lg md:text-xl font-medium text-blue-100 flex items-center gap-3">
+                                        <Info size={20} className="text-blue-400" />
+                                        {currentStepData.description}
+                                    </p>
+                                </motion.div>
+                            </div>
 
                             {/* Decorative Elements */}
-                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1),transparent_70%)]"></div>
+                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1),transparent_70%)] pointer-events-none"></div>
 
-                            <AnimatePresence mode="wait">
-                                {currentStepData.checking !== null ? (
-                                    <motion.div
-                                        key="checking"
-                                        initial={{ scale: 0.9, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        exit={{ scale: 0.9, opacity: 0 }}
-                                        className="relative z-10 w-full max-w-2xl"
-                                    >
-                                        {/* Division Visualizer */}
-                                        <div className="flex flex-col items-center gap-8">
-                                            <div className="flex items-center gap-6 md:gap-12">
-                                                {/* Dividend */}
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <span className="text-slate-400 text-xs font-mono uppercase tracking-widest">Dividend</span>
-                                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-2xl">
-                                                        <span className="text-4xl md:text-5xl font-bold text-white">{currentStepData.number}</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Operator */}
-                                                <span className="text-4xl text-slate-600 font-light">÷</span>
-
-                                                {/* Divisor */}
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <span className="text-slate-400 text-xs font-mono uppercase tracking-widest">Divisor</span>
-                                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-blue-600/20 border border-blue-500/50 flex items-center justify-center shadow-2xl shadow-blue-500/10">
-                                                        <span className="text-4xl md:text-5xl font-bold text-blue-400">{currentStepData.checking}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Connector Line */}
-                                            <div className="h-12 w-0.5 bg-gradient-to-b from-slate-700 to-transparent"></div>
-
-                                            {/* Result Area */}
-                                            {currentStepData.quotient !== undefined && (
-                                                <motion.div
-                                                    initial={{ y: 20, opacity: 0 }}
-                                                    animate={{ y: 0, opacity: 1 }}
-                                                    className="grid grid-cols-2 gap-4 w-full max-w-md"
-                                                >
-                                                    <div className="bg-slate-800/80 p-4 rounded-xl border border-white/5 text-center">
-                                                        <div className="text-xs text-slate-500 mb-1">Quotient</div>
-                                                        <div className="text-2xl font-bold text-white">{currentStepData.quotient}</div>
-                                                    </div>
-                                                    <div className={`bg-slate-800/80 p-4 rounded-xl border ${currentStepData.remainder === 0 ? 'border-green-500/30 bg-green-500/10' : 'border-red-500/30 bg-red-500/10'} text-center transition-colors duration-500`}>
-                                                        <div className="text-xs text-slate-500 mb-1">Remainder</div>
-                                                        <div className={`text-2xl font-bold ${currentStepData.remainder === 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                                            {currentStepData.remainder}
+                            <div className="flex-1 w-full flex items-center justify-center relative z-10">
+                                <AnimatePresence mode="wait">
+                                    {currentStepData.checking !== null ? (
+                                        <motion.div
+                                            key="checking"
+                                            initial={{ scale: 0.9, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            exit={{ scale: 0.9, opacity: 0 }}
+                                            className="relative z-10 w-full max-w-2xl"
+                                        >
+                                            {/* Division Visualizer */}
+                                            <div className="flex flex-col items-center gap-8">
+                                                <div className="flex items-center gap-6 md:gap-12">
+                                                    {/* Dividend */}
+                                                    <div className="flex flex-col items-center gap-2">
+                                                        <span className="text-slate-400 text-xs font-mono uppercase tracking-widest">Dividend</span>
+                                                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-2xl">
+                                                            <span className="text-4xl md:text-5xl font-bold text-white">{currentStepData.number}</span>
                                                         </div>
                                                     </div>
-                                                </motion.div>
-                                            )}
 
-                                            {/* Status Badge */}
-                                            {currentStepData.isDivisible !== null && (
-                                                <motion.div
-                                                    initial={{ scale: 0.5, opacity: 0 }}
-                                                    animate={{ scale: 1, opacity: 1 }}
-                                                    className={`px-6 py-2 rounded-full font-bold text-lg border backdrop-blur-md ${currentStepData.isDivisible
+                                                    {/* Operator */}
+                                                    <span className="text-4xl text-slate-600 font-light">÷</span>
+
+                                                    {/* Divisor */}
+                                                    <div className="flex flex-col items-center gap-2">
+                                                        <span className="text-slate-400 text-xs font-mono uppercase tracking-widest">Divisor</span>
+                                                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-blue-600/20 border border-blue-500/50 flex items-center justify-center shadow-2xl shadow-blue-500/10">
+                                                            <span className="text-4xl md:text-5xl font-bold text-blue-400">{currentStepData.checking}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Connector Line */}
+                                                <div className="h-12 w-0.5 bg-gradient-to-b from-slate-700 to-transparent"></div>
+
+                                                {/* Result Area */}
+                                                {currentStepData.quotient !== undefined && (
+                                                    <motion.div
+                                                        initial={{ y: 20, opacity: 0 }}
+                                                        animate={{ y: 0, opacity: 1 }}
+                                                        className="grid grid-cols-2 gap-4 w-full max-w-md"
+                                                    >
+                                                        <div className="bg-slate-800/80 p-4 rounded-xl border border-white/5 text-center">
+                                                            <div className="text-xs text-slate-500 mb-1">Quotient</div>
+                                                            <div className="text-2xl font-bold text-white">{currentStepData.quotient}</div>
+                                                        </div>
+                                                        <div className={`bg-slate-800/80 p-4 rounded-xl border ${currentStepData.remainder === 0 ? 'border-green-500/30 bg-green-500/10' : 'border-red-500/30 bg-red-500/10'} text-center transition-colors duration-500`}>
+                                                            <div className="text-xs text-slate-500 mb-1">Remainder</div>
+                                                            <div className={`text-2xl font-bold ${currentStepData.remainder === 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                                {currentStepData.remainder}
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+
+                                                {/* Status Badge */}
+                                                {currentStepData.isDivisible !== null && (
+                                                    <motion.div
+                                                        initial={{ scale: 0.5, opacity: 0 }}
+                                                        animate={{ scale: 1, opacity: 1 }}
+                                                        className={`px-6 py-2 rounded-full font-bold text-lg border backdrop-blur-md ${currentStepData.isDivisible
                                                             ? 'bg-green-500/20 border-green-500/50 text-green-300 shadow-lg shadow-green-500/20'
                                                             : 'bg-red-500/20 border-red-500/50 text-red-300'
-                                                        }`}
-                                                >
-                                                    {currentStepData.isDivisible ? 'Factor Found!' : 'Not a Factor'}
-                                                </motion.div>
-                                            )}
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div className="text-center text-slate-500">
-                                        <Play size={48} className="mx-auto mb-4 opacity-20" />
-                                        <p>Start the visualization to see the division process.</p>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                                                            }`}
+                                                    >
+                                                        {currentStepData.isDivisible ? 'Factor Found!' : 'Not a Factor'}
+                                                    </motion.div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div className="text-center text-slate-500">
+                                            <Play size={48} className="mx-auto mb-4 opacity-20" />
+                                            <p>Start the visualization to see the division process.</p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
 
                         {/* 2. Factors Found Grid (Bottom) */}
@@ -614,8 +654,8 @@ const FactorsVisualizer = () => {
                                                     initial={{ scale: 0, opacity: 0 }}
                                                     animate={{ scale: 1, opacity: 1 }}
                                                     className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold text-lg border transition-colors ${factor === currentStepData.newFactor || factor === currentStepData.newPair
-                                                            ? 'bg-green-500 text-white border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.5)] z-10'
-                                                            : 'bg-slate-800 text-blue-300 border-white/5'
+                                                        ? 'bg-green-500 text-white border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.5)] z-10'
+                                                        : 'bg-slate-800 text-blue-300 border-white/5'
                                                         }`}
                                                 >
                                                     {factor}

@@ -1,114 +1,113 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Play, Edit3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Edit3, Code, Info } from 'lucide-react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const ArmstrongVisualizer = () => {
     // Initial number to check
     const [inputNumber, setInputNumber] = useState(153);
     const [isEditing, setIsEditing] = useState(false);
     const [tempInput, setTempInput] = useState('153');
+    const [isPlaying, setIsPlaying] = useState(false);
 
-    // Generate steps for the current number
+    // Generate steps for Armstrong number check
     const generateSteps = (num: number) => {
+        const steps = [];
         const numStr = num.toString();
         const digits = numStr.split('').map(Number);
-        const numDigits = digits.length;
+        const n = digits.length;
 
-        const steps = [
-            {
-                description: `Starting: Check if ${num} is an Armstrong number`,
-                stage: 'init',
-                number: num,
-                digits: [] as number[],
-                numDigits: 0,
-                powers: [] as number[],
-                sum: 0,
-                highlightDigit: null as number | null,
-                currentDigit: null as number | null,
-                currentPower: null as number | null,
-                isArmstrong: null as boolean | null,
-                completed: false,
-                jsLine: 0,
-                pyLine: 0
-            },
-            {
-                description: `Extract digits from ${num}: [${digits.join(', ')}]`,
-                stage: 'extract',
-                number: num,
-                digits: digits,
-                numDigits: numDigits,
-                powers: [] as number[],
-                sum: 0,
-                highlightDigit: null,
-                currentDigit: null,
-                currentPower: null,
-                isArmstrong: null,
-                completed: false,
-                jsLine: 2,
-                pyLine: 2
-            },
-            {
-                description: `Count number of digits: ${numDigits}`,
-                stage: 'count',
-                number: num,
-                digits: digits,
-                numDigits: numDigits,
-                powers: [] as number[],
-                sum: 0,
-                highlightDigit: null,
-                currentDigit: null,
-                currentPower: null,
-                isArmstrong: null,
-                completed: false,
-                jsLine: 3,
-                pyLine: 3
-            }
-        ];
-
-        // Add steps for each digit calculation
-        let runningSum = 0;
-        digits.forEach((digit, idx) => {
-            const power = Math.pow(digit, numDigits);
-            runningSum += power;
-
-            steps.push({
-                description: `Calculate ${digit}^${numDigits} = ${power}`,
-                stage: 'calculate',
-                number: num,
-                digits: digits,
-                numDigits: numDigits,
-                powers: digits.slice(0, idx + 1).map(d => Math.pow(d, numDigits)),
-                currentDigit: digit,
-                currentPower: power,
-                highlightDigit: idx,
-                sum: runningSum,
-                isArmstrong: null,
-                completed: false,
-                jsLine: 5,
-                pyLine: 5
-            });
+        // Initial step
+        steps.push({
+            description: `Checking if ${num} is an Armstrong number`,
+            stage: 'init',
+            number: num,
+            digits: [],
+            powers: [],
+            sum: 0,
+            currentDigit: null,
+            highlightDigit: -1,
+            isArmstrong: null,
+            jsLine: 0,
+            pyLine: 0
         });
 
-        // Final comparison
-        const isArmstrong = runningSum === num;
+        // Extract digits
         steps.push({
-            description: `Sum = ${runningSum}. ${isArmstrong ? `${runningSum} = ${num}. ✓ Armstrong Number!` : `${runningSum} ≠ ${num}. ✗ Not an Armstrong Number`}`,
+            description: `Number has ${n} digits: [${digits.join(', ')}]`,
+            stage: 'extract',
+            number: num,
+            digits: digits,
+            powers: [],
+            sum: 0,
+            currentDigit: null,
+            highlightDigit: -1,
+            isArmstrong: null,
+            jsLine: 1,
+            pyLine: 1
+        });
+
+        let sum = 0;
+        const powers: number[] = [];
+
+        // Calculate powers for each digit
+        for (let i = 0; i < digits.length; i++) {
+            const digit = digits[i];
+            const power = Math.pow(digit, n);
+
+            steps.push({
+                description: `Calculating ${digit}^${n} = ${power}`,
+                stage: 'calculating',
+                number: num,
+                digits: digits,
+                powers: [...powers],
+                sum: sum,
+                currentDigit: digit,
+                highlightDigit: i,
+                isArmstrong: null,
+                jsLine: 2,
+                pyLine: 2
+            });
+
+            powers.push(power);
+            sum += power;
+
+            steps.push({
+                description: `Sum = ${sum} (added ${power})`,
+                stage: 'summing',
+                number: num,
+                digits: digits,
+                powers: [...powers],
+                sum: sum,
+                currentDigit: null,
+                highlightDigit: i,
+                isArmstrong: null,
+                jsLine: 3,
+                pyLine: 3
+            });
+        }
+
+        // Final check
+        const isArmstrong = sum === num;
+        steps.push({
+            description: isArmstrong
+                ? `${num} = ${sum} ✓ It's an Armstrong number!`
+                : `${num} ≠ ${sum} ✗ Not an Armstrong number`,
             stage: 'result',
             number: num,
             digits: digits,
-            numDigits: numDigits,
-            powers: digits.map(d => Math.pow(d, numDigits)),
-            sum: runningSum,
-            isArmstrong: isArmstrong,
-            completed: true,
-            highlightDigit: null,
+            powers: powers,
+            sum: sum,
             currentDigit: null,
-            currentPower: null,
-            jsLine: 8,
-            pyLine: 7
+            highlightDigit: -1,
+            isArmstrong: isArmstrong,
+            jsLine: 4,
+            pyLine: 4
         });
 
         return steps;
@@ -118,18 +117,14 @@ const ArmstrongVisualizer = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
 
-    const currentStepData = steps[currentStep];
+    const currentStepData = { ...steps[currentStep], completed: currentStep === steps.length - 1 };
 
     // JavaScript code
     const jsCode = [
         "function isArmstrong(num) {",
-        "  const numStr = num.toString();",
-        "  const digits = numStr.split('').map(Number);",
-        "  const numDigits = digits.length;",
-        "  let sum = 0;",
-        "  for (let digit of digits) {",
-        "    sum += Math.pow(digit, numDigits);",
-        "  }",
+        "  const digits = num.toString().split('').map(Number);",
+        "  const n = digits.length;",
+        "  const sum = digits.reduce((acc, d) => acc + Math.pow(d, n), 0);",
         "  return sum === num;",
         "}"
     ];
@@ -137,13 +132,10 @@ const ArmstrongVisualizer = () => {
     // Python code
     const pyCode = [
         "def is_armstrong(num):",
-        "    num_str = str(num)",
-        "    digits = [int(d) for d in num_str]",
-        "    num_digits = len(digits)",
-        "    total = 0",
-        "    for digit in digits:",
-        "        total += digit ** num_digits",
-        "    return total == num"
+        "    digits = [int(d) for d in str(num)]",
+        "    n = len(digits)",
+        "    sum_powers = sum(d ** n for d in digits)",
+        "    return sum_powers == num"
     ];
 
     const code = language === 'javascript' ? jsCode : pyCode;
@@ -163,28 +155,39 @@ const ArmstrongVisualizer = () => {
 
     const handleReset = () => {
         setCurrentStep(0);
+        setIsPlaying(false);
     };
 
-    const handleAutoPlay = () => {
-        let step = currentStep;
-        const interval = setInterval(() => {
-            step++;
-            if (step >= steps.length) {
-                clearInterval(interval);
-            } else {
-                setCurrentStep(step);
-            }
-        }, 1500);
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isPlaying && currentStep < steps.length - 1) {
+            interval = setInterval(() => {
+                setCurrentStep(prev => {
+                    if (prev >= steps.length - 1) {
+                        setIsPlaying(false);
+                        return prev;
+                    }
+                    return prev + 1;
+                });
+            }, 800);
+        } else if (currentStep >= steps.length - 1) {
+            setIsPlaying(false);
+        }
+        return () => clearInterval(interval);
+    }, [isPlaying, currentStep, steps.length]);
+
+    const togglePlay = () => {
+        setIsPlaying(!isPlaying);
     };
 
     const handleNumberChange = () => {
         const newNum = parseInt(tempInput);
-        if (!isNaN(newNum) && newNum > 0 && newNum < 1000000) {
+        if (!isNaN(newNum) && newNum > 0 && newNum <= 100000) {
             setInputNumber(newNum);
-            const newSteps = generateSteps(newNum);
-            setSteps(newSteps);
+            setSteps(generateSteps(newNum));
             setCurrentStep(0);
             setIsEditing(false);
+            setIsPlaying(false);
         }
     };
 
@@ -195,374 +198,305 @@ const ArmstrongVisualizer = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
+        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans selection:bg-purple-500/30">
             <Header />
-            <div className="pt-24 pb-12 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen">
-                <div className="max-w-6xl mx-auto px-4">
-                    {/* Header */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold text-white mb-2">Armstrong Number Checker</h1>
-                        <p className="text-purple-300">Visual Step-by-Step Algorithm</p>
 
-                        {/* Number Input */}
-                        <div className="mt-6 flex items-center justify-center gap-3">
-                            {isEditing ? (
-                                <div className="flex items-center gap-2 bg-slate-800/80 p-2 rounded-xl backdrop-blur-sm border border-purple-500/50">
-                                    <input
-                                        type="number"
-                                        value={tempInput}
-                                        onChange={(e) => setTempInput(e.target.value)}
-                                        onKeyPress={handleKeyPress}
-                                        className="px-4 py-2 rounded-lg bg-slate-900 text-white border border-purple-500 focus:outline-none focus:border-pink-500 w-32"
-                                        autoFocus
-                                    />
-                                    <button
-                                        onClick={handleNumberChange}
-                                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-lg shadow-green-600/20"
-                                    >
-                                        Check
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setIsEditing(false);
-                                            setTempInput(inputNumber.toString());
-                                        }}
-                                        className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-4 bg-slate-800/60 p-3 rounded-xl backdrop-blur-sm border border-white/10">
-                                    <span className="text-3xl font-bold text-white tracking-tight">{inputNumber}</span>
-                                    <div className="w-px h-8 bg-slate-600"></div>
-                                    <button
-                                        onClick={() => setIsEditing(true)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all transform hover:scale-105 shadow-lg shadow-purple-600/30"
-                                    >
-                                        <Edit3 size={18} />
-                                        <span>Change</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+            {/* Main Content Area - Full Screen Layout */}
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+                {/* Background Decoration */}
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
 
-                    {/* Main Content Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left Column - Visualization */}
-                        <div className="space-y-6">
-                            {/* Number Breakdown */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                <h2 className="text-xl font-semibold text-white mb-4">Number Breakdown</h2>
-                                <div className="text-center py-4">
-                                    <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-2">
-                                        {currentStepData.number}
-                                    </div>
-                                    <div className="text-sm text-purple-300 font-medium uppercase tracking-wider">
-                                        {currentStepData.numDigits > 0 && `${currentStepData.numDigits} digit${currentStepData.numDigits > 1 ? 's' : ''}`}
-                                    </div>
+                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
+
+                    {/* LEFT COLUMN: Controller & Code */}
+                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+
+                        {/* 1. Controller Panel */}
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
+                            <div className="flex items-center justify-between mb-6">
+                                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                                    Armstrong Checker
+                                </h1>
+                                <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
+                                    v2.0
                                 </div>
                             </div>
 
-                            {/* Digits Visualization */}
-                            {currentStepData.digits.length > 0 && (
-                                <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                    <h2 className="text-xl font-semibold text-white mb-6">Power Calculation</h2>
-                                    <div className="flex flex-wrap gap-4 justify-center">
-                                        {currentStepData.digits.map((digit, idx) => (
-                                            <div
-                                                key={idx}
-                                                className={`
-                          relative flex flex-col items-center p-4 rounded-xl transition-all duration-300 min-w-[5rem]
-                          ${idx === currentStepData.highlightDigit
-                                                        ? 'bg-yellow-500 text-slate-900 scale-110 shadow-lg shadow-yellow-500/50 z-10'
-                                                        : currentStepData.powers[idx] !== undefined
-                                                            ? 'bg-green-600 text-white shadow-lg shadow-green-600/20'
-                                                            : 'bg-slate-700 text-slate-300'
-                                                    }
-                        `}
-                                            >
-                                                <span className="text-[10px] uppercase font-bold opacity-60 mb-1">Index {idx}</span>
-                                                <div className="flex items-start">
-                                                    <span className="text-3xl font-bold">{digit}</span>
-                                                    {currentStepData.numDigits > 0 && (
-                                                        <span className="text-xs font-bold -mt-0.5 ml-0.5 opacity-80">
-                                                            {currentStepData.numDigits}
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                {currentStepData.powers[idx] !== undefined && (
-                                                    <div className="mt-2 pt-2 border-t border-white/20 w-full text-center">
-                                                        <span className="text-lg font-bold">
-                                                            {currentStepData.powers[idx]}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Legend */}
-                                    {currentStepData.stage === 'calculate' && (
-                                        <div className="flex gap-6 justify-center mt-8 text-sm">
-                                            <div className="flex items-center gap-2">
-                                                <span className="relative flex h-3 w-3">
-                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
-                                                </span>
-                                                <span className="text-white">Calculating</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                                                <span className="text-white">Calculated</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-3 h-3 bg-slate-700 rounded-full"></div>
-                                                <span className="text-slate-400">Pending</span>
-                                            </div>
-                                        </div>
-                                    )}
+                            {/* Input Section */}
+                            <div className="bg-slate-800/50 rounded-2xl p-4 border border-white/5 mb-6">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm text-slate-400 font-medium">Target Number</span>
                                 </div>
-                            )}
 
-                            {/* Current Calculation Detail */}
-                            {currentStepData.stage === 'calculate' && (
-                                <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                    <h2 className="text-xl font-semibold text-white mb-4">Current Step</h2>
-                                    <div className="bg-slate-900 rounded-lg p-6 border border-slate-700/50">
-                                        <div className="text-center">
-                                            <div className="text-3xl font-bold text-yellow-400 mb-2 font-mono">
-                                                {currentStepData.currentDigit}^{currentStepData.numDigits} = {currentStepData.currentPower}
-                                            </div>
-                                            <div className="text-slate-400 text-sm mt-3 flex justify-center items-center gap-2">
-                                                Current Running Sum: <span className="text-white font-bold text-lg">{currentStepData.sum}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Sum Verification */}
-                            {currentStepData.sum > 0 && (
-                                <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                    <h2 className="text-xl font-semibold text-white mb-4">Sum Verification</h2>
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center p-4 bg-slate-700/50 rounded-lg border border-slate-600/50">
-                                            <span className="text-purple-300 font-medium">Total Sum of Powers</span>
-                                            <span className="text-white font-mono font-bold text-2xl">{currentStepData.sum}</span>
-                                        </div>
-
-                                        {currentStepData.stage === 'result' && (
-                                            <div className="flex justify-between items-center p-4 bg-slate-700/50 rounded-lg border border-slate-600/50">
-                                                <span className="text-purple-300 font-medium">Original Number</span>
-                                                <span className="text-white font-mono font-bold text-2xl">{currentStepData.number}</span>
-                                            </div>
-                                        )}
-
-                                        {currentStepData.powers.length > 0 && (
-                                            <div className="p-4 bg-slate-900 rounded-lg border border-slate-700/50 mt-4">
-                                                <p className="text-xs text-slate-400 uppercase tracking-widest mb-3">Equation</p>
-                                                <p className="text-white font-mono text-base break-all leading-relaxed">
-                                                    {currentStepData.powers.join(' + ')} = <span className="text-green-400 font-bold">{currentStepData.sum}</span>
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Right Column - Code & Controls */}
-                        <div className="space-y-6">
-                            {/* Code Display */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold text-white">Algorithm Logic</h2>
-                                    <div className="flex bg-slate-900 rounded-lg p-1">
+                                {isEditing ? (
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="number"
+                                            value={tempInput}
+                                            onChange={(e) => setTempInput(e.target.value)}
+                                            onKeyPress={handleKeyPress}
+                                            className="flex-1 bg-slate-900 border border-purple-500/50 rounded-lg px-3 py-2 text-white outline-none focus:ring-2 focus:ring-purple-500/50 font-mono text-lg"
+                                            autoFocus
+                                        />
                                         <button
-                                            onClick={() => setLanguage('javascript')}
-                                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${language === 'javascript'
-                                                ? 'bg-yellow-500 text-slate-900 shadow-md'
-                                                : 'text-slate-400 hover:text-white'
-                                                }`}
+                                            onClick={handleNumberChange}
+                                            className="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-4 font-medium transition-colors"
                                         >
-                                            JavaScript
-                                        </button>
-                                        <button
-                                            onClick={() => setLanguage('python')}
-                                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${language === 'python'
-                                                ? 'bg-blue-500 text-white shadow-md'
-                                                : 'text-slate-400 hover:text-white'
-                                                }`}
-                                        >
-                                            Python
+                                            Go
                                         </button>
                                     </div>
-                                </div>
-
-                                <div className="bg-slate-950 rounded-lg p-4 font-mono text-sm overflow-x-auto border border-slate-800">
-                                    {code.map((line, idx) => (
-                                        <div
-                                            key={idx}
-                                            className={`
-                        py-1 px-3 rounded pointer-events-none transition-all duration-200
-                        ${idx === currentLine
-                                                    ? 'bg-white/10 border-l-2 border-yellow-500 ml-[-2px]'
-                                                    : 'border-l-2 border-transparent'
-                                                }
-                      `}
-                                        >
-                                            <span className="text-slate-600 mr-4 w-6 inline-block text-right select-none">{idx + 1}</span>
-                                            <span className={idx === currentLine ? 'text-yellow-100 font-medium' : 'text-slate-400'}>
-                                                {line}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Step Description */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                <div className="flex items-start gap-4">
-                                    <div className="p-3 bg-indigo-500/10 rounded-lg">
-                                        <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-lg font-semibold text-white mb-2">Current Step</h2>
-                                        <p className="text-purple-200 text-lg leading-relaxed">{currentStepData.description}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Controls */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                {/* Progress Bar */}
-                                <div className="mb-6">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-slate-400 text-sm font-medium">Progress</span>
-                                        <span className="text-white text-sm font-medium">
-                                            {Math.round(((currentStep + 1) / steps.length) * 100)}%
+                                ) : (
+                                    <div className="flex items-center justify-between group cursor-pointer" onClick={() => setIsEditing(true)}>
+                                        <span className="text-4xl font-bold font-mono tracking-tight text-white group-hover:text-purple-300 transition-colors">
+                                            {inputNumber}
                                         </span>
+                                        <Edit3 className="text-slate-500 group-hover:text-white transition-colors" size={20} />
                                     </div>
-                                    <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                                        <div
-                                            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-300 ease-out"
-                                            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
+                                )}
 
-                                <div className="flex gap-4 justify-center">
-                                    <button
-                                        onClick={handlePrevious}
-                                        disabled={currentStep === 0}
-                                        className="flex flex-col items-center gap-1 group disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <div className="p-3 bg-slate-700 text-white rounded-full group-hover:bg-slate-600 transition-all shadow-lg">
-                                            <ChevronLeft size={24} />
-                                        </div>
-                                        <span className="text-xs text-slate-400">Prev</span>
-                                    </button>
-
-                                    <button
-                                        onClick={handleAutoPlay}
-                                        disabled={currentStep === steps.length - 1}
-                                        className="flex flex-col items-center gap-1 group disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <div className="p-4 bg-purple-600 text-white rounded-full group-hover:bg-purple-500 transition-all transform hover:scale-110 shadow-lg shadow-purple-500/30">
-                                            <Play size={28} className="ml-1" />
-                                        </div>
-                                        <span className="text-xs text-purple-400 font-medium">Play</span>
-                                    </button>
-
-                                    <button
-                                        onClick={handleReset}
-                                        className="flex flex-col items-center gap-1 group"
-                                    >
-                                        <div className="p-3 bg-slate-700 text-white rounded-full group-hover:bg-purple-600 transition-all shadow-lg">
-                                            <RotateCcw size={24} />
-                                        </div>
-                                        <span className="text-xs text-slate-400">Reset</span>
-                                    </button>
-
-                                    <button
-                                        onClick={handleNext}
-                                        disabled={currentStep === steps.length - 1}
-                                        className="flex flex-col items-center gap-1 group disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <div className="p-3 bg-slate-700 text-white rounded-full group-hover:bg-slate-600 transition-all shadow-lg">
-                                            <ChevronRight size={24} />
-                                        </div>
-                                        <span className="text-xs text-slate-400">Next</span>
-                                    </button>
-                                </div>
-
-                                {/* Result Badge */}
-                                {currentStepData.completed && (
-                                    <div className={`mt-6 p-6 rounded-xl text-center border-2 animate-in zoom-in-50 duration-300 ${currentStepData.isArmstrong
-                                        ? 'bg-green-500/10 border-green-500/50'
-                                        : 'bg-red-500/10 border-red-500/50'
+                                {currentStepData.isArmstrong !== null && (
+                                    <div className={`mt-3 px-3 py-1 rounded-full text-center text-sm font-semibold ${currentStepData.isArmstrong
+                                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                            : 'bg-red-500/20 text-red-400 border border-red-500/30'
                                         }`}>
-                                        <p className={`font-black text-2xl mb-2 ${currentStepData.isArmstrong ? 'text-green-400' : 'text-red-400'
-                                            }`}>
-                                            {currentStepData.isArmstrong ? 'Armstrong Number Confirmed!' : 'Not an Armstrong Number'}
-                                        </p>
-                                        <div className={`text-base font-mono inline-block px-3 py-1 rounded bg-black/20 ${currentStepData.isArmstrong ? 'text-green-300' : 'text-red-300'
-                                            }`}>
-                                            {currentStepData.sum} {currentStepData.isArmstrong ? '=' : '≠'} {currentStepData.number}
-                                        </div>
+                                        {currentStepData.isArmstrong ? '✓ Armstrong Number' : '✗ Not Armstrong'}
                                     </div>
                                 )}
                             </div>
-                        </div>
-                    </div>
 
-                    {/* Examples & Info */}
-                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Algorithm Info */}
-                        <div className="bg-slate-800 rounded-xl p-8 shadow-xl border border-slate-700">
-                            <h2 className="text-xl font-semibold text-white mb-4">About Armstrong Numbers</h2>
-                            <div className="text-purple-200 space-y-4 text-sm leading-relaxed">
-                                <p>
-                                    An <strong className="text-purple-100">Armstrong number</strong> (also known as a narcissistic number) is a number that is the sum of its own digits each raised to the power of the number of digits.
-                                </p>
-                                <div className="bg-slate-900/60 p-4 rounded-lg border border-purple-500/20">
-                                    <p className="font-mono text-purple-300 mb-2 font-bold">Example: 153</p>
-                                    <p className="font-mono text-slate-300">
-                                        1³ + 5³ + 3³ = 1 + 125 + 27 = <span className="text-green-400 font-bold">153</span>
-                                    </p>
+                            {/* Playback Controls */}
+                            <div className="grid grid-cols-4 gap-2">
+                                <button
+                                    onClick={handleReset}
+                                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all flex items-center justify-center"
+                                    title="Reset"
+                                >
+                                    <RotateCcw size={20} />
+                                </button>
+                                <button
+                                    onClick={handlePrevious}
+                                    disabled={currentStep === 0}
+                                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white transition-all flex items-center justify-center"
+                                    title="Previous Step"
+                                >
+                                    <ChevronLeft size={24} />
+                                </button>
+                                <button
+                                    onClick={togglePlay}
+                                    disabled={currentStepData.completed}
+                                    className={`p-3 rounded-xl ${isPlaying ? 'bg-amber-600 hover:bg-amber-500' : 'bg-purple-600 hover:bg-purple-500'} text-white transition-all flex items-center justify-center shadow-lg shadow-purple-900/20`}
+                                    title={isPlaying ? "Pause" : "Play"}
+                                >
+                                    {isPlaying ? <Pause size={24} className="fill-current" /> : <Play size={24} className="fill-current ml-1" />}
+                                </button>
+                                <button
+                                    onClick={handleNext}
+                                    disabled={currentStepData.completed}
+                                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white transition-all flex items-center justify-center"
+                                    title="Next Step"
+                                >
+                                    <ChevronRight size={24} />
+                                </button>
+                            </div>
+
+                            {/* Progress Bar */}
+                            <div className="mt-6">
+                                <div className="flex justify-between text-xs text-slate-500 mb-2 font-medium">
+                                    <span>Progress</span>
+                                    <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
+                                </div>
+                                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                                        transition={{ duration: 0.2 }}
+                                    />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Examples */}
-                        <div className="bg-slate-800 rounded-xl p-8 shadow-xl border border-slate-700">
-                            <h2 className="text-xl font-semibold text-white mb-4">Try These Numbers</h2>
-                            <div className="grid grid-cols-3 gap-3">
-                                {[0, 1, 153, 370, 371, 407, 1634, 9474, 123].map((num) => (
-                                    <button
-                                        key={num}
-                                        onClick={() => {
-                                            setInputNumber(num);
-                                            setSteps(generateSteps(num));
-                                            setCurrentStep(0);
-                                            setTempInput(num.toString());
-                                        }}
-                                        className="px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-purple-600 
-                    transition-all transform hover:scale-105 active:scale-95 font-mono text-sm border border-slate-600 hover:border-purple-400"
-                                    >
-                                        {num}
-                                    </button>
-                                ))}
+                        {/* 2. Code Display */}
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl flex-1 flex flex-col min-h-[300px]">
+                            <div className="flex items-center gap-2 mb-4 text-purple-400">
+                                <Code size={18} />
+                                <h3 className="font-bold text-sm uppercase tracking-wider">Algorithm Code</h3>
+                            </div>
+
+                            <div className="relative flex-1 min-h-0 flex flex-col">
+                                <div className="absolute top-0 right-0 p-2 z-10 w-full flex justify-end pointer-events-none">
+                                    <div className="flex bg-slate-900/80 rounded p-1 border border-white/10 backdrop-blur-sm pointer-events-auto">
+                                        <button
+                                            className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${language === 'javascript' ? 'bg-purple-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                                            onClick={() => setLanguage('javascript')}
+                                        >JS</button>
+                                        <button
+                                            className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${language === 'python' ? 'bg-purple-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                                            onClick={() => setLanguage('python')}
+                                        >PY</button>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 rounded-xl overflow-hidden border border-slate-700/50 shadow-inner bg-[#1e1e1e] relative">
+                                    <div className="absolute inset-0 overflow-auto custom-scrollbar">
+                                        <SyntaxHighlighter
+                                            language={language}
+                                            style={atomDark}
+                                            showLineNumbers={true}
+                                            wrapLines={true}
+                                            customStyle={{
+                                                margin: 0,
+                                                padding: '1.5rem',
+                                                minHeight: '100%',
+                                                fontSize: '0.9rem',
+                                                lineHeight: '1.6',
+                                                backgroundColor: '#1e1e1e',
+                                                fontFamily: 'var(--font-mono)'
+                                            }}
+                                            lineNumberStyle={{ minWidth: '2em', paddingRight: '1em', color: '#6e7681', textAlign: 'right' }}
+                                            lineProps={(lineNumber: number) => {
+                                                const isCurrentLine = lineNumber === currentLine + 1;
+                                                return {
+                                                    style: {
+                                                        backgroundColor: isCurrentLine ? 'rgba(168, 85, 247, 0.15)' : undefined,
+                                                        display: 'block',
+                                                        width: '100%',
+                                                        borderLeft: isCurrentLine ? '3px solid #a855f7' : '3px solid transparent',
+                                                        paddingLeft: '1rem'
+                                                    }
+                                                };
+                                            }}
+                                        >
+                                            {code.join('\n')}
+                                        </SyntaxHighlighter>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                    </div>
+
+                    {/* RIGHT COLUMN: Visualization */}
+                    <div className="h-full flex flex-col gap-6 overflow-hidden">
+
+                        {/* 1. Main Animation Stage */}
+                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col items-center">
+                            {/* Step Description Header */}
+                            <div className="w-full text-center mb-8 relative z-20">
+                                <motion.div
+                                    key={currentStepData.description}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="inline-block bg-slate-800/80 border border-purple-500/30 rounded-full px-6 py-2 shadow-lg"
+                                >
+                                    <p className="text-lg md:text-xl font-medium text-purple-100 flex items-center gap-3">
+                                        <Info size={20} className="text-purple-400" />
+                                        {currentStepData.description}
+                                    </p>
+                                </motion.div>
+                            </div>
+
+                            {/* Decorative Elements */}
+                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.1),transparent_70%)] pointer-events-none"></div>
+
+                            {/* Digit Breakdown & Calculation */}
+                            <div className="flex-1 w-full flex items-center justify-center relative z-10">
+                                <div className="max-w-4xl w-full">
+                                    {/* Digits Display */}
+                                    {currentStepData.digits.length > 0 && (
+                                        <div className="flex justify-center gap-4 mb-12">
+                                            {currentStepData.digits.map((digit, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    initial={{ scale: 0, opacity: 0 }}
+                                                    animate={{
+                                                        scale: idx === currentStepData.highlightDigit ? 1.15 : 1,
+                                                        opacity: 1
+                                                    }}
+                                                    className={`relative flex flex-col items-center p-4 rounded-xl transition-all duration-300 min-w-[5rem] ${idx === currentStepData.highlightDigit
+                                                            ? 'bg-purple-500/30 border-2 border-purple-400 shadow-lg shadow-purple-500/50 z-10'
+                                                            : currentStepData.powers[idx] !== undefined
+                                                                ? 'bg-slate-700/50 border border-slate-600'
+                                                                : 'bg-slate-800/50 border border-slate-700'
+                                                        }`}
+                                                >
+                                                    <span className="text-4xl font-bold text-white mb-2">{digit}</span>
+                                                    {currentStepData.powers[idx] !== undefined && (
+                                                        <>
+                                                            <div className="text-xs text-purple-400 mb-1">
+                                                                {digit}<sup>{currentStepData.digits.length}</sup>
+                                                            </div>
+                                                            <div className="text-lg font-bold text-cyan-400">
+                                                                = {currentStepData.powers[idx]}
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Sum Display */}
+                                    {currentStepData.sum > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="text-center bg-slate-800/70 border border-purple-500/30 rounded-2xl p-6"
+                                        >
+                                            <div className="text-sm text-slate-400 uppercase tracking-wider mb-2">Running Sum</div>
+                                            <div className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                                                {currentStepData.sum}
+                                            </div>
+                                            {currentStepData.powers.length > 0 && (
+                                                <div className="text-sm text-slate-500 mt-2 font-mono">
+                                                    {currentStepData.powers.join(' + ')}
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    )}
+
+                                    {/* Result Badge */}
+                                    {currentStepData.isArmstrong !== null && (
+                                        <motion.div
+                                            initial={{ scale: 0.5, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            className={`mt-8 px-8 py-4 rounded-full font-bold text-2xl border backdrop-blur-md text-center ${currentStepData.isArmstrong
+                                                    ? 'bg-green-500/20 border-green-500/50 text-green-300 shadow-lg shadow-green-500/20'
+                                                    : 'bg-red-500/20 border-red-500/50 text-red-300'
+                                                }`}
+                                        >
+                                            {currentStepData.isArmstrong
+                                                ? `✓ ${inputNumber} is an Armstrong Number!`
+                                                : `✗ ${inputNumber} is NOT an Armstrong Number`}
+                                        </motion.div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 2. Info Panel */}
+                        <div className="h-32 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
+                            <div className="grid grid-cols-3 gap-4 h-full">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Number</span>
+                                    <span className="text-3xl font-bold text-purple-400">{inputNumber}</span>
+                                </div>
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Digits</span>
+                                    <span className="text-3xl font-bold text-pink-400">{currentStepData.digits.length || '-'}</span>
+                                </div>
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Complexity</span>
+                                    <span className="text-2xl font-bold text-cyan-400">O(d)</span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
-            </div>
-            <Footer />
+            </main>
         </div>
     );
 };

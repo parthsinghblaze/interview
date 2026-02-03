@@ -1,53 +1,91 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Play } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Code, Info } from 'lucide-react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const DSAVisualizer = () => {
     // Sample array to visualize
     const initialArray = [3, 7, 2, 9, 1, 5, 8, 4];
+    const [isPlaying, setIsPlaying] = useState(false);
 
-    // Algorithm steps
-    const steps = [
-        {
-            description: "Initialize: Set max to first element",
+    // Generate steps for the algorithm
+    const generateSteps = (arr: number[]) => {
+        const steps = [];
+
+        // Initial step
+        steps.push({
+            description: 'Start: Initialize max with first element',
             currentIndex: 0,
             maxIndex: 0,
-            maxValue: initialArray[0],
-            comparing: null,
+            maxValue: arr[0],
+            comparing: -1,
+            array: arr,
             jsLine: 1,
             pyLine: 1
-        },
-        ...initialArray.slice(1).map((_, idx) => {
-            const actualIdx = idx + 1;
-            const prevMax = Math.max(...initialArray.slice(0, actualIdx));
-            const prevMaxIdx = initialArray.indexOf(prevMax);
-            const currentValue = initialArray[actualIdx];
+        });
 
-            return {
-                description: `Compare arr[${actualIdx}] (${currentValue}) with current max (${prevMax})`,
-                currentIndex: actualIdx,
-                maxIndex: currentValue > prevMax ? actualIdx : prevMaxIdx,
-                maxValue: Math.max(currentValue, prevMax),
-                comparing: actualIdx,
-                jsLine: currentValue > prevMax ? 3 : 2,
-                pyLine: currentValue > prevMax ? 3 : 2
-            };
-        }),
-        {
-            description: `Algorithm Complete! Maximum value is ${Math.max(...initialArray)}`,
-            currentIndex: initialArray.length - 1,
-            maxIndex: initialArray.indexOf(Math.max(...initialArray)),
-            maxValue: Math.max(...initialArray),
-            comparing: null,
-            completed: true,
-            jsLine: 5,
-            pyLine: 5
+        // Iterate through array
+        for (let i = 1; i < arr.length; i++) {
+            // Comparing step
+            steps.push({
+                description: `Compare ${arr[i]} with current max ${arr[steps[steps.length - 1].maxIndex]}`,
+                currentIndex: i,
+                maxIndex: steps[steps.length - 1].maxIndex,
+                maxValue: steps[steps.length - 1].maxValue,
+                comparing: i,
+                array: arr,
+                jsLine: 2,
+                pyLine: 2
+            });
+
+            // Update or keep max
+            if (arr[i] > steps[steps.length - 1].maxValue) {
+                steps.push({
+                    description: `${arr[i]} is greater! Update max`,
+                    currentIndex: i,
+                    maxIndex: i,
+                    maxValue: arr[i],
+                    comparing: -1,
+                    array: arr,
+                    jsLine: 3,
+                    pyLine: 3
+                });
+            } else {
+                steps.push({
+                    description: `${arr[i]} is not greater. Keep current max`,
+                    currentIndex: i,
+                    maxIndex: steps[steps.length - 1].maxIndex,
+                    maxValue: steps[steps.length - 1].maxValue,
+                    comparing: -1,
+                    array: arr,
+                    jsLine: 2,
+                    pyLine: 2
+                });
+            }
         }
-    ];
 
+        // Final step
+        steps.push({
+            description: `Complete! Maximum value is ${steps[steps.length - 1].maxValue}`,
+            currentIndex: arr.length - 1,
+            maxIndex: steps[steps.length - 1].maxIndex,
+            maxValue: steps[steps.length - 1].maxValue,
+            comparing: -1,
+            array: arr,
+            completed: true,
+            jsLine: 4,
+            pyLine: 4
+        });
+
+        return steps;
+    };
+
+    const [steps] = useState(generateSteps(initialArray));
     const [currentStep, setCurrentStep] = useState(0);
     const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
 
@@ -70,9 +108,9 @@ const DSAVisualizer = () => {
     const pyCode = [
         "def find_max(arr):",
         "    max_val = arr[0]",
-        "    for i in range(1, len(arr)):",
-        "        if arr[i] > max_val:",
-        "            max_val = arr[i]",
+        "    for num in arr[1:]:",
+        "        if num > max_val:",
+        "            max_val = num",
         "    return max_val"
     ];
 
@@ -93,278 +131,285 @@ const DSAVisualizer = () => {
 
     const handleReset = () => {
         setCurrentStep(0);
+        setIsPlaying(false);
     };
 
-    const handleAutoPlay = () => {
-        let step = currentStep;
-        const interval = setInterval(() => {
-            step++;
-            if (step >= steps.length) {
-                clearInterval(interval);
-            } else {
-                setCurrentStep(step);
-            }
-        }, 1000);
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isPlaying && currentStep < steps.length - 1) {
+            interval = setInterval(() => {
+                setCurrentStep(prev => {
+                    if (prev >= steps.length - 1) {
+                        setIsPlaying(false);
+                        return prev;
+                    }
+                    return prev + 1;
+                });
+            }, 800);
+        } else if (currentStep >= steps.length - 1) {
+            setIsPlaying(false);
+        }
+        return () => clearInterval(interval);
+    }, [isPlaying, currentStep, steps.length]);
+
+    const togglePlay = () => {
+        setIsPlaying(!isPlaying);
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
+        <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col font-sans selection:bg-blue-500/30">
             <Header />
 
-            <div className="pt-24 pb-12 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
-                <div className="max-w-6xl mx-auto px-4">
-                    {/* Header */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold text-white mb-2">Find Maximum Number</h1>
-                        <p className="text-purple-300">Detailed Step-by-Step Visualization</p>
-                    </div>
+            {/* Main Content Area - Full Screen Layout */}
+            <main className="flex-1 relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black pt-20 pb-6 px-6 overflow-hidden">
+                {/* Background Decoration */}
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
 
-                    {/* Main Content Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left Column - Visualization */}
-                        <div className="space-y-6">
-                            {/* Array Visualization */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                <h2 className="text-xl font-semibold text-white mb-4">Array Visualization</h2>
-                                <div className="flex flex-wrap gap-3 justify-center">
-                                    {initialArray.map((value, idx) => (
-                                        <div
-                                            key={idx}
-                                            className={`
-                        relative w-14 h-14 md:w-16 md:h-16 flex flex-col items-center justify-center rounded-lg
-                        transition-all duration-300 transform border-2
-                        ${idx === currentStepData.maxIndex
-                                                    ? 'bg-green-500/20 border-green-500 scale-110 shadow-lg shadow-green-500/30'
-                                                    : idx === currentStepData.comparing
-                                                        ? 'bg-yellow-500/20 border-yellow-500 scale-105 shadow-lg shadow-yellow-500/30'
-                                                        : idx <= currentStepData.currentIndex
-                                                            ? 'bg-slate-700 border-slate-600'
-                                                            : 'bg-slate-800 border-slate-700 opacity-50'
-                                                }
-                      `}
-                                        >
-                                            <span className="text-xs text-slate-400 absolute -top-6">
-                                                {idx}
-                                            </span>
-                                            <span className={`text-xl font-bold ${idx === currentStepData.maxIndex ? 'text-green-400' :
-                                                idx === currentStepData.comparing ? 'text-yellow-400' : 'text-white'
-                                                }`}>{value}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                <div className="h-full w-full max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 relative z-10">
 
-                                {/* Legend */}
-                                <div className="flex gap-4 justify-center mt-8 text-sm">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                        <span className="text-slate-300">Current Max</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                        <span className="text-slate-300">Comparing</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 bg-slate-600 rounded-full"></div>
-                                        <span className="text-slate-300">Visited</span>
-                                    </div>
+                    {/* LEFT COLUMN: Controller & Code */}
+                    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+
+                        {/* 1. Controller Panel */}
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
+                            <div className="flex items-center justify-between mb-6">
+                                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                                    Find Maximum
+                                </h1>
+                                <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
+                                    v2.0
                                 </div>
                             </div>
 
-                            {/* Current State Info */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                <h2 className="text-xl font-semibold text-white mb-4">Current State</h2>
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                        <span className="text-purple-300 font-mono">Current Index [i]</span>
-                                        <span className="text-white font-mono font-bold text-lg">{currentStepData.currentIndex}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                        <span className="text-purple-300 font-mono">Max Value</span>
-                                        <span className="text-green-400 font-mono font-bold text-2xl">{currentStepData.maxValue}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-                                        <span className="text-purple-300 font-mono">Max Index</span>
-                                        <span className="text-white font-mono font-bold text-lg">{currentStepData.maxIndex}</span>
-                                    </div>
+                            {/* Array Display */}
+                            <div className="bg-slate-800/50 rounded-2xl p-4 border border-white/5 mb-6">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm text-slate-400 font-medium">Input Array</span>
+                                    <span className="text-xs text-slate-500 font-mono">{initialArray.length} elements</span>
+                                </div>
+                                <div className="font-mono text-lg text-white">
+                                    [{initialArray.join(', ')}]
+                                </div>
+                            </div>
+
+                            {/* Playback Controls */}
+                            <div className="grid grid-cols-4 gap-2">
+                                <button
+                                    onClick={handleReset}
+                                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all flex items-center justify-center"
+                                    title="Reset"
+                                >
+                                    <RotateCcw size={20} />
+                                </button>
+                                <button
+                                    onClick={handlePrevious}
+                                    disabled={currentStep === 0}
+                                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white transition-all flex items-center justify-center"
+                                    title="Previous Step"
+                                >
+                                    <ChevronLeft size={24} />
+                                </button>
+                                <button
+                                    onClick={togglePlay}
+                                    disabled={currentStepData.completed}
+                                    className={`p-3 rounded-xl ${isPlaying ? 'bg-amber-600 hover:bg-amber-500' : 'bg-blue-600 hover:bg-blue-500'} text-white transition-all flex items-center justify-center shadow-lg shadow-blue-900/20`}
+                                    title={isPlaying ? "Pause" : "Play"}
+                                >
+                                    {isPlaying ? <Pause size={24} className="fill-current" /> : <Play size={24} className="fill-current ml-1" />}
+                                </button>
+                                <button
+                                    onClick={handleNext}
+                                    disabled={currentStepData.completed}
+                                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white transition-all flex items-center justify-center"
+                                    title="Next Step"
+                                >
+                                    <ChevronRight size={24} />
+                                </button>
+                            </div>
+
+                            {/* Progress Bar */}
+                            <div className="mt-6">
+                                <div className="flex justify-between text-xs text-slate-500 mb-2 font-medium">
+                                    <span>Progress</span>
+                                    <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
+                                </div>
+                                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                                        transition={{ duration: 0.2 }}
+                                    />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Column - Code & Controls */}
-                        <div className="space-y-6">
-                            {/* Code Display */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold text-white">Algorithm Code</h2>
-                                    <div className="flex bg-slate-900 rounded-lg p-1">
+                        {/* 2. Code Display */}
+                        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl flex-1 flex flex-col min-h-[300px]">
+                            <div className="flex items-center gap-2 mb-4 text-blue-400">
+                                <Code size={18} />
+                                <h3 className="font-bold text-sm uppercase tracking-wider">Algorithm Code</h3>
+                            </div>
+
+                            <div className="relative flex-1 min-h-0 flex flex-col">
+                                <div className="absolute top-0 right-0 p-2 z-10 w-full flex justify-end pointer-events-none">
+                                    <div className="flex bg-slate-900/80 rounded p-1 border border-white/10 backdrop-blur-sm pointer-events-auto">
                                         <button
+                                            className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${language === 'javascript' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                                             onClick={() => setLanguage('javascript')}
-                                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${language === 'javascript'
-                                                ? 'bg-yellow-500 text-slate-900 shadow-md'
-                                                : 'text-slate-400 hover:text-white'
-                                                }`}
-                                        >
-                                            JavaScript
-                                        </button>
+                                        >JS</button>
                                         <button
+                                            className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${language === 'python' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                                             onClick={() => setLanguage('python')}
-                                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${language === 'python'
-                                                ? 'bg-blue-500 text-white shadow-md'
-                                                : 'text-slate-400 hover:text-white'
-                                                }`}
+                                        >PY</button>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 rounded-xl overflow-hidden border border-slate-700/50 shadow-inner bg-[#1e1e1e] relative">
+                                    <div className="absolute inset-0 overflow-auto custom-scrollbar">
+                                        <SyntaxHighlighter
+                                            language={language}
+                                            style={atomDark}
+                                            showLineNumbers={true}
+                                            wrapLines={true}
+                                            customStyle={{
+                                                margin: 0,
+                                                padding: '1.5rem',
+                                                minHeight: '100%',
+                                                fontSize: '0.9rem',
+                                                lineHeight: '1.6',
+                                                backgroundColor: '#1e1e1e',
+                                                fontFamily: 'var(--font-mono)'
+                                            }}
+                                            lineNumberStyle={{ minWidth: '2em', paddingRight: '1em', color: '#6e7681', textAlign: 'right' }}
+                                            lineProps={(lineNumber: number) => {
+                                                const isCurrentLine = lineNumber === currentLine + 1;
+                                                return {
+                                                    style: {
+                                                        backgroundColor: isCurrentLine ? 'rgba(59, 130, 246, 0.15)' : undefined,
+                                                        display: 'block',
+                                                        width: '100%',
+                                                        borderLeft: isCurrentLine ? '3px solid #3b82f6' : '3px solid transparent',
+                                                        paddingLeft: '1rem'
+                                                    }
+                                                };
+                                            }}
                                         >
-                                            Python
-                                        </button>
+                                            {code.join('\n')}
+                                        </SyntaxHighlighter>
                                     </div>
                                 </div>
-
-                                <div className="bg-slate-950 rounded-lg p-4 font-mono text-sm overflow-x-auto border border-slate-800">
-                                    {code.map((line, idx) => (
-                                        <div
-                                            key={idx}
-                                            className={`
-                        py-1 px-3 rounded pointer-events-none transition-all duration-200
-                        ${idx === currentLine
-                                                    ? 'bg-white/10 border-l-2 border-yellow-500 ml-[-2px]'
-                                                    : 'border-l-2 border-transparent'
-                                                }
-                      `}
-                                        >
-                                            <span className="text-slate-600 mr-4 w-6 inline-block text-right select-none">{idx + 1}</span>
-                                            <span className={idx === currentLine ? 'text-yellow-100 font-medium' : 'text-slate-400'}>
-                                                {line}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Step Description */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-                                <h2 className="text-xl font-semibold text-white mb-3">Analysis</h2>
-                                <div className="flex items-start gap-4">
-                                    <div className="p-3 bg-purple-500/10 rounded-lg">
-                                        <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                                    </div>
-                                    <p className="text-purple-200 text-lg leading-relaxed">{currentStepData.description}</p>
-                                </div>
-                            </div>
-
-                            {/* Controls */}
-                            <div className="bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-
-                                {/* Progress Bar */}
-                                <div className="mb-6">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-slate-400 text-sm font-medium">Progress</span>
-                                        <span className="text-white text-sm font-medium">
-                                            {Math.round(((currentStep + 1) / steps.length) * 100)}%
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                                        <div
-                                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-300 ease-out"
-                                            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-4 justify-center">
-                                    <button
-                                        onClick={handlePrevious}
-                                        disabled={currentStep === 0}
-                                        className="flex flex-col items-center gap-1 group disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <div className="p-3 bg-slate-700 text-white rounded-full group-hover:bg-slate-600 transition-all shadow-lg">
-                                            <ChevronLeft size={24} />
-                                        </div>
-                                        <span className="text-xs text-slate-400">Prev</span>
-                                    </button>
-
-                                    <button
-                                        onClick={handleAutoPlay}
-                                        disabled={currentStep === steps.length - 1}
-                                        className="flex flex-col items-center gap-1 group disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <div className="p-4 bg-blue-600 text-white rounded-full group-hover:bg-blue-500 transition-all transform hover:scale-110 shadow-lg shadow-blue-500/30">
-                                            <Play size={28} className="ml-1" />
-                                        </div>
-                                        <span className="text-xs text-blue-400 font-medium">Play</span>
-                                    </button>
-
-                                    <button
-                                        onClick={handleReset}
-                                        className="flex flex-col items-center gap-1 group"
-                                    >
-                                        <div className="p-3 bg-slate-700 text-white rounded-full group-hover:bg-purple-600 transition-all shadow-lg">
-                                            <RotateCcw size={24} />
-                                        </div>
-                                        <span className="text-xs text-slate-400">Reset</span>
-                                    </button>
-
-                                    <button
-                                        onClick={handleNext}
-                                        disabled={currentStep === steps.length - 1}
-                                        className="flex flex-col items-center gap-1 group disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <div className="p-3 bg-slate-700 text-white rounded-full group-hover:bg-slate-600 transition-all shadow-lg">
-                                            <ChevronRight size={24} />
-                                        </div>
-                                        <span className="text-xs text-slate-400">Next</span>
-                                    </button>
-                                </div>
-
-                                {/* Completion Badge */}
-                                {currentStepData.completed && (
-                                    <div className="mt-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-center animate-in fade-in slide-in-from-bottom-4">
-                                        <p className="text-green-400 font-bold text-lg">Algorithm Completed Successfully</p>
-                                        <p className="text-green-300/80 text-sm mt-1">
-                                            The maximum value found is {currentStepData.maxValue} at index {currentStepData.maxIndex}
-                                        </p>
-                                    </div>
-                                )}
                             </div>
                         </div>
+
                     </div>
 
-                    {/* Complexity Analysis */}
-                    <div className="mt-8 bg-slate-800 rounded-xl p-8 shadow-xl border border-slate-700">
-                        <h2 className="text-xl font-semibold text-white mb-6">Complexity Analysis</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-blue-500/20 rounded-md text-blue-400 font-mono text-sm font-bold">O(n)</div>
-                                    <p className="text-slate-300 font-medium">Time Complexity</p>
-                                </div>
-                                <p className="text-slate-400 text-sm leading-relaxed">
-                                    The algorithm iterates through the array exactly once, performing constant time operations at each step.
-                                </p>
+                    {/* RIGHT COLUMN: Visualization */}
+                    <div className="h-full flex flex-col gap-6 overflow-hidden">
+
+                        {/* 1. Main Animation Stage */}
+                        <div className="flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 relative overflow-hidden flex flex-col items-center">
+                            {/* Step Description Header */}
+                            <div className="w-full text-center mb-8 relative z-20">
+                                <motion.div
+                                    key={currentStepData.description}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="inline-block bg-slate-800/80 border border-blue-500/30 rounded-full px-6 py-2 shadow-lg"
+                                >
+                                    <p className="text-lg md:text-xl font-medium text-blue-100 flex items-center gap-3">
+                                        <Info size={20} className="text-blue-400" />
+                                        {currentStepData.description}
+                                    </p>
+                                </motion.div>
                             </div>
 
-                            <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-purple-500/20 rounded-md text-purple-400 font-mono text-sm font-bold">O(1)</div>
-                                    <p className="text-slate-300 font-medium">Space Complexity</p>
+                            {/* Decorative Elements */}
+                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1),transparent_70%)] pointer-events-none"></div>
+
+                            {/* Array Visualization */}
+                            <div className="flex-1 w-full flex items-center justify-center relative z-10">
+                                <div className="flex gap-3 items-end px-4">
+                                    {currentStepData.array.map((value, idx) => {
+                                        const isMax = idx === currentStepData.maxIndex;
+                                        const isComparing = idx === currentStepData.comparing;
+                                        const isVisited = idx < currentStepData.currentIndex;
+
+                                        return (
+                                            <motion.div
+                                                key={idx}
+                                                initial={{ scale: 0.8, opacity: 0 }}
+                                                animate={{
+                                                    scale: isComparing ? 1.15 : (isMax ? 1.1 : 1),
+                                                    opacity: 1
+                                                }}
+                                                className="flex flex-col items-center gap-2"
+                                            >
+                                                {/* Bar */}
+                                                <div
+                                                    className={`w-16 md:w-20 rounded-t-xl flex items-end justify-center pb-2 transition-all duration-300 ${isMax
+                                                            ? 'bg-gradient-to-t from-green-600 to-green-400 shadow-lg shadow-green-500/50'
+                                                            : isComparing
+                                                                ? 'bg-gradient-to-t from-yellow-600 to-yellow-400 shadow-lg shadow-yellow-500/50'
+                                                                : isVisited
+                                                                    ? 'bg-gradient-to-t from-slate-600 to-slate-500'
+                                                                    : 'bg-gradient-to-t from-blue-600 to-blue-400'
+                                                        }`}
+                                                    style={{ height: `${value * 20}px` }}
+                                                >
+                                                    <span className="text-white font-bold text-xl">{value}</span>
+                                                </div>
+
+                                                {/* Label */}
+                                                <div className={`text-xs font-mono px-2 py-1 rounded ${isMax
+                                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                                        : isComparing
+                                                            ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                                            : 'bg-slate-800 text-slate-400'
+                                                    }`}>
+                                                    {isMax ? 'MAX' : isComparing ? 'CURR' : `[${idx}]`}
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    })}
                                 </div>
-                                <p className="text-slate-400 text-sm leading-relaxed">
-                                    Only a few variables (max, current index) are used regardless of the input size, so space usage is constant.
-                                </p>
                             </div>
 
-                            <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-green-500/20 rounded-md text-green-400 font-mono text-sm font-bold">{initialArray.length}</div>
-                                    <p className="text-slate-300 font-medium">Elements Processed</p>
+                            {/* Completion Badge */}
+                            {currentStepData.completed && (
+                                <motion.div
+                                    initial={{ scale: 0.5, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    className="mt-8 px-6 py-3 bg-green-500/20 border border-green-500/50 text-green-300 rounded-full font-bold text-xl shadow-lg shadow-green-500/20 relative z-20"
+                                >
+                                    Algorithm Complete! Maximum = {currentStepData.maxValue}
+                                </motion.div>
+                            )}
+                        </div>
+
+                        {/* 2. Stats Panel */}
+                        <div className="h-32 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
+                            <div className="grid grid-cols-3 gap-4 h-full">
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Current Max</span>
+                                    <span className="text-3xl font-bold text-green-400">{currentStepData.maxValue}</span>
                                 </div>
-                                <p className="text-slate-400 text-sm leading-relaxed">
-                                    This visualization processes an array of fixed size for demonstration purposes.
-                                </p>
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Position</span>
+                                    <span className="text-3xl font-bold text-blue-400">{currentStepData.currentIndex + 1}/{currentStepData.array.length}</span>
+                                </div>
+                                <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5">
+                                    <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Complexity</span>
+                                    <span className="text-2xl font-bold text-cyan-400">O(n)</span>
+                                </div>
                             </div>
                         </div>
+
                     </div>
+
                 </div>
-            </div>
-            <Footer />
+            </main>
         </div>
     );
 };

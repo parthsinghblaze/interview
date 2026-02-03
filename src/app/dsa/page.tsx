@@ -2,12 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 export default function DSAPage() {
+    const [searchQuery, setSearchQuery] = React.useState('');
     const algorithms = [
         {
             id: 'find-max',
@@ -70,73 +71,159 @@ export default function DSAPage() {
                         </motion.div>
                     </div>
 
-                    {/* Available Algorithms Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
-                        {algorithms.map((algo, idx) => (
-                            <motion.div
-                                key={algo.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.15, duration: 0.5 }}
-                                className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
-                            >
-                                {/* Card Header */}
-                                <div className={`p-6 bg-gradient-to-br ${algo.color === 'blue' ? 'from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/10' :
-                                    algo.color === 'purple' ? 'from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/10' :
-                                        'from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10'
-                                    }`}>
-                                    <div className="flex justify-between items-start">
-                                        <div className={`p-3 rounded-xl ${algo.color === 'blue' ? 'bg-blue-100 text-blue-600 dark:bg-blue-800/50 dark:text-blue-300' :
-                                            algo.color === 'purple' ? 'bg-purple-100 text-purple-600 dark:bg-purple-800/50 dark:text-purple-300' :
-                                                'bg-emerald-100 text-emerald-600 dark:bg-emerald-800/50 dark:text-emerald-300'
-                                            }`}>
-                                            <algo.icon size={32} />
-                                        </div>
-                                        <span className="flex items-center gap-1 text-xs font-mono font-medium text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-black/20 px-2 py-1 rounded">
-                                            <Clock size={12} /> {algo.timeComplexity}
-                                        </span>
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-4">{algo.title}</h3>
-                                </div>
+                    {/* Search Bar Section */}
+                    <div className="max-w-2xl mx-auto mb-12">
+                        <div className="relative group">
+                            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                            <input
+                                type="text"
+                                placeholder="Search algorithms (e.g. factors, armstrong)..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border-2 border-gray-200 dark:border-slate-800 rounded-2xl focus:border-blue-500 dark:focus:border-blue-500 outline-none transition-all shadow-sm hover:shadow-md text-gray-900 dark:text-white"
+                            />
+                        </div>
+                    </div>
 
-                                {/* Card Content */}
-                                <div className="p-6 flex-grow flex flex-col">
-                                    <p className="text-gray-600 dark:text-slate-400 mb-6 flex-grow">
-                                        {algo.description}
-                                    </p>
-
-                                    <div className="space-y-4 mb-6">
-                                        <div>
-                                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 uppercase tracking-wide opacity-80">Key Concepts</h4>
+                    {/* Featured: Complexity Section */}
+                    {!searchQuery && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="mb-16"
+                        >
+                            <Link href="/dsa/complexity">
+                                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 rounded-2xl p-8 border border-blue-200 dark:border-blue-500/30 hover:border-blue-300 dark:hover:border-blue-400/50 transition-all hover:shadow-2xl hover:shadow-blue-500/10 dark:hover:shadow-blue-500/20 cursor-pointer group">
+                                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <Clock className="text-blue-600 dark:text-blue-400" size={32} />
+                                                <Database className="text-purple-600 dark:text-purple-400" size={32} />
+                                            </div>
+                                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                                                Understanding Time & Space Complexity
+                                            </h2>
+                                            <p className="text-gray-600 dark:text-blue-200 text-lg mb-4">
+                                                Master Big O notation with interactive visualizations and real-world examples.
+                                                Learn how to analyze algorithm efficiency and make better coding decisions.
+                                            </p>
                                             <div className="flex flex-wrap gap-2">
-                                                {algo.techniques.map((tech) => (
-                                                    <span key={tech} className="px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 text-xs rounded-md">
-                                                        {tech}
-                                                    </span>
-                                                ))}
+                                                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 rounded-full text-sm">Big O Notation</span>
+                                                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 rounded-full text-sm">Interactive Charts</span>
+                                                <span className="px-3 py-1 bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 rounded-full text-sm">Real Examples</span>
                                             </div>
                                         </div>
-                                        <div>
-                                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 uppercase tracking-wide opacity-80">What You'll Learn</h4>
-                                            <p className="text-sm text-gray-600 dark:text-slate-400">
-                                                {algo.learning}
-                                            </p>
+                                        <div className="flex items-center gap-2 text-blue-600 dark:text-white font-semibold text-lg group-hover:gap-4 transition-all">
+                                            Learn Complexity
+                                            <ArrowRight className="group-hover:translate-x-1 transition-transform" size={24} />
                                         </div>
                                     </div>
-
-                                    <Link
-                                        href={algo.href}
-                                        className={`w-full py-3 rounded-lg font-semibold text-center flex items-center justify-center gap-2 transition-all group ${algo.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' :
-                                            algo.color === 'purple' ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/20' :
-                                                'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
-                                            } shadow-lg`}
-                                    >
-                                        <Play size={18} className="fill-current" /> Try Visualizer
-                                    </Link>
                                 </div>
-                            </motion.div>
-                        ))}
+                            </Link>
+                        </motion.div>
+                    )}
+
+                    {/* Available Algorithms Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+                        <AnimatePresence>
+                            {algorithms
+                                .filter(algo =>
+                                    algo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    algo.techniques.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
+                                )
+                                .map((algo, idx) => (
+                                    <motion.div
+                                        key={algo.id}
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                                    >
+                                        {/* Card Header */}
+                                        <div className={`p-6 bg-gradient-to-br ${algo.color === 'blue' ? 'from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/10' :
+                                            algo.color === 'purple' ? 'from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/10' :
+                                                'from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10'
+                                            }`}>
+                                            <div className="flex justify-between items-start">
+                                                <div className={`p-3 rounded-xl ${algo.color === 'blue' ? 'bg-blue-100 text-blue-600 dark:bg-blue-800/50 dark:text-blue-300' :
+                                                    algo.color === 'purple' ? 'bg-purple-100 text-purple-600 dark:bg-purple-800/50 dark:text-purple-300' :
+                                                        'bg-emerald-100 text-emerald-600 dark:bg-emerald-800/50 dark:text-emerald-300'
+                                                    }`}>
+                                                    <algo.icon size={32} />
+                                                </div>
+                                                <span className="flex items-center gap-1 text-xs font-mono font-medium text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-black/20 px-2 py-1 rounded">
+                                                    <Clock size={12} /> {algo.timeComplexity}
+                                                </span>
+                                            </div>
+                                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-4">{algo.title}</h3>
+                                        </div>
+
+                                        {/* Card Content */}
+                                        <div className="p-6 flex-grow flex flex-col">
+                                            <p className="text-gray-600 dark:text-slate-400 mb-6 flex-grow">
+                                                {algo.description}
+                                            </p>
+
+                                            <div className="space-y-4 mb-6">
+                                                <div>
+                                                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 uppercase tracking-wide opacity-80">Key Concepts</h4>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {algo.techniques.map((tech) => (
+                                                            <span key={tech} className="px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 text-xs rounded-md">
+                                                                {tech}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 uppercase tracking-wide opacity-80">What You'll Learn</h4>
+                                                    <p className="text-sm text-gray-600 dark:text-slate-400">
+                                                        {algo.learning}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <Link
+                                                href={algo.href}
+                                                className={`w-full py-3 rounded-lg font-semibold text-center flex items-center justify-center gap-2 transition-all group ${algo.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' :
+                                                    algo.color === 'purple' ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/20' :
+                                                        'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+                                                    } shadow-lg`}
+                                            >
+                                                <Play size={18} className="fill-current" /> Try Visualizer
+                                            </Link>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                        </AnimatePresence>
                     </div>
+
+                    {/* No Results Fallback */}
+                    {algorithms.filter(algo =>
+                        algo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        algo.techniques.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
+                    ).length === 0 && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-800 mb-20"
+                            >
+                                <div className="p-4 bg-gray-100 dark:bg-slate-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                    <SearchIcon className="text-gray-400" size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No algorithms found</h3>
+                                <p className="text-gray-600 dark:text-slate-400">Try searching with a different keyword or browse our categories.</p>
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="mt-6 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Clear Search
+                                </button>
+                            </motion.div>
+                        )}
 
                     {/* Coming Soon Section */}
                     <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-gray-100 dark:border-slate-800 text-center">

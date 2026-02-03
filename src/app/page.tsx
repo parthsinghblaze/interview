@@ -2,10 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Play, Layers, Code, Moon, ArrowRight, Lock, Database, Server, Box } from 'lucide-react';
+import { Play, Layers, Code, Moon, ArrowRight, Lock, Database, Server, Box, Terminal, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Search from './components/Search';
 
 export default function Home() {
   const features = [
@@ -45,6 +46,26 @@ export default function Home() {
       count: '3 Visualizers',
       href: '/dsa',
       gradient: 'from-blue-500 to-cyan-500'
+    },
+    {
+      id: 'javascript',
+      title: 'JavaScript Deep Dive',
+      description: 'Understand closures, hoisting, and the event loop.',
+      icon: Terminal,
+      status: 'active',
+      count: '17 Concepts',
+      href: '/javascript',
+      gradient: 'from-yellow-400 to-yellow-600'
+    },
+    {
+      id: 'typescript',
+      title: 'TypeScript Mastery',
+      description: 'Learn interfaces, generics, and type safety.',
+      icon: Cpu,
+      status: 'active',
+      count: '8 Visualizers',
+      href: '/typescript',
+      gradient: 'from-blue-600 to-indigo-600'
     },
     {
       id: 'react',
@@ -129,6 +150,10 @@ export default function Home() {
               Understand complex concepts through beautiful, interactive animations.
             </p>
 
+            <div className="mt-10 mb-12 flex justify-center">
+              <Search />
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/dsa"
@@ -137,7 +162,7 @@ export default function Home() {
                 Start Learning
               </Link>
               <button
-                className="px-8 py-4 bg-white dark:bg-slate-800 text-gray-700 dark:text-white font-semibold rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
+                className="px-8 py-4 bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-semibold rounded-lg border border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-sm"
                 onClick={() => document.getElementById('topics')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 View Topics
@@ -226,7 +251,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-xl hover:shadow-xl transition-shadow border border-transparent dark:border-slate-800 hover:border-gray-200 dark:hover:border-slate-700"
+                className="bg-white dark:bg-slate-800/50 p-6 rounded-xl shadow-sm hover:shadow-xl transition-all border border-gray-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-slate-700"
               >
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 
                   ${feature.color === 'blue' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : ''}
