@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash } from 'lucide-react';
+import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash, LayoutGrid } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -68,6 +68,18 @@ export default function DSAPage() {
             techniques: ['Hash Map', 'String Traversal', 'Frequency Counting'],
             learning: 'Data structures, hash tables, and linear time complexity.',
             href: '/dsa/frequency-counter',
+            color: 'rose'
+        },
+        {
+            id: 'spiral-matrix',
+            title: 'Spiral Matrix',
+            description: 'Traverse a 2D matrix in a spiral clock-wise order, mastering boundary management.',
+            icon: LayoutGrid,
+            timeComplexity: 'O(m*n)',
+            spaceComplexity: 'O(1)',
+            techniques: ['2D Arrays', 'Boundary Shrinking', 'Matrix Traversal'],
+            learning: 'Matrix manipulation, boundary condition handling, and complex loops.',
+            href: '/dsa/spiral-matrix',
             color: 'rose'
         }
     ];
