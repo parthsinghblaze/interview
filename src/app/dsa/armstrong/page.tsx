@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Edit3, Code, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Edit3, Code, Info, HelpCircle } from 'lucide-react';
+import DSAExplanationModal from '../../components/DSAExplanationModal';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -116,6 +117,7 @@ const ArmstrongVisualizer = () => {
     const [steps, setSteps] = useState(generateSteps(inputNumber));
     const [currentStep, setCurrentStep] = useState(0);
     const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const currentStepData = { ...steps[currentStep], completed: currentStep === steps.length - 1 };
 
@@ -218,8 +220,17 @@ const ArmstrongVisualizer = () => {
                                 <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                                     Armstrong Checker
                                 </h1>
-                                <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
-                                    v2.0
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="p-2 rounded-full bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors"
+                                        title="Algorithm Explanation"
+                                    >
+                                        <HelpCircle size={20} />
+                                    </button>
+                                    <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
+                                        v2.0
+                                    </div>
                                 </div>
                             </div>
 
@@ -257,8 +268,8 @@ const ArmstrongVisualizer = () => {
 
                                 {currentStepData.isArmstrong !== null && (
                                     <div className={`mt-3 px-3 py-1 rounded-full text-center text-sm font-semibold ${currentStepData.isArmstrong
-                                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                            : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
                                         }`}>
                                         {currentStepData.isArmstrong ? '✓ Armstrong Number' : '✗ Not Armstrong'}
                                     </div>
@@ -415,10 +426,10 @@ const ArmstrongVisualizer = () => {
                                                         opacity: 1
                                                     }}
                                                     className={`relative flex flex-col items-center p-4 rounded-xl transition-all duration-300 min-w-[5rem] ${idx === currentStepData.highlightDigit
-                                                            ? 'bg-purple-500/30 border-2 border-purple-400 shadow-lg shadow-purple-500/50 z-10'
-                                                            : currentStepData.powers[idx] !== undefined
-                                                                ? 'bg-slate-700/50 border border-slate-600'
-                                                                : 'bg-slate-800/50 border border-slate-700'
+                                                        ? 'bg-purple-500/30 border-2 border-purple-400 shadow-lg shadow-purple-500/50 z-10'
+                                                        : currentStepData.powers[idx] !== undefined
+                                                            ? 'bg-slate-700/50 border border-slate-600'
+                                                            : 'bg-slate-800/50 border border-slate-700'
                                                         }`}
                                                 >
                                                     <span className="text-4xl font-bold text-white mb-2">{digit}</span>
@@ -462,8 +473,8 @@ const ArmstrongVisualizer = () => {
                                             initial={{ scale: 0.5, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
                                             className={`mt-8 px-8 py-4 rounded-full font-bold text-2xl border backdrop-blur-md text-center ${currentStepData.isArmstrong
-                                                    ? 'bg-green-500/20 border-green-500/50 text-green-300 shadow-lg shadow-green-500/20'
-                                                    : 'bg-red-500/20 border-red-500/50 text-red-300'
+                                                ? 'bg-green-500/20 border-green-500/50 text-green-300 shadow-lg shadow-green-500/20'
+                                                : 'bg-red-500/20 border-red-500/50 text-red-300'
                                                 }`}
                                         >
                                             {currentStepData.isArmstrong
@@ -497,6 +508,29 @@ const ArmstrongVisualizer = () => {
 
                 </div>
             </main>
+
+            <DSAExplanationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Armstrong Number"
+                description="Determine if a number equals the sum of its own digits each raised to the power of the number of digits."
+                concept="An Armstrong number (or narcissistic number) of 3 digits is an integer such that the sum of the cubes of its digits is equal to the number itself. For example, 371 is an Armstrong number because 3³ + 7³ + 1³ = 371."
+                efficiency="The algorithm extracts each digit, calculates its power, and adds it to a sum. This is a linear process relative to the number of digits."
+                useCases={[
+                    "Number theory exploration",
+                    "Computer science education for basic loops",
+                    "Input validation and digit manipulation practice"
+                ]}
+                timeComplexity="O(d)"
+                spaceComplexity="O(d)"
+                complexityNotes="d = Number of digits in the number"
+                interviewTips={[
+                    "Clarify the definition of Armstrong numbers for different digit counts (power of N).",
+                    "Discuss efficient ways to extract digits (modulo vs string conversion).",
+                    "Mention potential overflow issues with very large numbers."
+                ]}
+                color="purple"
+            />
         </div>
     );
 };

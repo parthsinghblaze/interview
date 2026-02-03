@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Play, RotateCcw, ChevronRight, ChevronLeft, Code, BookOpen, Lightbulb, AlertCircle, Layers } from 'lucide-react';
+import { Shield, RotateCcw, ChevronRight, ChevronLeft, Code, BookOpen, Lightbulb, AlertCircle, Layers, XCircle, CheckCircle2 } from 'lucide-react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -14,188 +14,94 @@ const StrictModeVisualizer = () => {
 
     const examples = [
         {
-            title: 'Accidental Global Variables',
-            code: `// Without strict mode
-function badCode() {
-  name = 'Parth'; // Whoops! No var/let/const
-  console.log(name);
-}
-badCode(); // Works, creates global variable
+            title: 'Global Variables',
+            code: `"use strict";
 
-// With strict mode
-'use strict';
-function goodCode() {
-  name = 'Parth'; // ReferenceError!
+function createGlobal() {
+  x = 10; // ReferenceError in strict mode
 }
-goodCode(); // Crashes!`,
+
+createGlobal();`,
             steps: [
                 {
-                    line: 3,
-                    description: 'Without strict mode: forgot var/let/const',
-                    data: { mode: 'sloppy', variable: 'name' },
-                    highlight: 'problem'
-                },
-                {
-                    line: 6,
-                    description: 'JavaScript creates a GLOBAL variable silently',
-                    data: { window: { name: 'Parth' }, pollution: true },
-                    highlight: 'bad',
-                    output: '⚠️ Global pollution'
-                },
-                {
-                    line: 9,
-                    description: 'Enable strict mode with "use strict"',
-                    data: { mode: 'strict', catchErrors: true },
+                    line: 1,
+                    description: 'Enabling "use strict" at the top of the file/function.',
+                    data: { mode: 'STRICT' },
                     highlight: 'strict'
-                },
-                {
-                    line: 11,
-                    description: 'Same code now THROWS an error',
-                    data: { error: 'ReferenceError: name is not defined' },
-                    highlight: 'error',
-                    output: 'ReferenceError! ✅'
-                },
-                {
-                    line: 13,
-                    description: 'Function crashes, forcing you to fix the bug',
-                    data: { benefit: 'Early error detection' },
-                    highlight: 'benefit',
-                    output: 'Bug caught early!'
-                }
-            ],
-            explanation: 'Strict mode prevents accidental global variables by throwing errors instead of silently creating them.'
-        },
-        {
-            title: 'Deleting Variables',
-            code: `// Without strict mode
-var x = 10;
-delete x; // Silently fails, x still exists
-console.log(x); // 10
-
-// With strict mode
-'use strict';
-var y = 20;
-delete y; // SyntaxError!`,
-            steps: [
-                {
-                    line: 2,
-                    description: 'Create a variable x',
-                    data: { x: 10 },
-                    highlight: 'create'
-                },
-                {
-                    line: 3,
-                    description: 'Try to delete x - SILENTLY FAILS',
-                    data: { operation: 'delete x', result: false, x: 10 },
-                    highlight: 'silent',
-                    output: 'No error, but x still exists'
                 },
                 {
                     line: 4,
-                    description: 'x is still 10, delete did nothing',
-                    data: { x: 10 },
-                    highlight: 'problem',
-                    output: '10'
+                    description: 'Assigning a value to an undeclared variable "x".',
+                    data: { variable: 'x', declared: false },
+                    highlight: 'problem'
                 },
                 {
-                    line: 7,
-                    description: 'Enable strict mode',
-                    data: { mode: 'strict' },
-                    highlight: 'strict'
-                },
-                {
-                    line: 9,
-                    description: 'Same delete now throws SyntaxError',
-                    data: { error: 'SyntaxError: Delete of an unqualified identifier' },
+                    line: 4,
+                    description: 'Strict mode throws a ReferenceError. In sloppy mode, this would create window.x.',
+                    data: { error: 'ReferenceError: x is not defined' },
                     highlight: 'error',
-                    output: 'SyntaxError! ✅'
+                    output: 'ReferenceError'
                 }
             ],
-            explanation: 'Strict mode throws errors for operations that silently fail in sloppy mode, like deleting variables.'
+            explanation: 'Strict mode prevents accidental global variables by throwing errors for undeclared assignments.'
         },
         {
-            title: 'Duplicate Parameters',
-            code: `// Without strict mode
-function sum(a, b, a) { // Duplicate 'a'!
-  return a + b; // Which 'a'?
-}
-console.log(sum(1, 2, 3)); // 5 (uses last 'a')
+            title: 'Duplicate Params',
+            code: `"use strict";
 
-// With strict mode
-'use strict';
-function sum(a, b, a) { // SyntaxError!
-  return a + b;
+function sum(a, b, a) { // SyntaxError
+  return a + b + a;
 }`,
             steps: [
                 {
-                    line: 2,
-                    description: 'Function has duplicate parameter name "a"',
-                    data: { params: ['a', 'b', 'a'], issue: 'duplicate' },
+                    line: 3,
+                    description: 'Defining a function with duplicate parameter names.',
+                    data: { params: ['a', 'b', 'a'], duplicate: 'a' },
                     highlight: 'problem'
                 },
                 {
                     line: 3,
-                    description: 'Which "a" to use? Last one wins (confusing!)',
-                    data: { firstA: 1, lastA: 3, used: 3 },
-                    highlight: 'confusing'
-                },
-                {
-                    line: 5,
-                    description: 'sum(1, 2, 3) → 3 + 2 = 5',
-                    data: { calc: '3 + 2', result: 5 },
-                    highlight: 'bad',
-                    output: '5 (but confusing!)'
-                },
-                {
-                    line: 8,
-                    description: 'Strict mode catches this at parse time',
-                    data: { error: 'SyntaxError: Duplicate parameter name' },
+                    description: 'Strict mode catches this at parse time. It is a SyntaxError.',
+                    data: { error: 'SyntaxError: Duplicate parameter name not allowed' },
                     highlight: 'error',
-                    output: 'SyntaxError! ✅'
+                    output: 'SyntaxError'
                 }
             ],
-            explanation: 'Strict mode prevents duplicate parameter names, catching potential bugs before code runs.'
+            explanation: 'Sloppy mode allows duplicates (last one wins), which is highly confusing and bug-prone.'
         },
         {
-            title: 'Octal Literals Forbidden',
-            code: `// Without strict mode
-var octal = 077; // Octal (base 8) = 63 in decimal
-console.log(octal); // 63 (confusing!)
+            title: 'Read-Only Props',
+            code: `"use strict";
 
-// With strict mode
-'use strict';
-var octal = 077; // SyntaxError!
-// Use 0o77 or 63 instead`,
+const obj = {};
+Object.defineProperty(obj, 'x', { 
+  value: 42, 
+  writable: false 
+});
+
+obj.x = 9; // TypeError in strict mode`,
             steps: [
                 {
-                    line: 2,
-                    description: 'Number starting with 0 is octal in sloppy mode',
-                    data: { syntax: '077', base: 8, value: 63 },
+                    line: 3,
+                    description: 'Create an object with a non-writable (read-only) property "x".',
+                    data: { x: 42, writable: false },
+                    highlight: 'setup'
+                },
+                {
+                    line: 9,
+                    description: 'Attempting to change a read-only property.',
+                    data: { target: 9, status: 'BLOCKED' },
                     highlight: 'problem'
                 },
                 {
-                    line: 3,
-                    description: '077 is interpreted as octal: 7×8 + 7 = 63',
-                    data: { calculation: '7×8 + 7', decimal: 63 },
-                    highlight: 'confusing',
-                    output: '63 (not 77!)'
-                },
-                {
-                    line: 6,
-                    description: 'Strict mode forbids old octal syntax',
-                    data: { error: 'SyntaxError: Octal literals are not allowed' },
+                    line: 9,
+                    description: 'Strict mode throws a TypeError. Sloppy mode would just ignore the change silently!',
+                    data: { error: 'TypeError: Cannot assign to read only property' },
                     highlight: 'error',
-                    output: 'SyntaxError! ✅'
-                },
-                {
-                    line: 7,
-                    description: 'Modern syntax: use 0o77 for octal',
-                    data: { modern: '0o77', value: 63 },
-                    highlight: 'solution',
-                    output: 'Use 0o77 instead'
+                    output: 'TypeError'
                 }
             ],
-            explanation: 'Strict mode disallows confusing octal literals (077). Use explicit 0o77 syntax instead.'
+            explanation: 'Strict mode ensures that failed assignments to read-only properties throw errors instead of failing silently.'
         }
     ];
 
@@ -227,81 +133,83 @@ var octal = 077; // SyntaxError!
         <div className="min-h-screen bg-slate-950 text-white">
             <Header />
 
-            <main className="pt-20 pb-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Full Screen Layout */}
+            <div className="pt-20 min-h-[calc(100vh-5rem)] flex">
 
-                    {/* Header */}
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-center mb-12"
-                    >
-                        <div className="flex items-center justify-center gap-3 mb-4">
-                            <Shield className="text-slate-400" size={48} />
+                {/* Left Sidebar - Definitions */}
+                <div className="w-80 bg-slate-900 border-r border-slate-700 p-6 overflow-y-auto">
+                    <div className="mb-8">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Shield className="text-green-400" size={40} />
+                            <h1 className="text-3xl font-bold">Strict Mode</h1>
                         </div>
-                        <h1 className="text-5xl font-bold mb-4">Strict Mode</h1>
-                        <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                            Opt-in to a stricter variant of JavaScript that catches common mistakes
+                        <p className="text-slate-400 text-sm">
+                            Opt-in to a cleaner, safer JavaScript.
                         </p>
-                    </motion.div>
-
-                    {/* Definitions Section */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-                        {/* Interview Definition */}
-                        <div className="bg-gradient-to-br from-slate-800/40 to-slate-900 rounded-xl p-6 border border-slate-500/30">
-                            <div className="flex items-center gap-2 mb-4">
-                                <BookOpen className="text-slate-400" size={24} />
-                                <h3 className="text-lg font-bold text-slate-400">Interview Answer</h3>
-                            </div>
-                            <p className="text-slate-200 leading-relaxed">
-                                "Strict mode is enabled with 'use strict' and makes JavaScript throw errors for silent failures, bad syntax, and potentially problematic code."
-                            </p>
-                        </div>
-
-                        {/* Simple Explanation */}
-                        <div className="bg-gradient-to-br from-blue-900/40 to-slate-900 rounded-xl p-6 border border-blue-500/30">
-                            <div className="flex items-center gap-2 mb-4">
-                                <Lightbulb className="text-blue-400" size={24} />
-                                <h3 className="text-lg font-bold text-blue-400">Simple Explanation</h3>
-                            </div>
-                            <p className="text-slate-200 leading-relaxed">
-                                Think of strict mode as a spell-checker for JavaScript. Instead of letting typos pass silently, it highlights them so you can fix them!
-                            </p>
-                        </div>
-
-                        {/* Key Points */}
-                        <div className="bg-gradient-to-br from-green-900/40 to-slate-900 rounded-xl p-6 border border-green-500/30">
-                            <div className="flex items-center gap-2 mb-4">
-                                <AlertCircle className="text-green-400" size={24} />
-                                <h3 className="text-lg font-bold text-green-400">Core Concepts</h3>
-                            </div>
-                            <ul className="space-y-2 text-slate-200 text-sm">
-                                <li className="flex gap-2">
-                                    <span className="text-green-400">•</span>
-                                    <span>Use "use strict" to enable</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span className="text-green-400">•</span>
-                                    <span>Catches silent errors</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span className="text-green-400">•</span>
-                                    <span>Improves performance</span>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <BookOpen className="text-green-400" size={22} />
+                            <h3 className="text-base font-bold text-green-400 uppercase">Interview Answer</h3>
+                        </div>
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            "Strict Mode is a way to opt-in to a restricted variant of JavaScript. It converts silent errors into throw errors and fixes mistakes that make it difficult for engines to optimize."
+                        </p>
+                    </div>
+
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Lightbulb className="text-yellow-400" size={22} />
+                            <h3 className="text-base font-bold text-yellow-400 uppercase">Simple Explanation</h3>
+                        </div>
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            It's like having a strict teacher. Instead of letting you turn in messy homework, they make you fix every typo before they'll even look at it.
+                        </p>
+                    </div>
+
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <AlertCircle className="text-red-400" size={22} />
+                            <h3 className="text-base font-bold text-red-400 uppercase">Key Protections</h3>
+                        </div>
+                        <ul className="space-y-3 text-slate-200 text-sm">
+                            <li className="flex items-start gap-2">
+                                <span className="text-red-400 mt-1">•</span>
+                                <div><strong className="text-red-400">Globals:</strong> No undeclared variables.</div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-red-400 mt-1">•</span>
+                                <div><strong className="text-red-400">Silent Fails:</strong> Read-only errors throw.</div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-red-400 mt-1">•</span>
+                                <div><strong className="text-red-400">This Binding:</strong> Undefined instead of window.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <h4 className="text-sm font-semibold text-slate-400 mb-2 uppercase">Did you know?</h4>
+                        <p className="text-slate-400 text-xs">
+                            ES6 Modules and Classes are ALWAYS in Strict Mode by default. You don't even need to write the string!
+                        </p>
+                    </div>
+                </div>
+
+                {/* Right Side - Full Screen Visualizer */}
+                <div className="flex-1 flex flex-col bg-slate-950">
+
                     {/* Example Tabs */}
-                    <div className="mb-8">
-                        <div className="flex flex-wrap gap-3">
+                    <div className="bg-slate-900 border-b border-slate-700 px-6 py-4">
+                        <div className="flex gap-2 overflow-x-auto">
                             {examples.map((ex, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => changeExample(idx)}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-all ${currentExample === idx
-                                        ? 'bg-slate-600 text-white shadow-lg shadow-slate-500/30'
-                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                    className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${currentExample === idx
+                                            ? 'bg-green-600 text-white shadow-lg shadow-green-500/30'
+                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                         }`}
                                 >
                                     {ex.title}
@@ -311,20 +219,32 @@ var octal = 077; // SyntaxError!
                     </div>
 
                     {/* Code Display */}
-                    <div className="bg-slate-900 rounded-2xl p-6 border border-slate-700 mb-8">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Code className="text-slate-400" />
-                            <h3 className="text-xl font-bold">Code Example</h3>
+                    <div className="bg-slate-900/50 flex flex-col" style={{ height: '35vh' }}>
+                        <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-700 bg-slate-900">
+                            <Code className="text-green-400" size={20} />
+                            <h3 className="text-lg font-bold">Safety Checks</h3>
                         </div>
-                        <div className="bg-slate-950 rounded-xl overflow-hidden border border-slate-700">
+                        <div className="flex-1 overflow-auto">
                             <SyntaxHighlighter
                                 language="javascript"
                                 style={atomDark}
+                                showLineNumbers={true}
                                 customStyle={{
                                     margin: 0,
-                                    padding: '1.5rem',
-                                    fontSize: '0.95rem',
-                                    backgroundColor: '#0f172a'
+                                    padding: '2rem',
+                                    fontSize: '1.2rem',
+                                    lineHeight: '1.8',
+                                    backgroundColor: 'transparent'
+                                }}
+                                lineProps={(lineNumber: number) => {
+                                    const isCurrentLine = lineNumber === currentStepData.line;
+                                    return {
+                                        style: {
+                                            backgroundColor: isCurrentLine ? 'rgba(34, 197, 94, 0.15)' : undefined,
+                                            borderLeft: isCurrentLine ? '3px solid #22c55e' : '3px solid transparent',
+                                            paddingLeft: '1rem'
+                                        }
+                                    };
                                 }}
                             >
                                 {currentEx.code}
@@ -332,136 +252,113 @@ var octal = 077; // SyntaxError!
                         </div>
                     </div>
 
-                    {/* Step-by-Step Execution */}
-                    <div className="bg-slate-900 rounded-2xl p-8 border border-slate-700">
-                        <h3 className="text-2xl font-bold mb-6">Step-by-Step Visualization</h3>
-
-                        {/* Controls */}
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={handleReset}
-                                    className="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-                                >
-                                    <RotateCcw size={20} />
-                                </button>
-                                <button
-                                    onClick={handlePrevious}
-                                    disabled={currentStep === 0}
-                                    className="p-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 rounded-lg transition-colors"
-                                >
-                                    <ChevronLeft size={20} />
-                                </button>
-                                <button
-                                    onClick={handleNext}
-                                    disabled={currentStep === currentEx.steps.length - 1}
-                                    className="p-3 bg-slate-600 hover:bg-slate-500 disabled:opacity-50 rounded-lg transition-colors"
-                                >
-                                    <ChevronRight size={20} />
-                                </button>
-                            </div>
-                            <div className="text-slate-400">
-                                Step {currentStep + 1} of {currentEx.steps.length}
-                            </div>
-                        </div>
-
-                        {/* Current Step Display */}
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={currentStep}
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="space-y-6"
-                            >
-                                {/* Line Number */}
+                    {/* Interactive Visualization - Takes remaining space */}
+                    <div className="flex-1 bg-slate-900 px-8 py-6 border-t border-slate-700 overflow-y-auto">
+                        <div className="max-w-5xl mx-auto h-full flex flex-col">
+                            {/* Controls */}
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className="text-xl font-bold tracking-tight text-green-400 flex items-center gap-2">
+                                    <Shield size={20} /> Runtime Guard
+                                </h3>
                                 <div className="flex items-center gap-4">
-                                    <span className={`px-4 py-2 rounded-full text-sm font-semibold ${currentStepData.highlight === 'strict'
-                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                        : currentStepData.highlight === 'error'
-                                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                            : currentStepData.highlight === 'problem'
-                                                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                                                : currentStepData.highlight === 'benefit'
-                                                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                                    : 'bg-slate-500/20 text-slate-400 border border-slate-500/30'
-                                        }`}>
-                                        {currentStepData.highlight === 'strict' ? '🛡️ Strict Mode' :
-                                            currentStepData.highlight === 'error' ? '❌ Error' :
-                                                currentStepData.highlight === 'problem' ? '⚠️ Problem' :
-                                                    currentStepData.highlight === 'benefit' ? '✅ Benefit' : '📝 Info'}
+                                    <span className="text-slate-400 text-base font-mono">
+                                        Step {currentStep + 1}/{currentEx.steps.length}
                                     </span>
-                                    <span className="text-2xl font-bold text-white">
-                                        Line {currentStepData.line}
-                                    </span>
-                                </div>
-
-                                {/* Description */}
-                                <div className="bg-slate-950/50 rounded-xl p-6 border border-slate-700">
-                                    <p className="text-xl text-slate-200 leading-relaxed">
-                                        {currentStepData.description}
-                                    </p>
-                                </div>
-
-                                {/* Data Visualization */}
-                                <div className="bg-slate-950 rounded-xl p-6 border border-slate-500/30">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <Layers className="text-slate-400" size={20} />
-                                        <h4 className="text-lg font-semibold text-slate-400">Current State</h4>
-                                    </div>
-                                    <div className="font-mono text-sm">
-                                        <pre className="text-cyan-400">
-                                            {JSON.stringify(currentStepData.data, null, 2)}
-                                        </pre>
+                                    <div className="flex gap-2">
+                                        <button onClick={handleReset} className="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">
+                                            <RotateCcw size={20} />
+                                        </button>
+                                        <button onClick={handlePrevious} disabled={currentStep === 0} className="p-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 rounded-lg transition-colors">
+                                            <ChevronLeft size={20} />
+                                        </button>
+                                        <button onClick={handleNext} disabled={currentStep === currentEx.steps.length - 1} className="p-3 bg-green-600 hover:bg-green-500 disabled:opacity-50 rounded-lg transition-colors shadow-lg shadow-green-500/20">
+                                            <ChevronRight size={20} />
+                                        </button>
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* Output if exists */}
-                                {currentStepData.output && (
-                                    <div className="flex items-center gap-4">
-                                        <span className="text-slate-400">Output:</span>
-                                        <div className="px-6 py-3 rounded-xl font-mono text-lg font-bold bg-green-500/20 text-green-400 border-2 border-green-500">
-                                            {currentStepData.output}
+                            {/* Current Step Display */}
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={currentExample + currentStep}
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 1.02 }}
+                                    className="space-y-6 flex-1 flex flex-col"
+                                >
+                                    <div className="bg-slate-950/80 rounded-2xl p-6 border-2 border-slate-800 shadow-2xl relative overflow-hidden group">
+                                        <div className="absolute top-0 left-0 w-1 h-full bg-green-500 group-hover:w-2 transition-all" />
+                                        <p className="text-lg text-slate-100 leading-relaxed pl-2">{currentStepData.description}</p>
+                                    </div>
+
+                                    {/* Console / Engine Visualization */}
+                                    <div className="flex-1 flex items-center justify-center p-8 bg-slate-950 rounded-3xl border border-slate-800 relative shadow-inner">
+
+                                        <div className="grid grid-cols-2 gap-12 w-full max-w-2xl text-center">
+                                            {/* Sloppy Mode Column */}
+                                            <div className="flex flex-col items-center gap-4 opacity-40">
+                                                <div className="text-[10px] uppercase font-bold text-slate-600 tracking-widest">Sloppy Mode (Default)</div>
+                                                <div className="w-full aspect-square rounded-2xl border-2 border-slate-800 bg-slate-900/50 flex items-center justify-center relative">
+                                                    <CheckCircle2 className="text-slate-700" size={48} />
+                                                    <div className="absolute -bottom-2 bg-slate-800 px-3 py-1 rounded text-[10px] text-slate-500">Silent Success?</div>
+                                                </div>
+                                            </div>
+
+                                            {/* Strict Mode Column */}
+                                            <div className="flex flex-col items-center gap-4">
+                                                <div className="text-[10px] uppercase font-bold text-green-500 tracking-widest animate-pulse">Strict Mode (Active)</div>
+                                                <motion.div
+                                                    animate={{
+                                                        borderColor: currentStepData.highlight === 'error' ? '#ef4444' : '#22c55e',
+                                                        backgroundColor: currentStepData.highlight === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.05)'
+                                                    }}
+                                                    className="w-full aspect-square rounded-2xl border-4 flex items-center justify-center relative shadow-2xl"
+                                                >
+                                                    {currentStepData.highlight === 'error' ? (
+                                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                                                            <XCircle className="text-red-500" size={64} />
+                                                        </motion.div>
+                                                    ) : (
+                                                        <CheckCircle2 className="text-green-500" size={64} />
+                                                    )}
+
+                                                    {currentStepData.output && (
+                                                        <motion.div
+                                                            initial={{ y: 20, opacity: 0 }}
+                                                            animate={{ y: 0, opacity: 1 }}
+                                                            className="absolute -bottom-4 bg-red-600 px-4 py-2 rounded-lg text-xs font-bold text-white shadow-xl"
+                                                        >
+                                                            {currentStepData.output}!
+                                                        </motion.div>
+                                                    )}
+                                                </motion.div>
+                                            </div>
+                                        </div>
+
+                                        {/* Engine Info Box */}
+                                        <div className="absolute top-4 right-4 bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                                            <div className="text-[10px] uppercase font-bold text-slate-500 mb-1">Engine State</div>
+                                            <div className="font-mono text-[10px] text-green-400">
+                                                {Object.entries(currentStepData.data).map(([k, v]) => (
+                                                    <div key={k}>{k}: {String(v)}</div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                )}
-                            </motion.div>
-                        </AnimatePresence>
 
-                        {/* Explanation */}
-                        <div className="mt-8 p-6 bg-slate-500/10 rounded-xl border border-slate-500/30">
-                            <h4 className="text-lg font-semibold text-slate-400 mb-2">💡 Key Takeaway</h4>
-                            <p className="text-slate-300">{currentEx.explanation}</p>
+                                    <div className="p-5 bg-green-500/10 rounded-2xl border border-green-500/30">
+                                        <h4 className="text-sm font-bold text-green-400 mb-2 flex items-center gap-2 uppercase tracking-tight">
+                                            <Lightbulb size={16} /> Why it matters
+                                        </h4>
+                                        <p className="text-slate-400 text-sm leading-relaxed italic">{currentEx.explanation}</p>
+                                    </div>
+                                </motion.div>
+                            </AnimatePresence>
                         </div>
                     </div>
-
-                    {/* Interview Tips */}
-                    <div className="mt-12 bg-gradient-to-r from-slate-800/30 to-slate-700/30 rounded-2xl p-8 border border-slate-500/30">
-                        <h3 className="text-2xl font-bold text-white mb-6">🎯 Interview Tips</h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <h4 className="text-lg font-semibold text-slate-400 mb-3">Common Questions:</h4>
-                                <ul className="space-y-2 text-slate-300">
-                                    <li>• "What is strict mode?"</li>
-                                    <li>• "How to enable strict mode?"</li>
-                                    <li>• "What errors does it catch?"</li>
-                                    <li>• "Can you use it for just one function?"</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="text-lg font-semibold text-blue-400 mb-3">Real-World Benefits:</h4>
-                                <ul className="space-y-2 text-slate-300">
-                                    <li>• Catches typos (missing var/let/const)</li>
-                                    <li>• Prevents global pollution</li>
-                                    <li>• Better performance in some engines</li>
-                                    <li>• ES6 modules use strict by default</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-            </main>
+            </div>
 
             <Footer />
         </div>

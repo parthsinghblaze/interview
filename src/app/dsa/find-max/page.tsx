@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Code, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Code, Info, HelpCircle } from 'lucide-react';
+import DSAExplanationModal from '../../components/DSAExplanationModal';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -88,6 +89,7 @@ const DSAVisualizer = () => {
     const [steps] = useState(generateSteps(initialArray));
     const [currentStep, setCurrentStep] = useState(0);
     const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const currentStepData = { ...steps[currentStep], completed: currentStep === steps.length - 1 };
 
@@ -177,8 +179,17 @@ const DSAVisualizer = () => {
                                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                                     Find Maximum
                                 </h1>
-                                <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
-                                    v2.0
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="p-2 rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                                        title="Algorithm Explanation"
+                                    >
+                                        <HelpCircle size={20} />
+                                    </button>
+                                    <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
+                                        v2.0
+                                    </div>
                                 </div>
                             </div>
 
@@ -349,12 +360,12 @@ const DSAVisualizer = () => {
                                                 {/* Bar */}
                                                 <div
                                                     className={`w-16 md:w-20 rounded-t-xl flex items-end justify-center pb-2 transition-all duration-300 ${isMax
-                                                            ? 'bg-gradient-to-t from-green-600 to-green-400 shadow-lg shadow-green-500/50'
-                                                            : isComparing
-                                                                ? 'bg-gradient-to-t from-yellow-600 to-yellow-400 shadow-lg shadow-yellow-500/50'
-                                                                : isVisited
-                                                                    ? 'bg-gradient-to-t from-slate-600 to-slate-500'
-                                                                    : 'bg-gradient-to-t from-blue-600 to-blue-400'
+                                                        ? 'bg-gradient-to-t from-green-600 to-green-400 shadow-lg shadow-green-500/50'
+                                                        : isComparing
+                                                            ? 'bg-gradient-to-t from-yellow-600 to-yellow-400 shadow-lg shadow-yellow-500/50'
+                                                            : isVisited
+                                                                ? 'bg-gradient-to-t from-slate-600 to-slate-500'
+                                                                : 'bg-gradient-to-t from-blue-600 to-blue-400'
                                                         }`}
                                                     style={{ height: `${value * 20}px` }}
                                                 >
@@ -363,10 +374,10 @@ const DSAVisualizer = () => {
 
                                                 {/* Label */}
                                                 <div className={`text-xs font-mono px-2 py-1 rounded ${isMax
-                                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                                        : isComparing
-                                                            ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                                                            : 'bg-slate-800 text-slate-400'
+                                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                                    : isComparing
+                                                        ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                                        : 'bg-slate-800 text-slate-400'
                                                     }`}>
                                                     {isMax ? 'MAX' : isComparing ? 'CURR' : `[${idx}]`}
                                                 </div>
@@ -410,6 +421,29 @@ const DSAVisualizer = () => {
 
                 </div>
             </main>
+
+            <DSAExplanationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Find Maximum Number"
+                description="The fundamental linear search algorithm to find the largest element in an array."
+                concept="Linear search iterates through the array once, keeping track of the largest value seen so far. It initializes the maximum with the first element and updates it whenever a larger element is found."
+                efficiency="This is the most direct way to find the maximum in an unsorted array. It requires visiting every element exactly once."
+                useCases={[
+                    "Finding the highest score in a list",
+                    "Locating the maximum value in a raw dataset",
+                    "Basic building block for more complex sorting or selection algorithms"
+                ]}
+                timeComplexity="O(n)"
+                spaceComplexity="O(1)"
+                complexityNotes="n = Number of elements in the array"
+                interviewTips={[
+                    "Ask if the array can be empty (handle edge cases).",
+                    "Discuss what to return if the array is empty (e.g., -Infinity or an Error).",
+                    "Mention that for sorted arrays, this could be O(1) by simply checking the last element."
+                ]}
+                color="blue"
+            />
         </div>
     );
 };

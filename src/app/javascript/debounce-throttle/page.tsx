@@ -1,312 +1,344 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, RotateCcw, ChevronRight, ChevronLeft, Code, BookOpen, Lightbulb, AlertCircle, Timer, Zap, Play, Pause } from 'lucide-react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import { motion } from 'framer-motion';
-import { Activity, ArrowLeft, Timer, Zap } from 'lucide-react';
-import Link from 'next/link';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-export default function DebounceThrottlePage() {
-    const [debounceCount, setDebounceCount] = useState(0);
-    const [throttleCount, setThrottleCount] = useState(0);
-    const [normalCount, setNormalCount] = useState(0);
+const DebounceThrottleVisualizer = () => {
+    const [currentExample, setCurrentExample] = useState(0);
+    const [activeTab, setActiveTab] = useState('debounce');
 
-    return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
-            <Header />
+    // Visualization state
+    const [events, setEvents] = useState<{ id: number; type: 'trigger' | 'execution'; time: number }[]>([]);
+    const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
 
-            <main className="pt-24 pb-20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    // Refs for optimization
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const lastExecutionRef = useRef<number>(0);
+    const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-                    <div className="mb-8">
-                        <Link
-                            href="/javascript"
-                            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-500 transition-colors"
-                        >
-                            <ArrowLeft size={16} />
-                            Back to JavaScript
-                        </Link>
-                    </div>
-
-                    {/* Header */}
-                    <div className="text-center mb-16">
-                        <div className="inline-flex items-center justify-center p-3 mb-4 bg-orange-100 dark:bg-orange-900/30 rounded-2xl">
-                            <Activity className="text-orange-600 dark:text-orange-400" size={40} />
-                        </div>
-                        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-                            Debounce & Throttle
-                        </h1>
-                        <p className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
-                            Two powerful techniques to limit how often a function is executed. Essential for performance optimization in real-world applications.
-                        </p>
-                    </div>
-
-                    {/* The Problem */}
-                    <div className="mb-16 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-3xl p-8 border-2 border-red-200 dark:border-red-500/30">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                            ⚠️ The Problem
-                        </h2>
-                        <p className="text-lg text-gray-700 dark:text-slate-300 mb-4 leading-relaxed">
-                            Imagine a search box that makes an API call on every keystroke. If you type "JavaScript" (10 characters), that's 10 API calls in rapid succession!
-                        </p>
-                        <div className="bg-white dark:bg-slate-900 rounded-xl p-6">
-                            <pre className="text-sm font-mono text-slate-300">
-                                {`input.addEventListener('input', (e) => {
-  fetchSearchResults(e.target.value); // Called 10 times! 😱
-});
-
-// User types: J a v a S c r i p t
-// API calls:  1 2 3 4 5 6 7 8 9 10`}
-                            </pre>
-                        </div>
-                        <p className="text-gray-600 dark:text-slate-400 mt-4">
-                            This wastes bandwidth, increases server load, and can cause UI lag!
-                        </p>
-                    </div>
-
-                    {/* Debounce */}
-                    <div className="mb-16">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                                <Timer className="text-blue-600 dark:text-blue-400" size={32} />
-                            </div>
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                                Debounce: "Wait until they stop"
-                            </h2>
-                        </div>
-
-                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-200 dark:border-slate-800">
-                            <p className="text-lg text-gray-700 dark:text-slate-300 mb-6 leading-relaxed">
-                                <strong>Debouncing</strong> waits for a pause in activity before executing the function. If the function is called again before the timer expires, the timer resets.
-                            </p>
-
-                            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 mb-6 border border-blue-200 dark:border-blue-500/30">
-                                <h4 className="font-bold text-blue-700 dark:text-blue-300 mb-3">
-                                    Simple Analogy: Elevator Door
-                                </h4>
-                                <p className="text-gray-700 dark:text-slate-300">
-                                    An elevator door starts closing, but if someone presses the button, it reopens and waits again. It only closes when no one has pressed the button for a few seconds.
-                                </p>
-                            </div>
-
-                            <h4 className="font-bold text-gray-900 dark:text-white mb-4">Implementation:</h4>
-                            <div className="bg-slate-900 rounded-xl p-6 mb-6">
-                                <pre className="text-sm font-mono text-slate-300">
-                                    {`function debounce(func, delay) {
+    const examples = [
+        {
+            id: 'debounce',
+            title: 'Debounce',
+            icon: <Timer size={20} />,
+            color: 'text-blue-400',
+            bg: 'bg-blue-400',
+            border: 'border-blue-400',
+            code: `function debounce(func, delay) {
   let timeoutId;
-  
   return function(...args) {
-    clearTimeout(timeoutId); // Cancel previous timer
-    
+    clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
-      func.apply(this, args); // Execute after delay
+      func.apply(this, args);
     }, delay);
   };
-}
-
-// Usage
-const searchInput = document.getElementById('search');
-const debouncedSearch = debounce(fetchSearchResults, 500);
-
-searchInput.addEventListener('input', (e) => {
-  debouncedSearch(e.target.value); // Only calls API after 500ms of no typing
-});`}
-                                </pre>
-                            </div>
-
-                            <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-500/30">
-                                <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                                    ✅ <strong>Best for:</strong> Search inputs, form validation, window resize events, auto-save features
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Throttle */}
-                    <div className="mb-16">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                                <Zap className="text-purple-600 dark:text-purple-400" size={32} />
-                            </div>
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                                Throttle: "Execute at regular intervals"
-                            </h2>
-                        </div>
-
-                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-200 dark:border-slate-800">
-                            <p className="text-lg text-gray-700 dark:text-slate-300 mb-6 leading-relaxed">
-                                <strong>Throttling</strong> ensures a function is called at most once in a specified time period, regardless of how many times the event fires.
-                            </p>
-
-                            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-6 mb-6 border border-purple-200 dark:border-purple-500/30">
-                                <h4 className="font-bold text-purple-700 dark:text-purple-300 mb-3">
-                                    Simple Analogy: Traffic Light
-                                </h4>
-                                <p className="text-gray-700 dark:text-slate-300">
-                                    No matter how many cars arrive, the light only changes every 60 seconds. Cars that arrive during the red light must wait for the next cycle.
-                                </p>
-                            </div>
-
-                            <h4 className="font-bold text-gray-900 dark:text-white mb-4">Implementation:</h4>
-                            <div className="bg-slate-900 rounded-xl p-6 mb-6">
-                                <pre className="text-sm font-mono text-slate-300">
-                                    {`function throttle(func, limit) {
+}`,
+            explanation: 'Waits for a pause in activity before executing. Resets timer on every new event.',
+            interviewPoint: 'Best for search inputs and form validation.'
+        },
+        {
+            id: 'throttle',
+            title: 'Throttle',
+            icon: <Zap size={20} />,
+            color: 'text-purple-400',
+            bg: 'bg-purple-400',
+            border: 'border-purple-400',
+            code: `function throttle(func, limit) {
   let inThrottle;
-  
   return function(...args) {
     if (!inThrottle) {
-      func.apply(this, args); // Execute immediately
+      func.apply(this, args);
       inThrottle = true;
-      
-      setTimeout(() => {
-        inThrottle = false; // Allow next execution after limit
-      }, limit);
+      setTimeout(() => inThrottle = false, limit);
     }
   };
-}
+}`,
+            explanation: 'Executes at regular intervals regardless of frequency. Ignores events during cooldown.',
+            interviewPoint: 'Best for scroll events and button spam prevention.'
+        }
+    ];
 
-// Usage
-const handleScroll = throttle(() => {
-  console.log('Scroll position:', window.scrollY);
-}, 1000);
+    const currentEx = examples.find(e => e.id === activeTab) || examples[0];
 
-window.addEventListener('scroll', handleScroll); 
-// Logs at most once per second while scrolling`}
-                                </pre>
-                            </div>
+    const triggerEvent = () => {
+        const newEvent = { id: Date.now(), type: 'trigger' as const, time: Date.now() };
+        setEvents(prev => [...prev, newEvent].slice(-20));
 
-                            <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-500/30">
-                                <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                                    ✅ <strong>Best for:</strong> Scroll events, mouse movement tracking, button spam prevention, game loop updates
-                                </p>
-                            </div>
+        if (activeTab === 'debounce') {
+            if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
+            debounceTimeoutRef.current = setTimeout(() => {
+                executeFunction();
+            }, 1000);
+        } else {
+            const now = Date.now();
+            if (now - lastExecutionRef.current >= 1000) {
+                executeFunction();
+                lastExecutionRef.current = now;
+            }
+        }
+    };
+
+    const executeFunction = () => {
+        setEvents(prev => [...prev, { id: Date.now(), type: 'execution' as const, time: Date.now() }].slice(-20));
+    };
+
+    const handleReset = () => {
+        setEvents([]);
+        lastExecutionRef.current = 0;
+        if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-950 text-white">
+            <Header />
+
+            {/* Full Screen Layout */}
+            <div className="pt-20 min-h-[calc(100vh-5rem)] flex">
+
+                {/* Left Sidebar - Definitions */}
+                <div className="w-80 bg-slate-900 border-r border-slate-700 p-6 overflow-y-auto">
+                    {/* Header */}
+                    <div className="mb-8">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Activity className="text-orange-400" size={40} />
+                            <h1 className="text-2xl font-bold leading-tight">Debounce & Throttle</h1>
                         </div>
+                        <p className="text-slate-400 text-sm">
+                            Optimize performance by controlling function execution frequency.
+                        </p>
                     </div>
 
-                    {/* Comparison Table */}
-                    <div className="mb-16">
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-                            Quick Comparison
-                        </h2>
-                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-200 dark:border-slate-800 overflow-x-auto">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b-2 border-gray-200 dark:border-slate-700">
-                                        <th className="text-left py-4 px-4 font-bold text-gray-900 dark:text-white">Feature</th>
-                                        <th className="text-left py-4 px-4 font-bold text-blue-600 dark:text-blue-400">Debounce</th>
-                                        <th className="text-left py-4 px-4 font-bold text-purple-600 dark:text-purple-400">Throttle</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-gray-700 dark:text-slate-300">
-                                    <tr className="border-b border-gray-100 dark:border-slate-800">
-                                        <td className="py-4 px-4 font-medium">When it executes</td>
-                                        <td className="py-4 px-4">After a pause in events</td>
-                                        <td className="py-4 px-4">At regular intervals</td>
-                                    </tr>
-                                    <tr className="border-b border-gray-100 dark:border-slate-800">
-                                        <td className="py-4 px-4 font-medium">First call</td>
-                                        <td className="py-4 px-4">Waits for delay</td>
-                                        <td className="py-4 px-4">Executes immediately</td>
-                                    </tr>
-                                    <tr className="border-b border-gray-100 dark:border-slate-800">
-                                        <td className="py-4 px-4 font-medium">Subsequent calls</td>
-                                        <td className="py-4 px-4">Resets timer</td>
-                                        <td className="py-4 px-4">Ignored if in cooldown</td>
-                                    </tr>
-                                    <tr className="border-b border-gray-100 dark:border-slate-800">
-                                        <td className="py-4 px-4 font-medium">Use case</td>
-                                        <td className="py-4 px-4">Search, Resize, Validation</td>
-                                        <td className="py-4 px-4">Scroll, Mouse move, Infinite scroll</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    {/* Interview Definition */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <BookOpen className="text-orange-400" size={22} />
+                            <h3 className="text-base font-bold text-orange-400 uppercase">Debounce</h3>
                         </div>
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            "Wait until the user stops typing/acting. If they act again, start the wait over."
+                        </p>
                     </div>
 
-                    {/* Visual Timeline */}
-                    <div className="mb-16 bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-200 dark:border-slate-800">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                            Visual Timeline (10 rapid events)
-                        </h2>
-                        <div className="space-y-8">
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Zap className="text-purple-400" size={22} />
+                            <h3 className="text-base font-bold text-purple-400 uppercase">Throttle</h3>
+                        </div>
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            "Execute at most once every X milliseconds, even if triggered 100 times."
+                        </p>
+                    </div>
+
+                    {/* Key Use Cases */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Lightbulb className="text-green-400" size={22} />
+                            <h3 className="text-base font-bold text-green-400 uppercase">When to use?</h3>
+                        </div>
+                        <ul className="space-y-3 text-slate-200 text-base">
+                            <li className="flex items-start gap-2">
+                                <span className="text-blue-400 mt-1">•</span>
+                                <div><strong className="text-blue-400">Search:</strong> Debounce</div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-purple-400 mt-1">•</span>
+                                <div><strong className="text-purple-400">Scroll:</strong> Throttle</div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-emerald-400 mt-1">•</span>
+                                <div><strong className="text-emerald-400">Resize:</strong> Either (context dependent)</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Simple Analogy */}
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <h4 className="text-sm font-semibold text-slate-400 mb-3 uppercase">Analogies</h4>
+                        <div className="space-y-4">
                             <div>
-                                <h4 className="font-bold text-gray-900 dark:text-white mb-3">Without optimization:</h4>
-                                <div className="flex gap-1">
-                                    {Array(10).fill(0).map((_, i) => (
-                                        <div key={i} className="flex-1 h-12 bg-red-500 rounded flex items-center justify-center text-white text-xs">
-                                            ✕
-                                        </div>
-                                    ))}
-                                </div>
-                                <p className="text-sm text-gray-500 dark:text-slate-500 mt-2">10 executions</p>
+                                <p className="text-xs font-bold text-blue-400 mb-1">Debounce: Elevator Door</p>
+                                <p className="text-slate-400 text-[10px] leading-tight">Stays open as long as people keep walking in. Starts closing only after a pause.</p>
                             </div>
-
                             <div>
-                                <h4 className="font-bold text-blue-600 dark:text-blue-400 mb-3">With Debounce (500ms):</h4>
-                                <div className="flex gap-1">
-                                    {Array(10).fill(0).map((_, i) => (
-                                        <div key={i} className={`flex-1 h-12 rounded flex items-center justify-center text-xs ${i === 9 ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-slate-800 text-gray-400'
-                                            }`}>
-                                            {i === 9 ? '✓' : '○'}
-                                        </div>
-                                    ))}
-                                </div>
-                                <p className="text-sm text-gray-500 dark:text-slate-500 mt-2">1 execution (only after all events stop)</p>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold text-purple-600 dark:text-purple-400 mb-3">With Throttle (300ms):</h4>
-                                <div className="flex gap-1">
-                                    {Array(10).fill(0).map((_, i) => (
-                                        <div key={i} className={`flex-1 h-12 rounded flex items-center justify-center text-xs ${i % 3 === 0 ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-slate-800 text-gray-400'
-                                            }`}>
-                                            {i % 3 === 0 ? '✓' : '○'}
-                                        </div>
-                                    ))}
-                                </div>
-                                <p className="text-sm text-gray-500 dark:text-slate-500 mt-2">4 executions (every 300ms)</p>
+                                <p className="text-xs font-bold text-purple-400 mb-1">Throttle: Traffic Light</p>
+                                <p className="text-slate-400 text-[10px] leading-tight">Only allows cars through in cycles, regardless of how many cars wait.</p>
                             </div>
                         </div>
                     </div>
-
-                    {/* Interview Tips */}
-                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-3xl p-8 border border-yellow-200 dark:border-yellow-500/30">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                            💡 Common Interview Questions
-                        </h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl">
-                                <h4 className="font-bold text-gray-900 dark:text-white mb-2">❓ When to use debounce vs throttle?</h4>
-                                <p className="text-sm text-gray-600 dark:text-slate-400">
-                                    Use debounce when you want the final value (search, form validation). Use throttle when you want periodic updates (scroll position, progress).
-                                </p>
-                            </div>
-                            <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl">
-                                <h4 className="font-bold text-gray-900 dark:text-white mb-2">❓ Can you use both together?</h4>
-                                <p className="text-sm text-gray-600 dark:text-slate-400">
-                                    Rarely needed, but yes! For example, track scroll position periodically (throttle) but save to localStorage only after scrolling stops (debounce).
-                                </p>
-                            </div>
-                            <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl">
-                                <h4 className="font-bold text-gray-900 dark:text-white mb-2">❓ What about leading vs trailing?</h4>
-                                <p className="text-sm text-gray-600 dark:text-slate-400">
-                                    Leading: execute immediately on first call. Trailing: execute after delay. Lodash's debounce/throttle support both options.
-                                </p>
-                            </div>
-                            <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl">
-                                <h4 className="font-bold text-gray-900 dark:text-white mb-2">❓ Performance benefit?</h4>
-                                <p className="text-sm text-gray-600 dark:text-slate-400">
-                                    Can reduce function calls by 90%+! Critical for heavy operations like API calls, DOM manipulation, or complex calculations.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-            </main>
+
+                {/* Right Side - Full Screen Visualizer */}
+                <div className="flex-1 flex flex-col bg-slate-950">
+
+                    {/* Example Tabs */}
+                    <div className="bg-slate-900 border-b border-slate-700 px-6 py-4">
+                        <div className="flex gap-2 items-center">
+                            {examples.map((ex) => (
+                                <button
+                                    key={ex.id}
+                                    onClick={() => {
+                                        setActiveTab(ex.id);
+                                        handleReset();
+                                    }}
+                                    className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all ${activeTab === ex.id
+                                            ? `${ex.bg} text-white shadow-lg`
+                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                        }`}
+                                >
+                                    {ex.icon}
+                                    {ex.title}
+                                </button>
+                            ))}
+                            <div className="ml-auto flex items-center gap-4">
+                                <span className="text-xs text-slate-500 uppercase tracking-widest font-bold">1000ms Interval</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Code Display */}
+                    <div className="bg-slate-900/50 flex flex-col" style={{ height: '35vh' }}>
+                        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-700 bg-slate-900">
+                            <div className="flex items-center gap-2">
+                                <Code className={currentEx.color} size={20} />
+                                <h3 className="text-lg font-bold">{currentEx.title} Implementation</h3>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-auto">
+                            <SyntaxHighlighter
+                                language="javascript"
+                                style={atomDark}
+                                customStyle={{
+                                    margin: 0,
+                                    padding: '2rem',
+                                    fontSize: '1.1rem',
+                                    lineHeight: '1.6',
+                                    backgroundColor: 'transparent'
+                                }}
+                            >
+                                {currentEx.code}
+                            </SyntaxHighlighter>
+                        </div>
+                    </div>
+
+                    {/* Interactive Visualization - Takes remaining space */}
+                    <div className="flex-1 bg-slate-900 px-8 py-6 flex flex-col border-t border-slate-700 overflow-hidden">
+                        <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col">
+                            {/* Controls & Action Area */}
+                            <div className="flex flex-col items-center gap-6 mb-12">
+                                <div className="text-center">
+                                    <h3 className="text-xl font-bold mb-2">Visual Stress Test</h3>
+                                    <p className="text-slate-400 text-sm italic">Click frantically to see the difference!</p>
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <motion.button
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={triggerEvent}
+                                        className={`w-40 h-40 rounded-full border-4 ${currentEx.border} flex flex-col items-center justify-center gap-2 group relative overflow-hidden transition-all hover:bg-slate-800`}
+                                    >
+                                        <div className={`absolute inset-0 ${currentEx.bg} opacity-0 group-active:opacity-20 transition-opacity`} />
+                                        <Activity size={48} className={currentEx.color} />
+                                        <span className="font-bold text-sm uppercase">Click Here</span>
+                                    </motion.button>
+
+                                    <div className="flex flex-col gap-2">
+                                        <button
+                                            onClick={handleReset}
+                                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg flex items-center gap-2 transition-colors text-sm"
+                                        >
+                                            <RotateCcw size={16} />
+                                            Reset Grid
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Stream of Events */}
+                            <div className="flex-1 flex flex-col gap-8 min-h-0">
+                                {/* Trigger Stream */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-slate-500" />
+                                            Raw Events (Input)
+                                        </h4>
+                                        <span className="text-[10px] text-slate-600">Every click spawns a dot</span>
+                                    </div>
+                                    <div className="h-20 bg-slate-950/50 rounded-xl border border-slate-800 p-4 flex items-center gap-2 overflow-x-auto no-scrollbar relative">
+                                        <AnimatePresence>
+                                            {events.filter(e => e.type === 'trigger').map((e) => (
+                                                <motion.div
+                                                    key={e.id}
+                                                    initial={{ scale: 0, opacity: 0, x: 50 }}
+                                                    animate={{ scale: 1, opacity: 1, x: 0 }}
+                                                    exit={{ scale: 0, opacity: 0 }}
+                                                    className="w-4 h-4 rounded-full bg-slate-600 shrink-0 shadow-lg shadow-white/5"
+                                                />
+                                            ))}
+                                        </AnimatePresence>
+                                        {events.filter(e => e.type === 'trigger').length === 0 && (
+                                            <span className="text-slate-700 text-xs italic mx-auto">Click the button above to start...</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Execution Stream */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${currentEx.color}`}>
+                                            <div className={`w-2 h-2 rounded-full ${currentEx.bg} animate-pulse`} />
+                                            Actual Executions (Function Call)
+                                        </h4>
+                                        <span className="text-[10px] text-slate-600">{currentEx.id === 'debounce' ? 'Only after 1s pause' : 'At most once per 1s'}</span>
+                                    </div>
+                                    <div className={`h-20 bg-slate-950/50 rounded-xl border-2 ${currentEx.border} border-opacity-30 p-4 flex items-center gap-2 overflow-x-auto no-scrollbar relative`}>
+                                        <AnimatePresence>
+                                            {events.filter(e => e.type === 'execution').map((e) => (
+                                                <motion.div
+                                                    key={e.id}
+                                                    initial={{ scale: 0, opacity: 0, y: 20 }}
+                                                    animate={{ scale: 1.2, opacity: 1, y: 0 }}
+                                                    exit={{ scale: 0, opacity: 0 }}
+                                                    className={`w-4 h-4 rounded-full ${currentEx.bg} shrink-0 shadow-lg shadow-current/50`}
+                                                />
+                                            ))}
+                                        </AnimatePresence>
+                                        {events.filter(e => e.type === 'execution').length === 0 && (
+                                            <span className="text-slate-700 text-xs italic mx-auto">Waiting for {currentEx.title} to trigger execution...</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Explanation Box */}
+                                <div className={`p-4 rounded-xl border-2 ${currentEx.border} border-opacity-20 shadow-xl bg-opacity-5 ${currentEx.bg}`}>
+                                    <div className="flex items-start gap-4">
+                                        <div className={`p-2 rounded-lg ${currentEx.bg} bg-opacity-20`}>
+                                            <Lightbulb className={currentEx.color} size={20} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-sm mb-1">How it works here:</h4>
+                                            <p className="text-slate-400 text-xs leading-relaxed">
+                                                {currentEx.explanation} <br />
+                                                <span className="text-slate-300 font-medium mt-1 inline-block">Pro-tip: {currentEx.interviewPoint}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <Footer />
         </div>
     );
-}
+};
+
+export default DebounceThrottleVisualizer;

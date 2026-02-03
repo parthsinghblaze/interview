@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Edit3, Zap, Code, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Edit3, Zap, Code, Info, HelpCircle } from 'lucide-react';
+import DSAExplanationModal from '../../components/DSAExplanationModal';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -214,6 +215,7 @@ const FactorsVisualizer = () => {
     const [steps, setSteps] = useState(generateSteps(inputNumber, useOptimized));
     const [currentStep, setCurrentStep] = useState(0);
     const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const currentStepData = { ...steps[currentStep], completed: currentStep === steps.length - 1 };
 
@@ -361,10 +363,19 @@ const FactorsVisualizer = () => {
                         <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
                             <div className="flex items-center justify-between mb-6">
                                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                                    Factors Finder
+                                    Factor Finder
                                 </h1>
-                                <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
-                                    v2.0
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="p-2 rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                                        title="Algorithm Explanation"
+                                    >
+                                        <HelpCircle size={20} />
+                                    </button>
+                                    <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
+                                        v2.0
+                                    </div>
                                 </div>
                             </div>
 
@@ -671,6 +682,29 @@ const FactorsVisualizer = () => {
 
                 </div>
             </main>
+
+            <DSAExplanationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Factor Finder"
+                description="Identify all integers that divide a number without leaving a remainder."
+                concept="Factors are numbers you multiply together to get another number. The optimized algorithm only checks divisors up to the square root of N, as factors always come in pairs (one <= √N and one >= √N)."
+                efficiency="The naive approach checks all numbers up to N, but the optimized approach only checks up to √N, making it significantly faster for large numbers."
+                useCases={[
+                    "Cryptography (RSA algorithm relies on prime factorization)",
+                    "Finding the Greatest Common Divisor (GCD)",
+                    "Simplified fraction calculation"
+                ]}
+                timeComplexity="O(√n)"
+                spaceComplexity="O(k)"
+                complexityNotes="n = input number, k = number of factors found"
+                interviewTips={[
+                    "Always mention the Square Root optimization (√N) for extra points.",
+                    "Explain that factors come in pairs (i, n/i).",
+                    "Handle perfect squares as a special case where the pair elements are identical."
+                ]}
+                color="green"
+            />
         </div>
     );
 };

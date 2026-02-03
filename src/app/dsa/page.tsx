@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon } from 'lucide-react';
+import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -21,6 +21,18 @@ export default function DSAPage() {
             learning: 'Understanding iteration, comparison operations, and array traversal.',
             href: '/dsa/find-max',
             color: 'blue'
+        },
+        {
+            id: 'array-rotation',
+            title: 'Array Rotation',
+            description: 'Master Left and Right array rotation using linear and optimized reversal techniques.',
+            icon: RefreshCw,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(1)',
+            techniques: ['Reversal Algorithm', 'Circular Buffer', 'In-place'],
+            learning: 'Array manipulation, in-place algorithms, and index mapping.',
+            href: '/dsa/array-rotation',
+            color: 'purple'
         },
         {
             id: 'armstrong',
@@ -45,6 +57,18 @@ export default function DSAPage() {
             learning: 'Algorithm optimization, mathematical properties, and efficiency.',
             href: '/dsa/factors',
             color: 'green'
+        },
+        {
+            id: 'frequency-counter',
+            title: 'Duplicate Frequency',
+            description: 'Analyze character frequencies in a string using a high-performance Hash Map approach.',
+            icon: Hash,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(k)',
+            techniques: ['Hash Map', 'String Traversal', 'Frequency Counting'],
+            learning: 'Data structures, hash tables, and linear time complexity.',
+            href: '/dsa/frequency-counter',
+            color: 'rose'
         }
     ];
 
@@ -145,12 +169,14 @@ export default function DSAPage() {
                                         {/* Card Header */}
                                         <div className={`p-6 bg-gradient-to-br ${algo.color === 'blue' ? 'from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/10' :
                                             algo.color === 'purple' ? 'from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/10' :
-                                                'from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10'
+                                                algo.color === 'rose' ? 'from-rose-50 to-orange-50 dark:from-rose-900/20 dark:to-orange-900/10' :
+                                                    'from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10'
                                             }`}>
                                             <div className="flex justify-between items-start">
                                                 <div className={`p-3 rounded-xl ${algo.color === 'blue' ? 'bg-blue-100 text-blue-600 dark:bg-blue-800/50 dark:text-blue-300' :
                                                     algo.color === 'purple' ? 'bg-purple-100 text-purple-600 dark:bg-purple-800/50 dark:text-purple-300' :
-                                                        'bg-emerald-100 text-emerald-600 dark:bg-emerald-800/50 dark:text-emerald-300'
+                                                        algo.color === 'rose' ? 'bg-rose-100 text-rose-600 dark:bg-rose-800/50 dark:text-rose-300' :
+                                                            'bg-emerald-100 text-emerald-600 dark:bg-emerald-800/50 dark:text-emerald-300'
                                                     }`}>
                                                     <algo.icon size={32} />
                                                 </div>
@@ -190,7 +216,8 @@ export default function DSAPage() {
                                                 href={algo.href}
                                                 className={`w-full py-3 rounded-lg font-semibold text-center flex items-center justify-center gap-2 transition-all group ${algo.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' :
                                                     algo.color === 'purple' ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/20' :
-                                                        'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+                                                        algo.color === 'rose' ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/20' :
+                                                            'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
                                                     } shadow-lg`}
                                             >
                                                 <Play size={18} className="fill-current" /> Try Visualizer

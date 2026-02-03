@@ -225,14 +225,14 @@ export default function JavaScriptPage() {
             active: true
         },
         {
-            id: 'weakmap-weakset',
+            id: 'map-set',
             title: 'Map, Set & WeakMap',
             description: 'Advanced data structures in JavaScript and when to use WeakMap for memory-safe object storage.',
             icon: Database,
             difficulty: 'Medium',
             interviewFrequency: 'Medium',
             keyPoints: ['Key types', 'Garbage collection', 'Iteration'],
-            href: '/javascript/weakmap-weakset',
+            href: '/javascript/map-set',
             color: 'amber',
             active: true
         }

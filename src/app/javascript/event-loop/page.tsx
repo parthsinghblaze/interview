@@ -174,87 +174,109 @@ console.log('End');`;
         <div className="min-h-screen bg-slate-950 text-white">
             <Header />
 
-            <main className="pt-20 pb-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Full Screen Layout */}
+            <div className="pt-20 min-h-[calc(100vh-5rem)] flex">
 
+                {/* Left Sidebar - Definitions */}
+                <div className="w-80 bg-slate-900 border-r border-slate-700 p-6 overflow-y-auto">
                     {/* Header */}
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-center mb-12"
-                    >
-                        <div className="flex items-center justify-center gap-3 mb-4">
-                            <Repeat className="text-green-400" size={48} />
+                    <div className="mb-8">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Repeat className="text-green-400" size={40} />
+                            <h1 className="text-3xl font-bold">Event Loop</h1>
                         </div>
-                        <h1 className="text-5xl font-bold mb-4">JavaScript Event Loop</h1>
-                        <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-                            How JavaScript handles asynchronous code in a single-threaded environment
+                        <p className="text-slate-400 text-sm">
+                            How JavaScript handles async code in a single thread
                         </p>
-                    </motion.div>
-
-                    {/* Definitions Section */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-                        {/* Interview Definition */}
-                        <div className="bg-gradient-to-br from-green-900/40 to-slate-900 rounded-xl p-6 border border-green-500/30">
-                            <div className="flex items-center gap-2 mb-4">
-                                <BookOpen className="text-green-400" size={24} />
-                                <h3 className="text-lg font-bold text-green-400">Interview Answer</h3>
-                            </div>
-                            <p className="text-slate-200 leading-relaxed">
-                                "The Event Loop allows JavaScript to handle asynchronous tasks in a single-threaded environment. It continuously monitors the Call Stack and executes tasks in this order: 1) Synchronous code (Call Stack), 2) Microtasks (Promises, queueMicrotask), 3) Macrotasks (setTimeout, setInterval, I/O). This ensures microtasks always complete before the next macrotask runs."
-                            </p>
-                        </div>
-
-                        {/* Simple Explanation */}
-                        <div className="bg-gradient-to-br from-blue-900/40 to-slate-900 rounded-xl p-6 border border-blue-500/30">
-                            <div className="flex items-center gap-2 mb-4">
-                                <Lightbulb className="text-blue-400" size={24} />
-                                <h3 className="text-lg font-bold text-blue-400">Simple Explanation</h3>
-                            </div>
-                            <p className="text-slate-200 leading-relaxed">
-                                Think of it like a restaurant: the Call Stack is the chef cooking one dish at a time. The Event Loop is like a waiter checking if the chef is free to start the next order from the queue.
-                            </p>
-                        </div>
-
-                        {/* Key Points */}
-                        <div className="bg-gradient-to-br from-purple-900/40 to-slate-900 rounded-xl p-6 border border-purple-500/30">
-                            <div className="flex items-center gap-2 mb-4">
-                                <AlertCircle className="text-purple-400" size={24} />
-                                <h3 className="text-lg font-bold text-purple-400">Key Components</h3>
-                            </div>
-                            <ul className="space-y-2 text-slate-200 text-sm">
-                                <li className="flex gap-2">
-                                    <span className="text-purple-400">•</span>
-                                    <span><strong>Call Stack</strong>: Current execution</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span className="text-purple-400">•</span>
-                                    <span><strong>Microtask Queue</strong>: Promises</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span className="text-purple-400">•</span>
-                                    <span><strong>Task Queue</strong>: setTimeout, events</span>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
-                    {/* Code Display */}
-                    <div className="bg-slate-900 rounded-2xl p-6 border border-slate-700 mb-8">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Code className="text-green-400" />
-                            <h3 className="text-xl font-bold">Example Code</h3>
+                    {/* Interview Definition */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <BookOpen className="text-green-400" size={22} />
+                            <h3 className="text-base font-bold text-green-400 uppercase">Interview Answer</h3>
                         </div>
-                        <div className="bg-slate-950 rounded-xl overflow-hidden border border-slate-700">
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            "The Event Loop continuously monitors the Call Stack and executes tasks in order: 1) Synchronous code, 2) Microtasks (Promises), 3) Macrotasks (setTimeout)."
+                        </p>
+                    </div>
+
+                    {/* Simple Explanation */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Lightbulb className="text-blue-400" size={22} />
+                            <h3 className="text-base font-bold text-blue-400 uppercase">Simple Explanation</h3>
+                        </div>
+                        <p className="text-slate-200 text-base leading-relaxed">
+                            Think of a chef (Call Stack) cooking one dish at a time. A waiter (Event Loop) checks if the chef is free, then brings orders from the priority queue (Promises first, then timeouts).
+                        </p>
+                    </div>
+
+                    {/* Key Points */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                            <AlertCircle className="text-purple-400" size={22} />
+                            <h3 className="text-base font-bold text-purple-400 uppercase">Key Components</h3>
+                        </div>
+                        <ul className="space-y-3 text-slate-200 text-base">
+                            <li className="flex items-start gap-2">
+                                <span className="text-yellow-400 mt-1">📚</span>
+                                <div>
+                                    <strong className="text-yellow-400">Call Stack:</strong> Current execution
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-purple-400 mt-1">⚡</span>
+                                <div>
+                                    <strong className="text-purple-400">Microtasks:</strong> Promises (priority!)
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-blue-400 mt-1">⏱️</span>
+                                <div>
+                                    <strong className="text-blue-400">Tasks:</strong> setTimeout, events
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Execution Order */}
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <h4 className="text-sm font-semibold text-slate-400 mb-3 uppercase">Priority Order</h4>
+                        <div className="space-y-2 text-xs">
+                            <div className="flex items-center gap-2 text-yellow-400">
+                                <span className="font-bold">1.</span> Call Stack (sync)
+                            </div>
+                            <div className="flex items-center gap-2 text-purple-400">
+                                <span className="font-bold">2.</span> Microtasks (Promises)
+                            </div>
+                            <div className="flex items-center gap-2 text-blue-400">
+                                <span className="font-bold">3.</span> Tasks (setTimeout)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Side - Full Screen Visualizer */}
+                <div className="flex-1 flex flex-col bg-slate-950">
+
+                    {/* Code Display */}
+                    <div className="bg-slate-900/50 flex flex-col" style={{ height: '35vh' }}>
+                        <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-700 bg-slate-900">
+                            <Code className="text-green-400" size={20} />
+                            <h3 className="text-lg font-bold">Example Code</h3>
+                        </div>
+                        <div className="flex-1 overflow-auto">
                             <SyntaxHighlighter
                                 language="javascript"
                                 style={atomDark}
                                 showLineNumbers={true}
                                 customStyle={{
                                     margin: 0,
-                                    padding: '1.5rem',
-                                    fontSize: '0.95rem',
-                                    backgroundColor: '#0f172a'
+                                    padding: '2rem',
+                                    fontSize: '1.1rem',
+                                    lineHeight: '1.8',
+                                    backgroundColor: 'transparent'
                                 }}
                                 lineProps={(lineNumber: number) => {
                                     const isCurrentLine = lineNumber === currentStepData.line;
@@ -272,224 +294,179 @@ console.log('End');`;
                         </div>
                     </div>
 
-                    {/* Event Loop Visualization */}
-                    <div className="bg-slate-900 rounded-2xl p-8 border border-slate-700 mb-8">
-                        <h3 className="text-2xl font-bold mb-6">Real-Time Visualization</h3>
-
-                        {/* Controls */}
-                        <div className="flex items-center justify-between mb-8">
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={handleReset}
-                                    className="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-                                >
-                                    <RotateCcw size={20} />
-                                </button>
-                                <button
-                                    onClick={handlePrevious}
-                                    disabled={currentStep === 0}
-                                    className="p-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 rounded-lg transition-colors"
-                                >
-                                    <ChevronLeft size={20} />
-                                </button>
-                                <button
-                                    onClick={() => setIsPlaying(!isPlaying)}
-                                    className={`p-3 ${isPlaying ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'} rounded-lg transition-colors`}
-                                >
-                                    {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-                                </button>
-                                <button
-                                    onClick={handleNext}
-                                    disabled={currentStep === steps.length - 1}
-                                    className="p-3 bg-green-600 hover:bg-green-500 disabled:opacity-50 rounded-lg transition-colors"
-                                >
-                                    <ChevronRight size={20} />
-                                </button>
-                            </div>
-                            <div className="text-slate-400">
-                                Step {currentStep + 1} of {steps.length}
-                            </div>
-                        </div>
-
-                        {/* Description */}
-                        <div className="bg-slate-950/50 rounded-xl p-6 border border-slate-700 mb-8">
-                            <p className="text-xl text-slate-200 leading-relaxed">
-                                {currentStepData.description}
-                            </p>
-                        </div>
-
-                        {/* Visual Components */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                            {/* Call Stack */}
-                            <div className={`bg-slate-950 rounded-xl p-6 border-2 transition-all ${currentStepData.executing === 'callStack'
-                                ? 'border-yellow-500 shadow-lg shadow-yellow-500/30'
-                                : 'border-slate-700'
-                                }`}>
-                                <h4 className="text-lg font-bold text-yellow-400 mb-4 flex items-center gap-2">
-                                    <span>📚</span> Call Stack
-                                </h4>
-                                <div className="space-y-2 min-h-[100px]">
-                                    {currentStepData.callStack.length === 0 ? (
-                                        <div className="text-slate-600 italic text-center py-4">Empty</div>
-                                    ) : (
-                                        currentStepData.callStack.map((item, idx) => (
-                                            <motion.div
-                                                key={idx}
-                                                initial={{ scale: 0.8, opacity: 0 }}
-                                                animate={{ scale: 1, opacity: 1 }}
-                                                className="bg-yellow-500/20 border border-yellow-500 rounded-lg p-3 text-sm text-yellow-200"
-                                            >
-                                                {item}
-                                            </motion.div>
-                                        ))
-                                    )}
+                    {/* Real-Time Visualization - Takes remaining space */}
+                    <div className="flex-1 bg-slate-900 px-8 py-6 overflow-y-auto border-t border-slate-700">
+                        <div className="max-w-6xl mx-auto">
+                            {/* Controls */}
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className="text-xl font-bold">Real-Time Visualization</h3>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-slate-400 text-base">
+                                        Step {currentStep + 1} of {steps.length}
+                                    </span>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={handleReset}
+                                            className="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                                            title="Reset"
+                                        >
+                                            <RotateCcw size={20} />
+                                        </button>
+                                        <button
+                                            onClick={handlePrevious}
+                                            disabled={currentStep === 0}
+                                            className="p-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                                            title="Previous"
+                                        >
+                                            <ChevronLeft size={20} />
+                                        </button>
+                                        <button
+                                            onClick={() => setIsPlaying(!isPlaying)}
+                                            className={`p-3 ${isPlaying ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'} rounded-lg transition-colors`}
+                                            title={isPlaying ? 'Pause' : 'Play'}
+                                        >
+                                            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                                        </button>
+                                        <button
+                                            onClick={handleNext}
+                                            disabled={currentStep === steps.length - 1}
+                                            className="p-3 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                                            title="Next"
+                                        >
+                                            <ChevronRight size={20} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Microtask Queue */}
-                            <div className={`bg-slate-950 rounded-xl p-6 border-2 transition-all ${currentStepData.executing === 'microtaskQueue'
-                                ? 'border-purple-500 shadow-lg shadow-purple-500/30'
-                                : 'border-slate-700'
-                                }`}>
-                                <h4 className="text-lg font-bold text-purple-400 mb-4 flex items-center gap-2">
-                                    <span>⚡</span> Microtask Queue
-                                </h4>
-                                <div className="space-y-2 min-h-[100px]">
-                                    {currentStepData.microtaskQueue.length === 0 ? (
-                                        <div className="text-slate-600 italic text-center py-4">Empty</div>
-                                    ) : (
-                                        currentStepData.microtaskQueue.map((item, idx) => (
-                                            <motion.div
-                                                key={idx}
-                                                initial={{ x: 20, opacity: 0 }}
-                                                animate={{ x: 0, opacity: 1 }}
-                                                className="bg-purple-500/20 border border-purple-500 rounded-lg p-3 text-sm text-purple-200"
-                                            >
-                                                {item}
-                                            </motion.div>
-                                        ))
-                                    )}
+                            {/* Description */}
+                            <div className="bg-slate-950/50 rounded-xl p-6 border-2 border-slate-700 mb-6">
+                                <p className="text-lg text-slate-100 leading-relaxed">
+                                    {currentStepData.description}
+                                </p>
+                            </div>
+
+                            {/* Visual Components Grid */}
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                {/* Call Stack */}
+                                <div className={`bg-slate-950 rounded-xl p-5 border-2 transition-all ${currentStepData.executing === 'callStack'
+                                        ? 'border-yellow-500 shadow-lg shadow-yellow-500/30'
+                                        : 'border-slate-700'
+                                    }`}>
+                                    <h4 className="text-base font-bold text-yellow-400 mb-3 flex items-center gap-2">
+                                        <span>📚</span> Call Stack
+                                    </h4>
+                                    <div className="space-y-2 min-h-[80px]">
+                                        {currentStepData.callStack.length === 0 ? (
+                                            <div className="text-slate-600 italic text-center py-3 text-sm">Empty</div>
+                                        ) : (
+                                            currentStepData.callStack.map((item, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    initial={{ scale: 0.8, opacity: 0 }}
+                                                    animate={{ scale: 1, opacity: 1 }}
+                                                    className="bg-yellow-500/20 border border-yellow-500 rounded-lg p-2 text-xs text-yellow-200"
+                                                >
+                                                    {item}
+                                                </motion.div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Microtask Queue */}
+                                <div className={`bg-slate-950 rounded-xl p-5 border-2 transition-all ${currentStepData.executing === 'microtaskQueue'
+                                        ? 'border-purple-500 shadow-lg shadow-purple-500/30'
+                                        : 'border-slate-700'
+                                    }`}>
+                                    <h4 className="text-base font-bold text-purple-400 mb-3 flex items-center gap-2">
+                                        <span>⚡</span> Microtask
+                                    </h4>
+                                    <div className="space-y-2 min-h-[80px]">
+                                        {currentStepData.microtaskQueue.length === 0 ? (
+                                            <div className="text-slate-600 italic text-center py-3 text-sm">Empty</div>
+                                        ) : (
+                                            currentStepData.microtaskQueue.map((item, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    initial={{ x: 20, opacity: 0 }}
+                                                    animate={{ x: 0, opacity: 1 }}
+                                                    className="bg-purple-500/20 border border-purple-500 rounded-lg p-2 text-xs text-purple-200"
+                                                >
+                                                    {item}
+                                                </motion.div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Task Queue */}
+                                <div className={`bg-slate-950 rounded-xl p-5 border-2 transition-all ${currentStepData.executing === 'taskQueue'
+                                        ? 'border-blue-500 shadow-lg shadow-blue-500/30'
+                                        : 'border-slate-700'
+                                    }`}>
+                                    <h4 className="text-base font-bold text-blue-400 mb-3 flex items-center gap-2">
+                                        <span>⏱️</span> Task Queue
+                                    </h4>
+                                    <div className="space-y-2 min-h-[80px]">
+                                        {currentStepData.taskQueue.length === 0 ? (
+                                            <div className="text-slate-600 italic text-center py-3 text-sm">Empty</div>
+                                        ) : (
+                                            currentStepData.taskQueue.map((item, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    initial={{ x: 20, opacity: 0 }}
+                                                    animate={{ x: 0, opacity: 1 }}
+                                                    className="bg-blue-500/20 border border-blue-500 rounded-lg p-2 text-xs text-blue-200"
+                                                >
+                                                    {item}
+                                                </motion.div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Console Output */}
+                                <div className={`bg-slate-950 rounded-xl p-5 border-2 transition-all ${currentStepData.executing === 'output'
+                                        ? 'border-green-500 shadow-lg shadow-green-500/30'
+                                        : 'border-slate-700'
+                                    }`}>
+                                    <h4 className="text-base font-bold text-green-400 mb-3 flex items-center gap-2">
+                                        <span>📤</span> Output
+                                    </h4>
+                                    <div className="space-y-1 min-h-[80px] font-mono text-xs">
+                                        {currentStepData.output.length === 0 ? (
+                                            <div className="text-slate-600 italic text-center py-3">-</div>
+                                        ) : (
+                                            currentStepData.output.map((item, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    initial={{ y: -10, opacity: 0 }}
+                                                    animate={{ y: 0, opacity: 1 }}
+                                                    className="text-green-400"
+                                                >
+                                                    &gt; {item}
+                                                </motion.div>
+                                            ))
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Task Queue */}
-                            <div className={`bg-slate-950 rounded-xl p-6 border-2 transition-all ${currentStepData.executing === 'taskQueue'
-                                ? 'border-blue-500 shadow-lg shadow-blue-500/30'
-                                : 'border-slate-700'
-                                }`}>
-                                <h4 className="text-lg font-bold text-blue-400 mb-4 flex items-center gap-2">
-                                    <span>⏱️</span> Task Queue
+                            {/* Key Takeaway */}
+                            <div className="mt-6 p-5 bg-green-500/10 rounded-xl border-2 border-green-500/30">
+                                <h4 className="text-base font-semibold text-green-400 mb-2 flex items-center gap-2">
+                                    <span>💡</span> Why This Order?
                                 </h4>
-                                <div className="space-y-2 min-h-[100px]">
-                                    {currentStepData.taskQueue.length === 0 ? (
-                                        <div className="text-slate-600 italic text-center py-4">Empty</div>
-                                    ) : (
-                                        currentStepData.taskQueue.map((item, idx) => (
-                                            <motion.div
-                                                key={idx}
-                                                initial={{ x: 20, opacity: 0 }}
-                                                animate={{ x: 0, opacity: 1 }}
-                                                className="bg-blue-500/20 border border-blue-500 rounded-lg p-3 text-sm text-blue-200"
-                                            >
-                                                {item}
-                                            </motion.div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Console Output */}
-                            <div className={`bg-slate-950 rounded-xl p-6 border-2 transition-all ${currentStepData.executing === 'output'
-                                ? 'border-green-500 shadow-lg shadow-green-500/30'
-                                : 'border-slate-700'
-                                }`}>
-                                <h4 className="text-lg font-bold text-green-400 mb-4 flex items-center gap-2">
-                                    <span>📤</span> Console Output
-                                </h4>
-                                <div className="space-y-2 min-h-[100px] font-mono">
-                                    {currentStepData.output.length === 0 ? (
-                                        <div className="text-slate-600 italic text-center py-4">-</div>
-                                    ) : (
-                                        currentStepData.output.map((item, idx) => (
-                                            <motion.div
-                                                key={idx}
-                                                initial={{ y: -10, opacity: 0 }}
-                                                animate={{ y: 0, opacity: 1 }}
-                                                className="text-green-400 text-sm"
-                                            >
-                                                &gt; {item}
-                                            </motion.div>
-                                        ))
-                                    )}
-                                </div>
+                                <p className="text-slate-300 text-base">
+                                    The Event Loop checks for empty Call Stack, then processes ALL microtasks before ANY macrotasks.
+                                    That's why "Promise" prints before "Timeout" even though setTimeout was called first!
+                                </p>
                             </div>
                         </div>
                     </div>
-
-                    {/* Execution Order Diagram */}
-                    <div className="bg-slate-900 rounded-2xl p-8 border border-slate-700 mb-8">
-                        <h3 className="text-2xl font-bold mb-6">Execution Order</h3>
-                        <div className="bg-slate-950 rounded-xl p-8 border border-slate-700">
-                            <div className="flex items-center justify-between max-w-4xl mx-auto">
-                                <div className="text-center">
-                                    <div className="w-24 h-24 bg-yellow-500/20 border-2 border-yellow-500 rounded-full flex items-center justify-center mb-3">
-                                        <span className="text-3xl">1</span>
-                                    </div>
-                                    <div className="text-yellow-400 font-semibold">Call Stack</div>
-                                    <div className="text-xs text-slate-500">Execute current</div>
-                                </div>
-
-                                <div className="text-slate-600 text-3xl">→</div>
-
-                                <div className="text-center">
-                                    <div className="w-24 h-24 bg-purple-500/20 border-2 border-purple-500 rounded-full flex items-center justify-center mb-3">
-                                        <span className="text-3xl">2</span>
-                                    </div>
-                                    <div className="text-purple-400 font-semibold">Microtasks</div>
-                                    <div className="text-xs text-slate-500">Promises first!</div>
-                                </div>
-
-                                <div className="text-slate-600 text-3xl">→</div>
-
-                                <div className="text-center">
-                                    <div className="w-24 h-24 bg-blue-500/20 border-2 border-blue-500 rounded-full flex items-center justify-center mb-3">
-                                        <span className="text-3xl">3</span>
-                                    </div>
-                                    <div className="text-blue-400 font-semibold">Tasks</div>
-                                    <div className="text-xs text-slate-500">setTimeout</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Interview Tips */}
-                    <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-2xl p-8 border border-green-500/30">
-                        <h3 className="text-2xl font-bold text-white mb-6">🎯 Interview Tips</h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <h4 className="text-lg font-semibold text-green-400 mb-3">Common Questions:</h4>
-                                <ul className="space-y-2 text-slate-300">
-                                    <li>• "Explain the Event Loop"</li>
-                                    <li>• "What's the difference between microtasks and macrotasks?"</li>
-                                    <li>• "How does JavaScript handle async code?"</li>
-                                    <li>• "Why do Promises execute before setTimeout?"</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="text-lg font-semibold text-blue-400 mb-3">Remember:</h4>
-                                <ul className="space-y-2 text-slate-300">
-                                    <li>• JavaScript is single-threaded</li>
-                                    <li>• Microtasks have higher priority</li>
-                                    <li>• Event Loop waits for empty Call Stack</li>
-                                    <li>• Promise callbacks are microtasks</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-            </main>
+            </div>
 
             <Footer />
         </div>
