@@ -8,11 +8,31 @@ import Footer from '../../components/Footer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
+interface Step {
+    line: number;
+    description: string;
+    status: string;
+    message: string;
+    output?: string;
+    waiting?: string;
+    value?: string;
+    time?: string;
+    timeline?: any;
+    error?: string;
+}
+
+interface Example {
+    title: string;
+    code: string;
+    steps: Step[];
+    explanation: string;
+}
+
 const AsyncAwaitVisualizer = () => {
     const [currentExample, setCurrentExample] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
 
-    const examples = [
+    const examples: Example[] = [
         {
             title: 'Basic Async/Await',
             code: `async function fetchUser() {
@@ -341,8 +361,8 @@ async function parallel() {
                                     key={idx}
                                     onClick={() => changeExample(idx)}
                                     className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${currentExample === idx
-                                            ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
-                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                        ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
+                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                         }`}
                                 >
                                     {ex.title}
@@ -450,9 +470,9 @@ async function parallel() {
                                     {currentStepData.timeline && (
                                         <div className="bg-slate-950 rounded-xl p-6 border border-slate-700">
                                             <h4 className="text-base font-semibold text-cyan-400 mb-4">Execution Timeline:</h4>
-                                            <div className="space-y-3">
-                                                {currentStepData.timeline.map((item, idx) => (
-                                                    <div key={idx} className="flex items-center gap-4">
+                                            <div className="flex gap-4 min-h-[80px]">
+                                                {currentStepData.timeline.map((item: any, idx: number) => (
+                                                    <div key={idx} className="flex flex-col items-center gap-2">
                                                         <div className={`w-28 px-3 py-2 rounded-lg font-semibold text-sm ${item.status === 'done' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'
                                                             }`}>
                                                             {item.name}

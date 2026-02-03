@@ -8,11 +8,32 @@ import Footer from '../../components/Footer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
+interface Step {
+    line: number;
+    description: string;
+    message: string;
+    state?: string;
+    value?: any;
+    output?: string;
+    chain?: string[];
+    parallel?: any[];
+    error?: string;
+    promises?: any[];
+    httpStatus?: number;
+}
+
+interface Example {
+    title: string;
+    code: string;
+    steps: Step[];
+    explanation: string;
+}
+
 const PromisesVisualizer = () => {
     const [currentExample, setCurrentExample] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
 
-    const examples = [
+    const examples: Example[] = [
         {
             title: 'Promise States',
             code: `const promise = new Promise((resolve, reject) => {
@@ -477,28 +498,28 @@ Promise.all([promise1, promise2, promise3])
                                     </div>
 
                                     {/* Promise State Visualization */}
-                                    {(currentStepData as any).state && (
-                                        <div className={`border-2 rounded-2xl p-6 ${getStateColor((currentStepData as any).state)}`}>
+                                    {currentStepData.state && (
+                                        <div className={`border-2 rounded-2xl p-6 ${getStateColor(currentStepData.state)}`}>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
-                                                    {getStateIcon((currentStepData as any).state)}
+                                                    {getStateIcon(currentStepData.state)}
                                                     <div>
                                                         <div className="text-xl font-bold text-white uppercase">
-                                                            {(currentStepData as any).state}
+                                                            {currentStepData.state}
                                                         </div>
                                                         <div className="text-slate-400 text-sm">{currentStepData.message}</div>
                                                     </div>
                                                 </div>
-                                                {(currentStepData as any).value && (
+                                                {currentStepData.value && (
                                                     <div className="bg-slate-950 rounded-lg px-5 py-2 border border-slate-700">
                                                         <div className="text-xs text-slate-500">Value:</div>
-                                                        <div className="font-mono text-green-400">{(currentStepData as any).value}</div>
+                                                        <div className="font-mono text-green-400">{currentStepData.value}</div>
                                                     </div>
                                                 )}
-                                                {(currentStepData as any).error && (
+                                                {currentStepData.error && (
                                                     <div className="bg-slate-950 rounded-lg px-5 py-2 border border-red-500">
                                                         <div className="text-xs text-slate-500">Error:</div>
-                                                        <div className="font-mono text-red-400">{(currentStepData as any).error}</div>
+                                                        <div className="font-mono text-red-400">{currentStepData.error}</div>
                                                     </div>
                                                 )}
                                             </div>
@@ -506,11 +527,11 @@ Promise.all([promise1, promise2, promise3])
                                     )}
 
                                     {/* Promise Chain Visualization */}
-                                    {(currentStepData as any).chain && (
+                                    {currentStepData.chain && (
                                         <div className="bg-slate-950 rounded-xl p-6 border border-slate-700">
                                             <h4 className="text-base font-semibold text-orange-400 mb-4">Promise Chain:</h4>
                                             <div className="flex flex-wrap items-center gap-3">
-                                                {(currentStepData as any).chain.map((item: any, idx: number) => (
+                                                {currentStepData.chain.map((item: any, idx: number) => (
                                                     <React.Fragment key={idx}>
                                                         <div className={`px-4 py-2 rounded-lg text-sm ${item.includes('✓')
                                                             ? 'bg-green-500/20 text-green-400 border border-green-500'
