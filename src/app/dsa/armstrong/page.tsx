@@ -385,7 +385,7 @@ const ArmstrongVisualizer = () => {
                     <div className="flex flex-col gap-6">
 
                         {/* 1. Main Animation Stage */}
-                        <div className="min-h-[500px] lg:h-full bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-hidden flex flex-col items-center">
+                        <div className="min-h-[500px] lg:h-full bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-visible flex flex-col items-center">
                             {/* Step Description Header */}
                             <div className="w-full text-center mb-8 relative z-20">
                                 <motion.div

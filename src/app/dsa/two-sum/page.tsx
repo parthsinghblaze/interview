@@ -303,11 +303,11 @@ const TwoSumVisualizer = () => {
                             </motion.div>
                         </div>
 
-                        <div className="flex flex-col lg:grid lg:grid-rows-[1fr_200px] gap-6 overflow-hidden">
+                        <div className="flex flex-col lg:grid lg:grid-rows-[1fr_200px] gap-6 overflow-visible">
                             {/* Array Visualizer */}
                             <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 flex flex-col items-center justify-center relative min-h-[300px]">
                                 <div className="text-xs text-slate-500 uppercase tracking-widest mb-12">Array Traversal</div>
-                                <div className="w-full overflow-x-auto pb-8 custom-scrollbar">
+                                <div className="w-full overflow-x-auto pt-12 pb-8 custom-scrollbar">
                                     <div className="flex gap-4 justify-start md:justify-center min-w-max px-4">
                                         {parsedArray.map((val: number, idx: number) => {
                                             const isCurrent = idx === currentStepData.currentIndex;

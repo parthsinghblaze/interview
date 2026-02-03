@@ -320,7 +320,7 @@ const DSAVisualizer = () => {
                     <div className="flex flex-col gap-6">
 
                         {/* 1. Main Animation Stage */}
-                        <div className="min-h-[500px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-hidden flex flex-col items-center">
+                        <div className="min-h-[500px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-visible flex flex-col items-center">
                             {/* Step Description Header */}
                             <div className="w-full text-center mb-8 relative z-20">
                                 <motion.div
@@ -340,7 +340,7 @@ const DSAVisualizer = () => {
                             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1),transparent_70%)] pointer-events-none"></div>
 
                             {/* Array Visualization */}
-                            <div className="flex-1 w-full flex items-center justify-center relative z-10 overflow-x-auto pb-8 custom-scrollbar">
+                            <div className="flex-1 w-full flex items-center justify-center relative z-10 overflow-x-auto pt-10 pb-8 custom-scrollbar">
                                 <div className="flex gap-2 md:gap-3 items-end px-4 min-w-max">
                                     {currentStepData.array.map((value, idx) => {
                                         const isMax = idx === currentStepData.maxIndex;

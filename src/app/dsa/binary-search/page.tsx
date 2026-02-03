@@ -342,10 +342,10 @@ const BinarySearchVisualizer = () => {
                             </motion.div>
                         </div>
 
-                        <div className="min-h-[400px] lg:flex-1 flex flex-col bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 items-center justify-center relative overflow-hidden">
+                        <div className="min-h-[400px] lg:flex-1 flex flex-col bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 items-center justify-center relative overflow-visible">
                             <div className="text-xs text-slate-500 uppercase tracking-widest mb-12 relative z-20">Searching in Half-Intervals</div>
 
-                            <div className="w-full overflow-x-auto pb-8 custom-scrollbar">
+                            <div className="w-full overflow-x-auto pt-12 pb-8 custom-scrollbar">
                                 <div className="flex gap-3 justify-start md:justify-center items-end min-w-max px-4 h-64 relative z-20">
                                     {parsedArray.map((val: number, idx: number) => {
                                         const isMid = idx === currentStepData.mid;

@@ -293,7 +293,7 @@ const ValidParenthesesVisualizer = () => {
                     {/* RIGHT COLUMN */}
                     <div className="flex flex-col gap-6 text-left">
 
-                        <div className="min-h-[600px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative flex flex-col items-center justify-center overflow-hidden">
+                        <div className="min-h-[600px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative flex flex-col items-center justify-center overflow-visible">
 
                             {/* Narrator */}
                             <div className="absolute top-8 left-0 right-0 flex justify-center z-20">

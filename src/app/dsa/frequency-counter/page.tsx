@@ -312,7 +312,7 @@ const FrequencyCounter = () => {
                     <div className="flex flex-col gap-6">
 
                         {/* 1. Animation Stage */}
-                        <div className="min-h-[500px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-hidden flex flex-col">
+                        <div className="min-h-[500px] lg:flex-grow bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 relative overflow-visible flex flex-col">
                             {/* Step Description */}
                             <div className="w-full text-center mb-12 relative z-20">
                                 <motion.div
@@ -331,7 +331,7 @@ const FrequencyCounter = () => {
                             {/* Processing Lane */}
                             <div className="flex-1 flex flex-col items-center justify-center gap-16 relative z-10">
                                 {/* Input String Visualization */}
-                                <div className="w-full overflow-x-auto pb-4 custom-scrollbar">
+                                <div className="w-full overflow-x-auto pt-12 pb-4 custom-scrollbar">
                                     <div className="flex gap-2 p-4 bg-slate-950/50 rounded-2xl border border-white/5 shadow-2xl min-w-max mx-auto">
                                         {inputString.split('').map((char, idx) => (
                                             <motion.div
