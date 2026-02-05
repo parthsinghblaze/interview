@@ -16,10 +16,10 @@ import {
     Database,
     Binary,
     ArrowRight,
-    ChevronDown
+    ChevronDown,
+    Hash
 } from 'lucide-react';
 import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -29,16 +29,16 @@ const NumberFrequencyVisualizer = () => {
     // Initial State
     const [arrayN, setArrayN] = useState([5, 3, 2, 2, 1, 5, 5, 1, 5, 10]);
     const [arrayM, setArrayM] = useState([10, 11, 1, 9, 5]);
-    const [mode, setMode] = useState<'brute' | 'optimal'>('optimal');
+    const [mode, setMode] = useState<'brute' | 'optimal' | 'map'>('map'); // Default to Map as requested
     const [isEditing, setIsEditing] = useState(false);
     const [tempNInput, setTempNInput] = useState('5, 3, 2, 2, 1, 5, 5, 1, 5, 10');
     const [tempMInput, setTempMInput] = useState('10, 11, 1, 9, 5');
     const [isPlaying, setIsPlaying] = useState(false);
-    const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
+    const [language, setLanguage] = useState<'javascript' | 'python'>('python');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Step Generation
-    const generateSteps = (nArr: number[], mArr: number[], algoMode: 'brute' | 'optimal') => {
+    const generateSteps = (nArr: number[], mArr: number[], algoMode: 'brute' | 'optimal' | 'map') => {
         const steps = [];
         const n = [...nArr];
         const m = [...mArr];
@@ -102,12 +102,12 @@ const NumberFrequencyVisualizer = () => {
                     pyLine: 6
                 });
             }
-        } else {
+        } else if (algoMode === 'optimal') {
             // Optimal: Frequency Array (Hash-list)
             const hashList = new Array(11).fill(0); // 0 to 10
 
             steps.push({
-                description: "OPTIMAL: First, we pre-count all frequencies in N using a hash-list (frequency array).",
+                description: "OPTIMAL (ARRAY): First, we pre-count all frequencies in N using a fixed-size array.",
                 arrayN: [...n],
                 arrayM: [...m],
                 hashList: [...hashList],
@@ -139,7 +139,7 @@ const NumberFrequencyVisualizer = () => {
             }
 
             steps.push({
-                description: "Pre-counting complete! Now we can answer each query in M instantly using the hash-list.",
+                description: "Pre-counting complete! Now we can answer each query in M instantly.",
                 arrayN: [...n],
                 arrayM: [...m],
                 hashList: [...hashList],
@@ -158,7 +158,7 @@ const NumberFrequencyVisualizer = () => {
                 results[query] = res;
 
                 steps.push({
-                    description: `Query ${query}: ${query >= 1 && query <= 10 ? 'Check hash-list[' + query + ']' : 'Out of range [1-10]'} -> Result: ${res}`,
+                    description: `Query ${query}: Lookup hash-list[${query}] -> Result: ${res}`,
                     arrayN: [...n],
                     arrayM: [...m],
                     hashList: [...hashList],
@@ -171,15 +171,87 @@ const NumberFrequencyVisualizer = () => {
                     pyLine: 8
                 });
             }
+        } else {
+            // Dictionary / HashMap Solution
+            const freqMap: Record<number, number> = {};
+
+            steps.push({
+                description: "HASH MAP: Uses a Dictionary (Object) to count frequencies. Works for ANY number range.",
+                arrayN: [...n],
+                arrayM: [...m],
+                freqMap: { ...freqMap },
+                currentNIdx: -1,
+                currentMIdx: -1,
+                phase: 'PRECOUNT',
+                jsLine: 2,
+                pyLine: 4 // "freq_dict = defaultdict(int)"
+            });
+
+            // Phase 1: Pre-count
+            for (let i = 0; i < n.length; i++) {
+                const val = n[i];
+                freqMap[val] = (freqMap[val] || 0) + 1;
+
+                steps.push({
+                    description: `Reading N[${i}] = ${val}. Update Map: Key ${val} -> Count ${freqMap[val]}`,
+                    arrayN: [...n],
+                    arrayM: [...m],
+                    freqMap: { ...freqMap },
+                    currentNIdx: i,
+                    currentMIdx: -1,
+                    phase: 'PRECOUNT',
+                    highlightMapKey: val,
+                    jsLine: 6,
+                    pyLine: 7 // "freq_dict[num] += 1"
+                });
+            }
+
+            steps.push({
+                description: "Map built! Now we query against the dictionary keys.",
+                arrayN: [...n],
+                arrayM: [...m],
+                freqMap: { ...freqMap },
+                currentNIdx: -1,
+                currentMIdx: -1,
+                phase: 'QUERY_START',
+                jsLine: 9,
+                pyLine: 9
+            });
+
+            // Phase 2: Queries
+            const results: Record<number, number> = {};
+            for (let i = 0; i < m.length; i++) {
+                const query = m[i];
+                const res = freqMap[query] || 0;
+                results[query] = res;
+
+                steps.push({
+                    description: `Query ${query}: Check map key '${query}' -> ${res > 0 ? 'Found ' + res : 'Not Found (0)'}`,
+                    arrayN: [...n],
+                    arrayM: [...m],
+                    freqMap: { ...freqMap },
+                    currentNIdx: -1,
+                    currentMIdx: i,
+                    phase: 'QUERYING',
+                    highlightMapKey: query,
+                    results: { ...results },
+                    jsLine: 11,
+                    pyLine: 10 // "print(freq_dict[num])"
+                });
+            }
         }
 
         steps.push({
             description: "All queries processed successfully!",
             arrayN: [...n],
             arrayM: [...m],
+            // Preserve final state based on mode
+            hashList: algoMode === 'optimal' ? (steps[steps.length - 1] as any).hashList : undefined,
+            freqMap: algoMode === 'map' ? (steps[steps.length - 1] as any).freqMap : undefined,
+            results: (steps[steps.length - 1] as any).results,
             completed: true,
-            jsLine: 10,
-            pyLine: 10
+            jsLine: algoMode === 'brute' ? 6 : (algoMode === 'optimal' ? 8 : 11),
+            pyLine: algoMode === 'brute' ? 6 : (algoMode === 'optimal' ? 8 : 10)
         });
 
         return steps;
@@ -202,13 +274,25 @@ const NumberFrequencyVisualizer = () => {
     ];
 
     const jsOptimal = [
-        "const hash_list = new Array(11).fill(0);",
-        "for (let num of n_arr) {",
-        "  if (num <= 10) hash_list[num]++;",
+        "// Fixed Array (Range 0-10)",
+        "const freq = new Array(11).fill(0);",
+        "for (let n of n_arr) {",
+        "  if (n <= 10) freq[n]++;",
         "}",
-        "for (let num of m) {",
-        "  if (num < 1 || num > 10) console.log(0);",
-        "  else console.log(hash_list[num]);",
+        "for (let q of m) {",
+        "  console.log(freq[q] || 0);",
+        "}"
+    ];
+
+    const jsMap = [
+        "const freqMap = {};",
+        "// 1. Build Frequency Map",
+        "for (let num of n_arr) {",
+        "  freqMap[num] = (freqMap[num] || 0) + 1;",
+        "}",
+        "// 2. Query Map",
+        "for (let q of m) {",
+        "  console.log(freqMap[q] || 0);",
         "}"
     ];
 
@@ -222,20 +306,31 @@ const NumberFrequencyVisualizer = () => {
     ];
 
     const pyOptimal = [
-        "hash_list = [0] * 11",
-        "for num in n_arr:",
-        "    if num <= 10: hash_list[num] += 1",
-        "",
-        "for num in m:",
-        "    if num < 1 or num > 10:",
-        "        print(0)",
-        "    else:",
-        "        print(hash_list[num])"
+        "# Fixed Array 0-10",
+        "freq = [0] * 11",
+        "for n in n_arr:",
+        "    if n <= 10: freq[n] += 1",
+        "for q in m:",
+        "    print(freq[q] if 0<=q<=10 else 0)"
     ];
 
-    const code = mode === 'brute'
-        ? (language === 'javascript' ? jsBrute : pyBrute)
-        : (language === 'javascript' ? jsOptimal : pyOptimal);
+    const pyMap = [
+        "from collections import defaultdict",
+        "",
+        "# 1. Build Frequency Map",
+        "freq_dict = defaultdict(int)",
+        "",
+        "for num in n:",
+        "    freq_dict[num] += 1",
+        "",
+        "# 2. Query for each number in m",
+        "for num in m:",
+        "    print(freq_dict[num])"
+    ];
+
+    const code = mode === 'brute' ? (language === 'javascript' ? jsBrute : pyBrute) :
+        mode === 'optimal' ? (language === 'javascript' ? jsOptimal : pyOptimal) :
+            (language === 'javascript' ? jsMap : pyMap);
 
     const currentLine = language === 'javascript' ? currentStepData.jsLine : currentStepData.pyLine;
 
@@ -256,7 +351,7 @@ const NumberFrequencyVisualizer = () => {
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (isPlaying && currentStep < steps.length - 1) {
-            interval = setInterval(handleNext, 800);
+            interval = setInterval(handleNext, 1000);
         } else if (currentStep >= steps.length - 1) {
             setIsPlaying(false);
         }
@@ -275,7 +370,7 @@ const NumberFrequencyVisualizer = () => {
         setIsPlaying(false);
     };
 
-    const handleModeChange = (newMode: 'brute' | 'optimal') => {
+    const handleModeChange = (newMode: 'brute' | 'optimal' | 'map') => {
         setMode(newMode);
         setSteps(generateSteps(arrayN, arrayM, newMode));
         setCurrentStep(0);
@@ -298,13 +393,11 @@ const NumberFrequencyVisualizer = () => {
 
             osc.type = type;
             osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-            gain.gain.setValueAtTime(0.05, ctx.currentTime); // Lower volume to 0.05 for subtle effect
+            gain.gain.setValueAtTime(0.05, ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 
             osc.connect(gain);
             gain.connect(ctx.destination);
-
             osc.start();
             osc.stop(ctx.currentTime + duration);
         } catch (e) {
@@ -313,31 +406,20 @@ const NumberFrequencyVisualizer = () => {
     };
 
     useEffect(() => {
-        if (!isPlaying && currentStep === 0) return; // Don't play on initial load reset
+        if (!isPlaying && currentStep === 0) return;
 
         const step = steps[currentStep] as any;
 
-        // 1. Match Found (Brute Force)
         if (step.isMatch) {
-            playTone(880, 'sine', 0.1); // High Ding (A5)
-            setTimeout(() => playTone(1760, 'sine', 0.1), 50); // Octave up
-        }
-        // 2. Hash List Increment (Optimal Pre-count)
-        else if (step.phase === 'PRECOUNT' && step.highlightHashIdx !== undefined) {
-            // Pentatonic scaleish mapping
-            const baseFreq = 300;
-            playTone(baseFreq + (step.highlightHashIdx * 50), 'sine', 0.08);
-        }
-        // 3. Query Answered (Optimal Query) - Success sound
-        else if (step.phase === 'QUERYING') {
-            // Success Chord
-            playTone(523.25, 'sine', 0.15); // C5
-            setTimeout(() => playTone(659.25, 'sine', 0.15), 40); // E5
-            setTimeout(() => playTone(783.99, 'sine', 0.2), 80); // G5
-        }
-        // 4. Standard Step (Scanning / Moving)
-        else {
-            playTone(200, 'triangle', 0.02); // Very short blip
+            playTone(880, 'sine', 0.1);
+        } else if (mode === 'map' && step.phase === 'PRECOUNT') {
+            // Map build sound
+            playTone(400, 'triangle', 0.05);
+        } else if (step.phase === 'QUERYING') {
+            // Query sound
+            playTone(600, 'sine', 0.1);
+        } else {
+            playTone(200, 'sine', 0.02);
         }
     }, [currentStep, isPlaying]);
 
@@ -359,39 +441,30 @@ const NumberFrequencyVisualizer = () => {
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex flex-col">
                                     <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                                        Number Frequency
+                                        Find Duplicate Number Count
                                     </h1>
-                                    <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Query Optimization</span>
+                                    <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Frequency Smasher</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => setIsModalOpen(true)}
                                         className="p-2 rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
-                                        title="Algorithm Explanation"
                                     >
                                         <HelpCircle size={20} />
                                     </button>
-                                    <div className="px-2 py-1 rounded bg-slate-800 border border-white/10 text-xs font-mono text-slate-400">
-                                        v1.0
-                                    </div>
                                 </div>
                             </div>
 
                             {/* Algorithm Mode Selection */}
                             <div className="flex bg-slate-800/50 p-1 rounded-xl mb-6 border border-white/5">
-                                <button
-                                    onClick={() => handleModeChange('optimal')}
-                                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mode === 'optimal' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
-                                >
-                                    <Zap size={14} className={mode === 'optimal' ? 'fill-current' : ''} />
-                                    Optimal
+                                <button onClick={() => handleModeChange('brute')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${mode === 'brute' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>
+                                    Brute
                                 </button>
-                                <button
-                                    onClick={() => handleModeChange('brute')}
-                                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${mode === 'brute' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
-                                >
-                                    <Search size={14} />
-                                    Brute Force
+                                <button onClick={() => handleModeChange('optimal')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${mode === 'optimal' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>
+                                    Array
+                                </button>
+                                <button onClick={() => handleModeChange('map')} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${mode === 'map' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>
+                                    HashMap
                                 </button>
                             </div>
 
@@ -399,57 +472,30 @@ const NumberFrequencyVisualizer = () => {
                             <div className="bg-slate-800/50 rounded-2xl p-4 border border-white/5 mb-6">
                                 <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
                                     <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Configuration</span>
-                                    <Edit3 size={14} className="text-slate-600" />
+                                    <Edit3 size={14} className="text-slate-600 cursor-pointer" onClick={() => setIsEditing(!isEditing)} />
                                 </div>
 
                                 {isEditing ? (
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Array N (Elements 1-10)</label>
-                                            <input
-                                                type="text"
-                                                value={tempNInput}
-                                                onChange={(e) => setTempNInput(e.target.value)}
-                                                className="w-full bg-slate-900 border border-blue-500/50 rounded-lg px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500/50 font-mono text-xs"
-                                            />
+                                            <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Array N (Source)</label>
+                                            <input type="text" value={tempNInput} onChange={(e) => setTempNInput(e.target.value)} className="w-full bg-slate-900 border border-blue-500/50 rounded-lg px-3 py-2 text-white outline-none font-mono text-xs" />
                                         </div>
                                         <div>
                                             <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Array M (Queries)</label>
-                                            <input
-                                                type="text"
-                                                value={tempMInput}
-                                                onChange={(e) => setTempMInput(e.target.value)}
-                                                className="w-full bg-slate-900 border border-blue-500/50 rounded-lg px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500/50 font-mono text-xs"
-                                            />
+                                            <input type="text" value={tempMInput} onChange={(e) => setTempMInput(e.target.value)} className="w-full bg-slate-900 border border-blue-500/50 rounded-lg px-3 py-2 text-white outline-none font-mono text-xs" />
                                         </div>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => setIsEditing(false)}
-                                                className="flex-1 bg-slate-800 hover:bg-slate-700 text-white rounded-lg py-2 text-sm font-medium transition-colors"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                onClick={handleInputChange}
-                                                className="flex-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg py-2 text-sm font-medium transition-colors"
-                                            >
-                                                Apply Data
-                                            </button>
-                                        </div>
+                                        <button onClick={handleInputChange} className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-lg py-2 text-sm font-medium transition-colors">Apply Data</button>
                                     </div>
                                 ) : (
                                     <div className="space-y-3 cursor-pointer group" onClick={() => setIsEditing(true)}>
                                         <div>
                                             <span className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Source (N)</span>
-                                            <p className="text-sm font-bold font-mono text-white truncate truncate group-hover:text-blue-400 transition-colors">
-                                                [{arrayN.join(', ')}]
-                                            </p>
+                                            <p className="text-sm font-bold font-mono text-white truncate text-blue-100">[{arrayN.join(', ')}]</p>
                                         </div>
                                         <div>
                                             <span className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Queries (M)</span>
-                                            <p className="text-sm font-bold font-mono text-white truncate group-hover:text-blue-400 transition-colors">
-                                                [{arrayM.join(', ')}]
-                                            </p>
+                                            <p className="text-sm font-bold font-mono text-white truncate text-blue-100">[{arrayM.join(', ')}]</p>
                                         </div>
                                     </div>
                                 )}
@@ -459,30 +505,10 @@ const NumberFrequencyVisualizer = () => {
                             <div className="grid grid-cols-4 gap-2">
                                 <button onClick={handleReset} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all flex items-center justify-center"><RotateCcw size={20} /></button>
                                 <button onClick={handlePrevious} disabled={currentStep === 0} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white transition-all flex items-center justify-center"><ChevronLeft size={24} /></button>
-                                <button
-                                    onClick={() => setIsPlaying(!isPlaying)}
-                                    disabled={currentStepData.completed}
-                                    className={`p-3 rounded-xl ${isPlaying ? 'bg-amber-600 hover:bg-amber-500' : 'bg-blue-600 hover:bg-blue-500'} text-white transition-all flex items-center justify-center shadow-lg shadow-blue-900/20`}
-                                >
+                                <button onClick={() => setIsPlaying(!isPlaying)} disabled={currentStepData.completed} className={`p-3 rounded-xl ${isPlaying ? 'bg-amber-600 hover:bg-amber-500' : 'bg-blue-600 hover:bg-blue-500'} text-white transition-all flex items-center justify-center shadow-lg shadow-blue-900/20`}>
                                     {isPlaying ? <Pause size={24} className="fill-current" /> : <Play size={24} className="fill-current ml-1" />}
                                 </button>
                                 <button onClick={handleNext} disabled={currentStepData.completed} className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white transition-all flex items-center justify-center"><ChevronRight size={24} /></button>
-                            </div>
-
-                            {/* Progress */}
-                            <div className="mt-6">
-                                <div className="flex justify-between text-xs text-slate-500 mb-2 font-medium">
-                                    <span>Algorithm Progress</span>
-                                    <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
-                                </div>
-                                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                    <motion.div
-                                        className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                                        transition={{ duration: 0.2 }}
-                                    />
-                                </div>
                             </div>
                         </div>
 
@@ -492,7 +518,6 @@ const NumberFrequencyVisualizer = () => {
                                 <Code size={18} />
                                 <h3 className="font-bold text-sm uppercase tracking-wider">Algorithm Logic</h3>
                             </div>
-
                             <div className="relative flex-1 min-h-0 flex flex-col">
                                 <div className="absolute top-0 right-0 p-2 z-10 w-full flex justify-end pointer-events-none">
                                     <div className="flex bg-slate-900/80 rounded p-1 border border-white/10 backdrop-blur-sm pointer-events-auto">
@@ -500,7 +525,6 @@ const NumberFrequencyVisualizer = () => {
                                         <button className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${language === 'python' ? 'bg-blue-600 text-white' : 'text-slate-500'}`} onClick={() => setLanguage('python')}>PY</button>
                                     </div>
                                 </div>
-
                                 <div className="flex-1 rounded-xl overflow-hidden border border-slate-700/50 shadow-inner bg-[#1e1e1e] relative">
                                     <div className="absolute inset-0 overflow-auto custom-scrollbar">
                                         <SyntaxHighlighter
@@ -508,28 +532,15 @@ const NumberFrequencyVisualizer = () => {
                                             style={atomDark}
                                             showLineNumbers={true}
                                             wrapLines={true}
-                                            customStyle={{
-                                                margin: 0,
-                                                padding: '1.5rem',
-                                                minHeight: '100%',
-                                                fontSize: '0.85rem',
-                                                lineHeight: '1.6',
-                                                backgroundColor: '#1e1e1e',
-                                                fontFamily: 'var(--font-mono)'
-                                            }}
-                                            lineNumberStyle={{ minWidth: '2em', paddingRight: '1em', color: '#6e7681', textAlign: 'right' }}
-                                            lineProps={(lineNumber: number) => {
-                                                const isCurrentLine = lineNumber === currentLine;
-                                                return {
-                                                    style: {
-                                                        backgroundColor: isCurrentLine ? 'rgba(59, 130, 246, 0.15)' : undefined,
-                                                        display: 'block',
-                                                        width: '100%',
-                                                        borderLeft: isCurrentLine ? '3px solid #3b82f6' : '3px solid transparent',
-                                                        paddingLeft: '1rem'
-                                                    }
-                                                };
-                                            }}
+                                            customStyle={{ margin: 0, padding: '1.5rem', minHeight: '100%', fontSize: '0.85rem' }}
+                                            lineProps={(lineNumber: number) => ({
+                                                style: {
+                                                    backgroundColor: lineNumber === currentLine ? 'rgba(59, 130, 246, 0.15)' : undefined,
+                                                    display: 'block',
+                                                    width: '100%',
+                                                    borderLeft: lineNumber === currentLine ? '3px solid #3b82f6' : '3px solid transparent'
+                                                }
+                                            })}
                                         >
                                             {code.join('\n')}
                                         </SyntaxHighlighter>
@@ -565,7 +576,7 @@ const NumberFrequencyVisualizer = () => {
                             {/* Main Visualization Area */}
                             <div className="flex-1 w-full flex flex-col gap-10 relative z-10 overflow-hidden">
 
-                                {/* 1. Array N (Source) */}
+                                {/* Source View */}
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-widest pl-2">
                                         <Database size={12} /> Source Array (N)
@@ -585,14 +596,7 @@ const NumberFrequencyVisualizer = () => {
                                                 >
                                                     {val}
                                                     {isProcessing && (
-                                                        <motion.div
-                                                            layoutId="pointer-n"
-                                                            className="absolute -top-8 text-blue-400 filter drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]"
-                                                            initial={{ y: -5, opacity: 0 }}
-                                                            animate={{ y: 0, opacity: 1 }}
-                                                            exit={{ y: -5, opacity: 0 }}
-                                                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                                        >
+                                                        <motion.div layoutId="pointer-n" className="absolute -top-8 text-blue-400">
                                                             <ChevronDown size={24} strokeWidth={3} />
                                                         </motion.div>
                                                     )}
@@ -602,49 +606,69 @@ const NumberFrequencyVisualizer = () => {
                                     </div>
                                 </div>
 
-                                {/* Intermediate View: Hash List for Optimal mode */}
-                                {mode === 'optimal' && (
+                                {/* HashMap / Array View */}
+                                {mode !== 'brute' && (
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-widest pl-2">
-                                            <Binary size={12} /> Hash List (Pre-counted Frequency)
+                                            {mode === 'optimal' ? <Binary size={12} /> : <Hash size={12} />}
+                                            {mode === 'optimal' ? 'Hash List (Array 0-10)' : 'Frequency Dictionary (Hash Map)'}
                                         </div>
-                                        <div className="grid grid-cols-6 md:grid-cols-11 gap-2 p-4 bg-slate-800/30 rounded-2xl border border-white/5">
-                                            {[...Array(11)].map((_, idx) => {
-                                                const counts = (currentStepData as any).hashList || [];
-                                                const count = counts[idx] || 0;
-                                                const isHighlighted = (currentStepData as any).highlightHashIdx === idx;
 
-                                                return (
-                                                    <motion.div
-                                                        key={idx}
-                                                        animate={{
-                                                            scale: isHighlighted ? 1.15 : 1,
-                                                            borderColor: isHighlighted ? '#3b82f6' : 'rgba(255, 255, 255, 0.05)',
-                                                            backgroundColor: isHighlighted ? 'rgba(59, 130, 246, 0.15)' : 'transparent'
-                                                        }}
-                                                        className="flex flex-col items-center bg-slate-950/50 rounded-xl border p-2 transition-all duration-300"
-                                                    >
-                                                        <span className="text-[10px] text-slate-500 mb-1 font-mono">[{idx}]</span>
-                                                        <span className={`text-lg font-bold font-mono ${count > 0 ? 'text-cyan-400' : 'text-slate-700'}`}>{count}</span>
-                                                        {isHighlighted && (
-                                                            <div className="absolute inset-0 bg-blue-500/10 blur-md rounded-xl" />
-                                                        )}
-                                                    </motion.div>
-                                                )
-                                            })}
-                                        </div>
+                                        {mode === 'optimal' ? (
+                                            // Array Visualization
+                                            <div className="grid grid-cols-6 md:grid-cols-11 gap-2 p-4 bg-slate-800/30 rounded-2xl border border-white/5">
+                                                {[...Array(11)].map((_, idx) => {
+                                                    const counts = (currentStepData as any).hashList || [];
+                                                    const count = counts[idx] || 0;
+                                                    const isHighlighted = (currentStepData as any).highlightHashIdx === idx;
+                                                    return (
+                                                        <motion.div
+                                                            key={idx}
+                                                            animate={{
+                                                                scale: isHighlighted ? 1.15 : 1,
+                                                                borderColor: isHighlighted ? '#3b82f6' : 'rgba(255, 255, 255, 0.05)',
+                                                                backgroundColor: isHighlighted ? 'rgba(59, 130, 246, 0.15)' : 'transparent'
+                                                            }}
+                                                            className="flex flex-col items-center bg-slate-950/50 rounded-xl border p-2 transition-all duration-300"
+                                                        >
+                                                            <span className="text-[10px] text-slate-500 mb-1 font-mono">[{idx}]</span>
+                                                            <span className={`text-lg font-bold font-mono ${count > 0 ? 'text-cyan-400' : 'text-slate-700'}`}>{count}</span>
+                                                        </motion.div>
+                                                    )
+                                                })}
+                                            </div>
+                                        ) : (
+                                            // HashMap Visualization
+                                            <div className="flex flex-wrap gap-4 p-4 bg-slate-800/30 rounded-2xl border border-white/5 min-h-[100px] justify-center">
+                                                <AnimatePresence>
+                                                    {Object.entries((currentStepData as any).freqMap || {}).map(([key, count], i) => {
+                                                        const isHighlighted = (currentStepData as any).highlightMapKey == key;
+                                                        return (
+                                                            <motion.div
+                                                                key={key}
+                                                                initial={{ scale: 0, opacity: 0 }}
+                                                                animate={{ scale: isHighlighted ? 1.1 : 1, opacity: 1, backgroundColor: isHighlighted ? 'rgba(59, 130, 246, 0.15)' : 'rgba(15, 23, 42, 0.5)' }}
+                                                                className={`flex flex-col items-center rounded-xl border ${isHighlighted ? 'border-blue-400' : 'border-slate-700'} p-3 min-w-[60px]`}
+                                                            >
+                                                                <span className="text-[10px] text-slate-400 uppercase font-bold mb-1">Key {key}</span>
+                                                                <div className="w-full h-px bg-slate-700 mb-1"></div>
+                                                                <span className="text-xl font-bold text-cyan-400">{count as number}</span>
+                                                            </motion.div>
+                                                        );
+                                                    })}
+                                                    {Object.keys((currentStepData as any).freqMap || {}).length === 0 && (
+                                                        <div className="text-slate-600 text-sm italic py-4">Dictionary is empty...</div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
-                                {/* Arrow divider for visual flow */}
-                                <div className="flex justify-center -my-4 animate-pulse opacity-50">
-                                    <ArrowRight className="rotate-90 text-slate-700" size={24} />
-                                </div>
-
-                                {/* 2. Array M (Queries) */}
+                                {/* Queries View */}
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-widest pl-2">
-                                        <Search size={12} /> Queries (M) & Global Results
+                                        <Search size={12} /> Queries (M)
                                     </div>
                                     <div className="flex flex-wrap gap-4 md:gap-6 p-6 bg-slate-800/30 rounded-3xl border border-white/5 justify-center">
                                         {arrayM.map((val, idx) => {
@@ -668,38 +692,12 @@ const NumberFrequencyVisualizer = () => {
                                                     <span className="text-xs font-bold text-cyan-400 font-mono">
                                                         {result !== undefined ? `Count: ${result}` : '?'}
                                                     </span>
-
-                                                    {isQuerying && (
-                                                        <motion.div
-                                                            layoutId="query-indicator"
-                                                            className="absolute -top-10 text-blue-400 filter drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
-                                                            initial={{ y: -5 }}
-                                                            animate={{ y: 0 }}
-                                                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                                        >
-                                                            <div className="flex flex-col items-center gap-1">
-                                                                <span className="text-[10px] font-bold text-blue-300 bg-blue-900/50 px-2 py-0.5 rounded-full border border-blue-500/30">NOW</span>
-                                                                <ChevronDown size={28} strokeWidth={3} />
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
                                                 </motion.div>
                                             )
                                         })}
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Completion Badge */}
-                            {(currentStepData as any).completed && (
-                                <motion.div
-                                    initial={{ scale: 0.5, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    className="mt-8 px-8 py-4 bg-green-500/10 border border-green-500/50 text-green-300 rounded-full font-bold text-xl shadow-lg relative z-20"
-                                >
-                                    Counting Complete!
-                                </motion.div>
-                            )}
                         </div>
 
                         {/* 2. Stats Panel */}
@@ -716,13 +714,13 @@ const NumberFrequencyVisualizer = () => {
                                 <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
                                     <span className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Time TC</span>
                                     <span className="text-xl md:text-2xl font-bold text-purple-400">
-                                        O({mode === 'optimal' ? 'N + M' : 'N × M'})
+                                        O({mode === 'brute' ? 'N × M' : 'N + M'})
                                     </span>
                                 </div>
                                 <div className="flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-white/5 p-3">
                                     <span className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Space SC</span>
                                     <span className="text-xl md:text-2xl font-bold text-emerald-400">
-                                        O({mode === 'optimal' ? 'MaxRange' : '1'})
+                                        O({mode === 'brute' ? '1' : mode === 'optimal' ? 'Range' : 'U'})
                                     </span>
                                 </div>
                             </div>
@@ -736,22 +734,23 @@ const NumberFrequencyVisualizer = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title="Number Frequency Pattern"
-                description="Optimize query response times for counting element occurrences using Frequency Arrays (Hashing)."
-                concept="When we need to answer multiple frequency queries for a specific range of values, pre-calculating counts in a 'Hash List' reduces query time from O(N) to O(1)."
-                efficiency="The Brute Force approach checks the entire source array for every single query, resulting in O(N*M). The Optimal approach processes the source array once O(N) and queries the results in O(1), leading to O(N+M)."
+                description="Optimize query response times for counting element occurrences using Frequency Arrays or HashMaps."
+                concept="To avoid re-scanning the array for every query (Brute Force), we can pre-process the data. We count all items once and store them in a fast-lookup structure: either an Array (if numbers are small/bounded) or a HashMap (for any data)."
+                efficiency="Brute force is O(N*M). Using a Map/Array reduces this to O(N + M) because we scan the source once (N) and then each query is O(1) or O(1 average)."
                 useCases={[
-                    "Real-time analytics dashboard counters",
-                    "Validating character limits and counts",
-                    "Finding most/least frequent items in a stream",
-                    "Preparing data for O(1) constant-time lookups"
+                    "Finding duplicates in data",
+                    "Counting votes in an election",
+                    "Analyzing word frequency in text",
+                    "Optimizing repeated search queries"
                 ]}
-                timeComplexity={mode === 'optimal' ? "O(N + M)" : "O(N × M)"}
-                spaceComplexity={mode === 'optimal' ? "O(Range)" : "O(1)"}
-                complexityNotes="N = source size, M = query count, Range = spread of values"
+                timeComplexity="O(N + M)"
+                spaceComplexity="O(U) where U is unique elements"
+                complexityNotes="For the Hash Map, space depends on unique elements. For Fixed Array, space depends on the number range."
                 interviewTips={[
-                    "Identify the value range before choosing a Frequency Array (it works best for small, known ranges).",
-                    "Mention that for extremely sparse data or large ranges, a Hash Map (Object/Map) is better than an array.",
-                    "Normalize inputs: always handle values that might fall outside your hash-list index range."
+                    "Always ask about constraints: 'What is the range of numbers?'",
+                    "If range is small (e.g. 1-100), use an Array (faster, less overhead).",
+                    "If range is large (e.g. 1-10^9) or unknown, use a HashMap (Dictionary).",
+                    "In Python, 'collections.Counter' or 'defaultdict' is the standard way to do this."
                 ]}
                 color="blue"
             />

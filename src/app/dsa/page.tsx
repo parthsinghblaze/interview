@@ -120,13 +120,13 @@ export default function DSAPage() {
         },
         {
             id: 'number-frequency',
-            title: 'Number Frequency',
-            description: 'Optimize frequency counting and range queries using the efficient Hash-list (Frequency Array) pattern.',
+            title: 'Find Duplicate Number Count',
+            description: 'Count frequency of numbers from one array in another using Arrays or HashMaps for O(1) lookups.',
             icon: Binary,
             timeComplexity: 'O(n+m)',
             spaceComplexity: 'O(k)',
-            techniques: ['Hashing', 'Frequency Array', 'Query Optimization'],
-            learning: 'Frequency arrays, trade-offs between time and space, and query pre-processing.',
+            techniques: ['HashMap', 'Frequency Array', 'Dictionary'],
+            learning: 'Optimizing range queries, handling large number ranges with Maps vs Arrays.',
             href: '/dsa/number-frequency',
             color: 'blue'
         }
