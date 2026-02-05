@@ -153,27 +153,65 @@ const ArmstrongVisualizer = () => {
         setIsPlaying(false);
     };
 
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-        if (isPlaying && currentStep < steps.length - 1) {
-            interval = setInterval(() => {
-                setCurrentStep(prev => {
-                    if (prev >= steps.length - 1) {
-                        setIsPlaying(false);
-                        return prev;
-                    }
-                    return prev + 1;
-                });
-            }, 800);
-        } else if (currentStep >= steps.length - 1) {
-            setIsPlaying(false);
-        }
-        return () => clearInterval(interval);
-    }, [isPlaying, currentStep, steps.length]);
-
     const togglePlay = () => {
         setIsPlaying(!isPlaying);
     };
+
+    // Sound Effects
+    const playTone = (freq: number, type: 'sine' | 'square' | 'triangle' = 'sine', duration: number = 0.1) => {
+        try {
+            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.onended = () => ctx.close();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(0.05, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        } catch (e) {
+            console.error("Audio play failed", e);
+        }
+    };
+
+    useEffect(() => {
+        if ((!isPlaying && currentStep === 0) || currentStep >= steps.length) return;
+
+        const interval = setInterval(() => {
+            if (isPlaying && currentStep < steps.length - 1) {
+                setCurrentStep(prev => prev + 1);
+            } else if (currentStep >= steps.length - 1) {
+                setIsPlaying(false);
+            }
+        }, 800);
+
+        // Sound Triggers
+        if (isPlaying || currentStep > 0) {
+            const step = steps[currentStep] as any;
+            if (step.stage === 'result') {
+                if (step.isArmstrong) {
+                    playTone(600, 'sine', 0.1);
+                    setTimeout(() => playTone(800, 'sine', 0.2), 100);
+                    setTimeout(() => playTone(1000, 'triangle', 0.4), 200);
+                } else {
+                    playTone(300, 'square', 0.2); // Fail sound
+                }
+            } else if (step.stage === 'calculating') {
+                playTone(400, 'sine', 0.1);
+            } else if (step.stage === 'summing') {
+                playTone(500, 'sine', 0.15); // Sum added
+            } else {
+                playTone(200, 'sine', 0.05);
+            }
+        }
+
+        return () => clearInterval(interval);
+    }, [isPlaying, currentStep, steps]);
 
     const handleNumberChange = () => {
         const newNum = parseInt(tempInput);

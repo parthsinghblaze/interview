@@ -237,17 +237,55 @@ const SpiralMatrixVisualizer = () => {
     const handlePrevious = () => { if (currentStep > 0) setCurrentStep(currentStep - 1); };
     const handleReset = () => { setCurrentStep(0); setIsPlaying(false); };
 
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-        if (isPlaying && currentStep < steps.length - 1) {
-            interval = setInterval(() => {
-                setCurrentStep(prev => prev + 1);
-            }, 500);
-        } else if (currentStep >= steps.length - 1) {
-            setIsPlaying(false);
+    // Sound Effects
+    const playTone = (freq: number, type: 'sine' | 'square' | 'triangle' = 'sine', duration: number = 0.1) => {
+        try {
+            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.onended = () => ctx.close();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(0.05, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        } catch (e) {
+            console.error("Audio play failed", e);
         }
+    };
+
+    useEffect(() => {
+        if ((!isPlaying && currentStep === 0) || currentStep >= steps.length) return;
+
+        const interval = setInterval(() => {
+            if (isPlaying && currentStep < steps.length - 1) {
+                setCurrentStep(prev => prev + 1);
+            } else if (currentStep >= steps.length - 1) {
+                setIsPlaying(false);
+            }
+        }, 500);
+
+        // Sound Triggers
+        if (isPlaying || currentStep > 0) {
+            const step = steps[currentStep] as any;
+            if (step.completed) {
+                playTone(600, 'sine', 0.1);
+                setTimeout(() => playTone(800, 'sine', 0.2), 100);
+            } else if (step.activeCell) {
+                // Determine direction based on loop, maybe pitch shift?
+                playTone(200 + (currentStep % 10) * 10, 'sine', 0.05); // Subtle move
+            } else if (step.description.includes('Finished')) {
+                playTone(400, 'triangle', 0.15); // Boundary change
+            }
+        }
+
         return () => clearInterval(interval);
-    }, [isPlaying, currentStep, steps.length]);
+    }, [isPlaying, currentStep, steps]);
 
     return (
         <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans selection:bg-amber-500/30">

@@ -256,15 +256,64 @@ const ArrayRotationVisualizer = () => {
         setIsPlaying(false);
     };
 
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-        if (isPlaying && currentStep < steps.length - 1) {
-            interval = setInterval(handleNext, 1000);
-        } else if (currentStep >= steps.length - 1) {
-            setIsPlaying(false);
+    const handleTypeChange = (type: 'right' | 'left' | 'optimized') => {
+        setRotationType(type);
+        setSteps(generateSteps(inputArray, kValue, type));
+        setCurrentStep(0);
+        setIsPlaying(false);
+    };
+
+    // Sound Effects
+    const playTone = (freq: number, type: 'sine' | 'square' | 'triangle' = 'sine', duration: number = 0.1) => {
+        try {
+            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.onended = () => ctx.close();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(0.05, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        } catch (e) {
+            console.error("Audio play failed", e);
         }
+    };
+
+    useEffect(() => {
+        if ((!isPlaying && currentStep === 0) || currentStep >= steps.length) return;
+
+        const interval = setInterval(() => {
+            if (isPlaying && currentStep < steps.length - 1) {
+                setCurrentStep(prev => prev + 1);
+            } else if (currentStep >= steps.length - 1) {
+                setIsPlaying(false);
+            }
+        }, 800);
+
+        // Sound Triggers
+        if (isPlaying || currentStep > 0) {
+            const step = steps[currentStep] as any;
+            if (step.completed) {
+                playTone(600, 'sine', 0.1);
+                setTimeout(() => playTone(1200, 'sine', 0.2), 100);
+            } else if ((step.highlighted && step.highlighted.length > 2)) {
+                // Reversal (many items highlighted)
+                playTone(300, 'triangle', 0.3);
+            } else if (step.movingIndex !== -1) {
+                playTone(400, 'sine', 0.1); // Move
+            } else {
+                playTone(200, 'sine', 0.05); // Standard
+            }
+        }
+
         return () => clearInterval(interval);
-    }, [isPlaying, currentStep]);
+    }, [isPlaying, currentStep, steps]);
 
     const handleInputChange = () => {
         const newArr = tempArrayInput.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
@@ -279,12 +328,7 @@ const ArrayRotationVisualizer = () => {
         }
     };
 
-    const handleTypeChange = (type: 'right' | 'left' | 'optimized') => {
-        setRotationType(type);
-        setSteps(generateSteps(inputArray, kValue, type));
-        setCurrentStep(0);
-        setIsPlaying(false);
-    };
+
 
     return (
         <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans selection:bg-indigo-500/30">
