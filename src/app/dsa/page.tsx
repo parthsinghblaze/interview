@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash, LayoutGrid, Braces } from 'lucide-react';
+import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash, LayoutGrid, Braces, Binary } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -116,6 +116,18 @@ export default function DSAPage() {
             techniques: ['Divide & Conquer', 'Sorted Search', 'Iteration'],
             learning: 'Logarithmic time complexity, boundary management, and search efficiency.',
             href: '/dsa/binary-search',
+            color: 'blue'
+        },
+        {
+            id: 'number-frequency',
+            title: 'Number Frequency',
+            description: 'Optimize frequency counting and range queries using the efficient Hash-list (Frequency Array) pattern.',
+            icon: Binary,
+            timeComplexity: 'O(n+m)',
+            spaceComplexity: 'O(k)',
+            techniques: ['Hashing', 'Frequency Array', 'Query Optimization'],
+            learning: 'Frequency arrays, trade-offs between time and space, and query pre-processing.',
+            href: '/dsa/number-frequency',
             color: 'blue'
         }
     ];
