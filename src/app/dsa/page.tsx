@@ -119,6 +119,18 @@ export default function DSAPage() {
             color: 'blue'
         },
         {
+            id: 'recursion-types',
+            title: 'Head vs Tail Recursion',
+            description: 'Visualize the difference between Head and Tail recursion and how they affect the call stack.',
+            icon: RefreshCw,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(n)',
+            techniques: ['Recursion', 'Call Stack', 'Tail Call Optimization'],
+            learning: 'Execution flow of recursive calls and stack unwinding behavior.',
+            href: '/dsa/recursion-types',
+            color: 'indigo'
+        },
+        {
             id: 'number-frequency',
             title: 'Find Duplicate Number Count',
             description: 'Count frequency of numbers from one array in another using Arrays or HashMaps for O(1) lookups.',
