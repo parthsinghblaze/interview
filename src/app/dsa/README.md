@@ -144,3 +144,24 @@ const NewAlgoVisualizer = () => {
     );
 };
 ```
+
+## Available Visualizers
+
+| Visualizer | Directory | Description |
+|------------|-----------|-------------|
+| **Two Sum** | `two-sum/` | Visualizes the classic Two Sum problem using Brute Force and Hash Map. |
+| **Binary Search** | `binary-search/` | detailed step-by-step definition of Binary Search on sorted arrays. |
+| **Recursion Types** | `recursion-types/` | Explores Head vs Tail recursion with call stack visualization. |
+| **Palindrome Recursion** | `palindrome-recursion/` | Recursive check for Palindromes with stack unwinding. |
+| **Reverse Array Recursion** | `reverse-array/` | Array reversal using in-place recursion (Two-Pointer). |
+| **Number Frequency** | `number-frequency/` | Counting element frequency. |
+| **Armstrong Number** | `armstrong/` | Checking Armstrong numbers. |
+| **Array Rotation** | `array-rotation/` | Rotating arrays. |
+| **Factors** | `factors/` | Finding factors of an integer. |
+| **Find Max** | `find-max/` | Finding the maximum element in an array. |
+| **Frequency Counter** | `frequency-counter/` | General frequency counting patterns. |
+| **Spiral Matrix** | `spiral-matrix/` | Visualizing spiral traversal of a matrix. |
+| **Valid Parentheses** | `valid-parentheses/` | Stack-based validation of parentheses. |
+| **Selection Sort** | `selection-sort/` | Step-by-step selection sort with bar chart and min-tracking visualization. |
+| **Bubble Sort** | `bubble-sort/` | Adjacent-swap bubble sort with pass tracking and swap counter. |
+| **Complexity Analysis** | `complexity/` | Big O notation visualization. |

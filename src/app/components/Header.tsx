@@ -24,7 +24,7 @@ const Header = () => {
     const moreTopics = [
         { name: 'React', icon: Box, href: '/react', active: true },
         { name: 'Next.js', icon: Layers, href: '/nextjs', active: true },
-        { name: 'Node.js', icon: Server, href: '#', active: false },
+        { name: 'Node.js', icon: Server, href: '/nodejs', active: true },
         { name: 'Database', icon: Database, href: '#', active: false },
     ];
 

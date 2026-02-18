@@ -117,6 +117,18 @@ export default function JavaScriptPage() {
             active: true
         },
         {
+            id: 'oops',
+            title: 'OOPS Concepts',
+            description: 'Master Object-Oriented Programming in JS including Classes, Inheritance, Encapsulation, and Polymorphism.',
+            icon: Box,
+            difficulty: 'Medium',
+            interviewFrequency: 'Very High',
+            keyPoints: ['Classes', 'Inheritance', 'Encapsulation', 'Polymorphism'],
+            href: '/javascript/oops',
+            color: 'blue',
+            active: true
+        },
+        {
             id: 'debounce-throttle',
             title: 'Debounce & Throttle',
             description: 'Optimize performance by controlling how many times a function can be executed over time.',

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash, LayoutGrid, Braces, Binary } from 'lucide-react';
+import { ArrowRight, Maximize2, Calculator, Split, Play, Clock, Database, ChevronRight, Search as SearchIcon, RefreshCw, Hash, LayoutGrid, Braces, Binary, MoveHorizontal, SortDesc, Waves } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -141,6 +141,54 @@ export default function DSAPage() {
             learning: 'Optimizing range queries, handling large number ranges with Maps vs Arrays.',
             href: '/dsa/number-frequency',
             color: 'blue'
+        },
+        {
+            id: 'reverse-array',
+            title: 'Reverse Array (Recursion)',
+            description: 'Reverse an array in-place using a recursive two-pointer approach.',
+            icon: MoveHorizontal,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(n)',
+            techniques: ['Recursion', 'Two Pointers', 'In-place Swap'],
+            learning: 'Recursive state maintenance and in-place memory manipulation.',
+            href: '/dsa/reverse-array',
+            color: 'purple'
+        },
+        {
+            id: 'palindrome-recursion',
+            title: 'Palindrome Recursion',
+            description: 'Check if a string is a palindrome using recursive character comparison.',
+            icon: RefreshCw,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(n)',
+            techniques: ['Recursion', 'String Manipulation', 'Base Cases'],
+            learning: 'Recursive stack unwinding and string processing patterns.',
+            href: '/dsa/palindrome-recursion',
+            color: 'purple'
+        },
+        {
+            id: 'selection-sort',
+            title: 'Selection Sort',
+            description: 'Sort an array by repeatedly selecting the minimum element and placing it in the correct position.',
+            icon: SortDesc,
+            timeComplexity: 'O(n²)',
+            spaceComplexity: 'O(1)',
+            techniques: ['Comparison Sort', 'In-place', 'Nested Loops'],
+            learning: 'Nested iteration, minimum tracking, and in-place swapping patterns.',
+            href: '/dsa/selection-sort',
+            color: 'rose'
+        },
+        {
+            id: 'bubble-sort',
+            title: 'Bubble Sort',
+            description: 'Sort an array by repeatedly swapping adjacent elements that are in the wrong order, bubbling the largest to the end.',
+            icon: Waves,
+            timeComplexity: 'O(n²)',
+            spaceComplexity: 'O(1)',
+            techniques: ['Comparison Sort', 'Adjacent Swaps', 'Stable Sort'],
+            learning: 'Nested loops, adjacent comparisons, and how large values bubble to the top.',
+            href: '/dsa/bubble-sort',
+            color: 'rose'
         }
     ];
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Code, Info, HelpCircle, Hash, Target } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Play, Pause, Code, Info, HelpCircle, Hash, Target, Search, ArrowRight, Database } from 'lucide-react';
 import DSAExplanationModal from '../../components/DSAExplanationModal';
 import Header from '../../components/Header';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -337,11 +337,11 @@ const TwoSumVisualizer = () => {
                             </motion.div>
                         </div>
 
-                        <div className="flex flex-col lg:grid lg:grid-rows-[1fr_200px] gap-6 overflow-visible">
+                        <div className="flex flex-col gap-6 overflow-visible">
                             {/* Array Visualizer */}
-                            <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 flex flex-col items-center justify-center relative min-h-[300px]">
-                                <div className="text-xs text-slate-500 uppercase tracking-widest mb-12">Array Traversal</div>
-                                <div className="w-full overflow-x-auto pt-12 pb-8 custom-scrollbar">
+                            <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-4 md:p-8 flex flex-col items-center justify-center relative min-h-[250px] shadow-2xl">
+                                <div className="absolute top-4 left-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Memory Array (Reading)</div>
+                                <div className="w-full overflow-visible pt-16 pb-6 custom-scrollbar">
                                     <div className="flex gap-4 justify-start md:justify-center min-w-max px-4">
                                         {parsedArray.map((val: number, idx: number) => {
                                             const isCurrent = idx === currentStepData.currentIndex;
@@ -351,19 +351,36 @@ const TwoSumVisualizer = () => {
                                             return (
                                                 <motion.div
                                                     key={idx}
+                                                    layout
                                                     animate={{
-                                                        scale: isCurrent ? 1.2 : (isPair ? 1.15 : 1),
+                                                        scale: isCurrent ? 1.25 : (isPair ? 1.15 : 1),
                                                         y: isCurrent ? -10 : 0
                                                     }}
-                                                    className={`w-14 md:w-16 h-14 md:h-16 rounded-2xl flex items-center justify-center border-2 text-xl font-bold transition-colors relative ${isPair ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]' :
-                                                        isCurrent ? 'bg-blue-500/20 border-blue-500 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]' :
-                                                            isVisited ? 'bg-slate-800/50 border-white/5 text-slate-600' :
-                                                                'bg-slate-800 border-white/10 text-slate-300'
+                                                    className={`w-14 md:w-20 h-14 md:h-20 rounded-2xl flex items-center justify-center border-2 text-xl md:text-2xl font-black transition-all duration-500 relative ${isPair ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)]' :
+                                                        isCurrent ? 'bg-blue-500/20 border-blue-500 text-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.3)]' :
+                                                            isVisited ? 'bg-slate-800/30 border-white/5 text-slate-700' :
+                                                                'bg-slate-800 border-slate-700 text-slate-300'
                                                         }`}
                                                 >
                                                     {val}
-                                                    {isCurrent && <div className="absolute -top-10 text-[10px] whitespace-nowrap font-black text-blue-400">CHECKING</div>}
-                                                    {isPair && <div className="absolute -top-10 text-[10px] whitespace-nowrap font-black text-emerald-400">MATCH!</div>}
+                                                    {isCurrent && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: 10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            className="absolute -top-12 px-3 py-1 bg-blue-500 text-white text-[10px] whitespace-nowrap font-black rounded-lg shadow-lg shadow-blue-500/20"
+                                                        >
+                                                            NOW CHECKING
+                                                        </motion.div>
+                                                    )}
+                                                    {isPair && (
+                                                        <motion.div
+                                                            initial={{ scale: 0 }}
+                                                            animate={{ scale: 1 }}
+                                                            className="absolute -top-12 px-3 py-1 bg-emerald-500 text-white text-[10px] whitespace-nowrap font-black rounded-lg shadow-lg shadow-emerald-500/20"
+                                                        >
+                                                            PAIR FOUND!
+                                                        </motion.div>
+                                                    )}
                                                 </motion.div>
                                             );
                                         })}
@@ -371,32 +388,144 @@ const TwoSumVisualizer = () => {
                                 </div>
                             </div>
 
-                            {/* Hash Map Visualizer */}
-                            <div className="bg-slate-900/70 border border-white/10 rounded-3xl p-6 flex flex-col">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <Hash size={16} className="text-emerald-400" />
-                                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Hash Map (Previous Values)</h4>
+                            {/* New Thinking Engine Hub */}
+                            {currentStepData.currentIndex >= 0 && !currentStepData.found && (
+                                <div className="flex flex-col items-center gap-6 py-6">
+                                    {/* 3-Step Algorithm Path */}
+                                    <div className="flex items-center gap-4 mb-2">
+                                        {[
+                                            { label: '1. READ', active: true, color: 'text-blue-400' },
+                                            { label: '2. COMPUTE', active: true, color: 'text-emerald-400' },
+                                            { label: '3. LOOKUP', active: true, color: 'text-purple-400' }
+                                        ].map((step, i) => (
+                                            <React.Fragment key={i}>
+                                                <div className={`px-3 py-1 rounded-full text-[9px] font-black border ${step.active ? 'bg-slate-900 border-white/20 ' + step.color : 'bg-slate-950 border-white/5 text-slate-700'
+                                                    }`}>
+                                                    {step.label}
+                                                </div>
+                                                {i < 2 && <div className="w-4 h-px bg-slate-800" />}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="flex items-center gap-4 bg-slate-900 border border-slate-800 px-10 py-8 rounded-[3rem] shadow-2xl relative overflow-hidden group"
+                                    >
+                                        {/* Internal Scanning Glow */}
+                                        <motion.div
+                                            animate={{ x: [-500, 500] }}
+                                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                            className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent pointer-events-none"
+                                        />
+
+                                        <div className="flex flex-col items-center">
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Step 1: Get Value</span>
+                                            <div className="text-4xl font-black text-blue-400">{parsedArray[currentStepData.currentIndex]}</div>
+                                        </div>
+
+                                        <div className="text-3xl font-bold text-slate-700 mx-4">→</div>
+
+                                        <div className="flex flex-col items-center relative">
+                                            <div className="absolute -top-12 px-4 py-1.5 bg-emerald-500 text-white rounded-full text-[9px] font-black tracking-widest shadow-lg shadow-emerald-500/20 animate-bounce">
+                                                WHAT DO WE NEED?
+                                            </div>
+                                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2">Step 2: Subtraction</span>
+                                            <div className="text-4xl font-black text-emerald-400">
+                                                {parsedTarget} - {parsedArray[currentStepData.currentIndex]} = <span className="underline decoration-wavy">{currentStepData.checkingComplement}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="text-3xl font-bold text-slate-700 mx-4">→</div>
+
+                                        <div className="flex flex-col items-center">
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Step 3: Map Check</span>
+                                            <div className="p-3 bg-slate-800 rounded-2xl border border-white/5">
+                                                <Search className="text-slate-400 animate-pulse" size={24} />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+
+                                    <div className="flex flex-col items-center gap-2">
+                                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em]">Checking Memory For {currentStepData.checkingComplement}...</span>
+                                        <motion.div
+                                            animate={{ y: [0, 8, 0] }}
+                                            transition={{ repeat: Infinity, duration: 1.5 }}
+                                            className="text-emerald-500/50"
+                                        >
+                                            <ArrowRight size={32} className="rotate-90" />
+                                        </motion.div>
+                                    </div>
                                 </div>
-                                <div className="flex-1 flex gap-3 overflow-x-auto custom-scrollbar items-center">
-                                    {Object.entries(currentStepData.map).length === 0 ? (
-                                        <div className="text-slate-600 text-sm italic w-full text-center">Map is currently empty...</div>
-                                    ) : (
-                                        Object.entries(currentStepData.map).map(([key, value]) => (
+                            )}
+
+                            {/* Hash Map Visualizer */}
+                            <div className="bg-slate-900 border-2 border-slate-800 rounded-[3rem] p-10 flex flex-col relative shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]">
+                                <div className="absolute top-6 right-10 flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">O(1) Instant Lookup</span>
+                                </div>
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                                        <Database size={24} className="text-emerald-400" />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-lg font-black uppercase tracking-tight text-white leading-none">The Hash Map</h4>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase mt-1">Our algorithmic memory</p>
+                                    </div>
+                                </div>
+                                <div className="flex-1 flex gap-4 overflow-x-auto px-4 py-6 custom-scrollbar items-center min-h-[120px]">
+                                    <AnimatePresence>
+                                        {Object.entries(currentStepData.map).length === 0 ? (
                                             <motion.div
-                                                key={key}
-                                                initial={{ scale: 0, opacity: 0 }}
-                                                animate={{ scale: 1, opacity: 1 }}
-                                                className={`flex flex-col items-center gap-1 min-w-[80px] p-3 rounded-xl border border-white/5 bg-slate-800/50 ${Number(key) === currentStepData.checkingComplement ? 'border-emerald-500 ring-2 ring-emerald-500/20' : ''
-                                                    }`}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                className="text-slate-600 text-sm font-medium italic w-full text-center flex flex-col items-center gap-2"
                                             >
-                                                <div className="text-xs text-slate-500 font-mono">key: <span className="text-white font-bold">{key}</span></div>
-                                                <div className="text-xs text-slate-500 font-mono">val: <span className="text-emerald-400 font-bold">{value}</span></div>
+                                                <div className="w-12 h-1 bg-slate-800 rounded-full" />
+                                                No numbers seen yet. Storing history to avoid nested loops...
                                             </motion.div>
-                                        ))
-                                    )}
+                                        ) : (
+                                            Object.entries(currentStepData.map).map(([key, value]) => {
+                                                const isNeeded = Number(key) === currentStepData.checkingComplement;
+                                                return (
+                                                    <motion.div
+                                                        key={key}
+                                                        layout
+                                                        initial={{ scale: 0.5, opacity: 0, x: -20 }}
+                                                        animate={{
+                                                            scale: isNeeded ? 1.15 : 1,
+                                                            opacity: 1,
+                                                            x: 0,
+                                                            borderColor: isNeeded ? 'rgba(16, 185, 129, 0.5)' : 'rgba(255, 255, 255, 0.05)',
+                                                            backgroundColor: isNeeded ? 'rgba(16, 185, 129, 0.1)' : 'rgba(15, 23, 42, 0.6)'
+                                                        }}
+                                                        className={`flex flex-col items-center gap-2 min-w-[100px] p-4 rounded-2xl border transition-all duration-300 relative group shadow-xl`}
+                                                    >
+                                                        {isNeeded && (
+                                                            <div className="absolute -top-3 px-2 py-0.5 bg-emerald-500 text-white text-[8px] font-black rounded-full shadow-lg shadow-emerald-500/20">
+                                                                MATCH!
+                                                            </div>
+                                                        )}
+                                                        <div className="flex flex-col items-center">
+                                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter mb-1">Value</span>
+                                                            <span className={`text-xl font-black ${isNeeded ? 'text-emerald-400' : 'text-white'}`}>{key}</span>
+                                                        </div>
+                                                        <div className="w-full h-px bg-white/5" />
+                                                        <div className="flex flex-col items-center">
+                                                            <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter mb-1">Index</span>
+                                                            <span className="text-sm font-bold text-slate-400">{value}</span>
+                                                        </div>
+                                                    </motion.div>
+                                                );
+                                            })
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </main>
