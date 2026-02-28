@@ -159,6 +159,8 @@ const NewAlgoVisualizer = () => {
 | **Array Rotation** | `array-rotation/` | Rotating arrays. |
 | **Factors** | `factors/` | Finding factors of an integer. |
 | **Find Max** | `find-max/` | Finding the maximum element in an array. |
+| **Find Second Largest** | `find-second-largest/` | Two-pass linear scan to find the second largest unique element in an array. |
+| **Is Array Sorted?** | `is-sorted/` | Single-pass adjacent comparison with early exit to check ascending order. |
 | **Frequency Counter** | `frequency-counter/` | General frequency counting patterns. |
 | **Spiral Matrix** | `spiral-matrix/` | Visualizing spiral traversal of a matrix. |
 | **Valid Parentheses** | `valid-parentheses/` | Stack-based validation of parentheses. |

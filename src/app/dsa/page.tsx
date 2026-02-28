@@ -23,6 +23,30 @@ export default function DSAPage() {
             color: 'blue'
         },
         {
+            id: 'find-second-largest',
+            title: 'Find Second Largest Number',
+            description: 'Find the second largest unique element in an array using an efficient two-pass linear scan.',
+            icon: Maximize2,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(1)',
+            techniques: ['Linear Search', 'Two Passes', 'Comparison'],
+            learning: 'Multi-variable tracking, duplicate handling, and two-pass algorithm design.',
+            href: '/dsa/find-second-largest',
+            color: 'purple'
+        },
+        {
+            id: 'is-sorted',
+            title: 'Is Array Sorted?',
+            description: 'Check whether an array is sorted in ascending order using a single-pass adjacent comparison with early exit.',
+            icon: Maximize2,
+            timeComplexity: 'O(n)',
+            spaceComplexity: 'O(1)',
+            techniques: ['Linear Scan', 'Early Exit', 'Adjacent Comparison'],
+            learning: 'Short-circuit evaluation, boundary-aware loops, and single-pass validation patterns.',
+            href: '/dsa/is-sorted',
+            color: 'green'
+        },
+        {
             id: 'array-rotation',
             title: 'Array Rotation',
             description: 'Master Left and Right array rotation using linear and optimized reversal techniques.',
